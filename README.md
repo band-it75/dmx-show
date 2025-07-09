@@ -51,34 +51,59 @@ On Windows, you can run `install_requirements.ps1` to install the Python depende
 
 ## Devices
 
-| Addr Range | Fixture                | Mode (ch)                | Notes            |
-| ---------- | ---------------------- | ------------------------ | ---------------- |
-| 001–005    | **LumiPar 12UAW5 #1**  | 5‑ch                     | Stage Lights     |
-| 010–014    | LumiPar 12UAW5 #2      | 5‑ch                     |                  |
-| 019–023    | LumiPar 12UAW5 #3      | 5‑ch                     |                  |
-| 030–036    | **LumiPar 7UTRI #1**   | 7‑ch                     | Karaoke Wall        |
-| 041–047    | LumiPar 7UTRI #2       | 7‑ch                     |                  |
-| 055–064    | **LumiPar 12UQPro #1** | 10‑ch                    | Disco Lights   |
-| 069–078    | LumiPar 12UQPro #2     | 10‑ch                    |                  |
-| 085–107    | **PixieWash**          | 13‑ch                    | Moving Head        |
-| 115–118    | **Smoke machine**      | 1‑ch used, 3‑ch reserved | Future expansion |
+The following table lists the DMX fixtures currently configured for the
+show. Address ranges are inclusive and correspond to the channels used
+by each fixture.
+
+| Addr Range | Fixture                | Mode (ch)                | Notes                |
+| ---------- | ---------------------- | ------------------------ | -------------------- |
+| 001-005    | LumiPar 12UAW5 #1      | 5-ch                     | Stage left / house light |
+| 010-014    | LumiPar 12UAW5 #2      | 5-ch                     | Stage center / house light |
+| 019-023    | LumiPar 12UAW5 #3      | 5-ch                     | Stage right / house light |
+| 030-036    | LumiPar 7UTRI #1       | 7-ch                     | Karaoke wall left    |
+| 041-047    | LumiPar 7UTRI #2       | 7-ch                     | Karaoke wall right   |
+| 055-064    | LumiPar 12UQPro #1     | 10-ch                    | Overhead effects     |
+| 069-078    | LumiPar 12UQPro #2     | 10-ch                    | Overhead effects     |
+| 085-107    | PixieWash              | 13-ch                    | Moving head front    |
+| 115-118    | Smoke machine          | 1-ch used, 3-ch reserved | Fog bursts on choruses |
 
 ## Show
 
+Lighting cues are BPM-driven. LumiPar 12UAW5 units double as house lights.
+Overheads pulse with BPM and smoke bursts last 3 seconds with a 30-second gap.
+The moving head stays on the artist during songs and aims at the audience to end each song.
+
 ### Intermission
+House at 20% with slow wall fades.
 
-### Song Starting
+### Song start
+Stage lights fade to black as overheads rise to 30% warm white. Moving head centers on the artist.
 
-### Song Ongoing
+### Slow (BPM <80)
+- Overhead deep blue pulse every 2 beats.
+- Moving head gentle pan on the artist.
+- 3‑s smoke burst each chorus.
 
-#### Slow
+### Jazz (80-110 BPM)
+- Overhead amber pulse each beat.
+- Moving head narrow sweeps.
+- 3‑s smoke burst each chorus.
 
-#### Jazz
+### Pop (110-130 BPM)
+- Overhead pink chase each beat.
+- Moving head wide sweeps.
+- Smoke each chorus.
 
-#### POP
+### Rock (130-160 BPM)
+- Overhead red pulse each beat with 1‑s white strobe every 8 beats.
+- Moving head fast pan and tilt.
+- Smoke each chorus.
 
-#### Rock
+### Metal (>160 BPM)
+- Overhead white strobe each beat.
+- Moving head erratic sweeps.
+- Smoke each chorus.
 
-#### Metal
-
-### Song Ending
+### Song end
+Moving head points at the audience while stage lights fade to 50% warm white.
+Smoke bursts last 3 seconds with at least 30 seconds between triggers.
