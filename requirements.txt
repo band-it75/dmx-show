@@ -2,4 +2,3 @@ sounddevice
 aubio
 numpy
 scipy
-ola

@@ -1,6 +1,6 @@
 # DMX Show
 
-This project contains utilities to drive DMX lights.
+This project contains utilities to drive DMX lights and detect beats from microphone input.
 
 ## Beat-controlled blinking
 
@@ -18,3 +18,13 @@ python beat_dmx.py --universe 1 --channel 1
 Ensure you have PortAudio installed for microphone access and that an OLA
 daemon is running to handle the DMX output.
 
+## Standalone beat detection
+
+If you just want to detect beats without sending DMX commands, use `beat_detection.py`:
+
+```bash
+pip install -r requirements.txt
+python beat_detection.py
+```
+
+On Windows, you can run `install_requirements.ps1` to install the Python dependencies.
