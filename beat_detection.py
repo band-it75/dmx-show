@@ -19,7 +19,6 @@ class BeatDetector:
         self.samplerate = samplerate
         self.tempo = aubio.tempo("default", 1024, 512, samplerate)
         self.beat_times = []
-        self.last_print = time.time()
         self.amplitude_threshold = amplitude_threshold
         self.start_duration = start_duration
         self.end_duration = end_duration
@@ -38,6 +37,8 @@ class BeatDetector:
             "overhead_effects": "Off",
             "karaoke_lights": "Off",
         }
+        self.last_bpm = 0.0
+        self.last_genre = ""
 
     def _compute_bpm(self) -> float:
         """Return the estimated BPM using recent beat intervals."""
@@ -67,7 +68,7 @@ class BeatDetector:
     @staticmethod
     def _genre_color(genre: str) -> str:
         mapping = {
-            "Slow": "blue",
+            "Slow": "red",
             "Jazz": "amber",
             "Pop": "pink",
             "Rock": "red",
@@ -75,17 +76,27 @@ class BeatDetector:
         }
         return mapping.get(genre, "white")
 
-    def _print_state_change(self, **changes) -> None:
+    @staticmethod
+    def _stage_light_color(genre: str) -> str:
+        if genre in ("Slow", "Jazz"):
+            return "amber"
+        return "white"
+
+    def _print_state_change(self, **updates) -> None:
+        changes = {}
+        for name, val in updates.items():
+            if self.lighting_state.get(name) != val:
+                changes[name] = val
+                self.lighting_state[name] = val
         if changes:
             print("Change:", flush=True)
             for name, val in changes.items():
                 label = name.replace('_', ' ').title()
                 print(f"- {label}: {val}", flush=True)
-                self.lighting_state[name] = val
-        print("Current:", flush=True)
-        for name, val in self.lighting_state.items():
-            label = name.replace('_', ' ').title()
-            print(f"- {label}: {val}", flush=True)
+            print("Current:", flush=True)
+            for name, val in self.lighting_state.items():
+                label = name.replace('_', ' ').title()
+                print(f"- {label}: {val}", flush=True)
 
     def audio_callback(self, indata, frames, time_info, status):
         if status:
@@ -128,22 +139,21 @@ class BeatDetector:
                 print("Intermission", flush=True)
         if self.tempo(samples):
             self.beat_times.append(now)
-        # handle smoke timing
-        if self.smoke_on and now - self.smoke_start_time >= self.smoke_duration:
-            print("Smoke end", flush=True)
-            self.smoke_on = False
-        if now - self.last_print >= self.print_interval:
             bpm = self._compute_bpm()
             if bpm:
-                print(f"Estimated BPM: {bpm:.2f}", flush=True)
                 genre = self._detect_genre(bpm)
-                print(f"Likely genre: {genre}", flush=True)
-                color = self._genre_color(genre)
+                stage_color = self._stage_light_color(genre)
+                effect_color = self._genre_color(genre)
+                if abs(bpm - self.last_bpm) >= 1 or genre != self.last_genre:
+                    print(f"Estimated BPM: {bpm:.2f}", flush=True)
+                    print(f"Likely genre: {genre}", flush=True)
+                    self.last_bpm = bpm
+                    self.last_genre = genre
                 self._print_state_change(
                     moving_light="Artist",
-                    stage_light=color,
-                    overhead_effects=f"{color.capitalize()} (80%) Pulsing",
-                    karaoke_lights=f"{color.capitalize()} (10%)",
+                    stage_light=stage_color,
+                    overhead_effects=f"{effect_color.capitalize()} (80%) Pulsing",
+                    karaoke_lights=f"{effect_color.capitalize()} (10%)",
                 )
                 if not self.smoke_on and now - self.last_smoke_time >= self.smoke_gap:
                     print("Smoke start", flush=True)
@@ -151,10 +161,15 @@ class BeatDetector:
                     self.smoke_start_time = now
                     self.last_smoke_time = now
             else:
-                print("Insufficient data for BPM", flush=True)
-                self._print_state_change(moving_light="Audience", stage_light="Off")
-            self.last_print = now
-            self.beat_times = [t for t in self.beat_times if now - t <= 60]
+                if (self.lighting_state["moving_light"] != "Audience" or
+                        self.lighting_state["stage_light"] != "Off"):
+                    print("Insufficient data for BPM", flush=True)
+                    self._print_state_change(moving_light="Audience", stage_light="Off")
+        # handle smoke timing
+        if self.smoke_on and now - self.smoke_start_time >= self.smoke_duration:
+            print("Smoke end", flush=True)
+            self.smoke_on = False
+        self.beat_times = [t for t in self.beat_times if now - t <= 60]
 
     def run(self):
         with sd.InputStream(channels=1, callback=self.audio_callback,

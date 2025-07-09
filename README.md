@@ -88,9 +88,9 @@ by each fixture.
 
 | Addr Range | Fixture                | Mode (ch)                | Notes                |
 | ---------- | ---------------------- | ------------------------ | -------------------- |
-| 001-005    | LumiPar 12UAW5 #1      | 5-ch                     | Stage left / house light |
-| 010-014    | LumiPar 12UAW5 #2      | 5-ch                     | Stage center / house light |
-| 019-023    | LumiPar 12UAW5 #3      | 5-ch                     | Stage right / house light |
+| 001-005    | LumiPar 12UAW5 #1      | 5-ch                     | Stage left house (amber/white) |
+| 010-014    | LumiPar 12UAW5 #2      | 5-ch                     | Stage center (amber/white) |
+| 019-023    | LumiPar 12UAW5 #3      | 5-ch                     | Stage right (amber/white) |
 | 030-036    | LumiPar 7UTRI #1       | 7-ch                     | Karaoke wall left    |
 | 041-047    | LumiPar 7UTRI #2       | 7-ch                     | Karaoke wall right   |
 | 055-064    | LumiPar 12UQPro #1     | 10-ch                    | Overhead effects     |
@@ -111,7 +111,7 @@ House at 20% with slow wall fades.
 Stage lights fade to black as overheads rise to 30% warm white. Moving head centers on the artist.
 
 ### Slow (BPM <80)
-- Overhead deep blue pulse every 2 beats.
+- Overhead deep red pulse every 2 beats.
 - Moving head gentle pan on the artist.
 - 3‑s smoke burst each chorus.
 
