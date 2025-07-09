@@ -63,7 +63,10 @@ python beat_detection.py
 ```
 
 Output is limited to a short summary printed every 10 seconds to avoid
-performance issues when detecting rapid beats.
+performance issues when detecting rapid beats. Each summary also prints the
+current stage lighting state and whether smoke bursts are firing. LumiPar 12UAW5
+units double as house lights, overhead effects pulse with BPM and smoke bursts
+last 3 seconds with a 30-second gap.
 
 The detector will also analyze the incoming volume (VU level) to determine when a
 song is starting, ongoing, ending or if there is an intermission. Thresholds and
