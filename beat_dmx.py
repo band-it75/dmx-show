@@ -6,9 +6,13 @@ import sounddevice as sd
 import aubio
 from ola.ClientWrapper import ClientWrapper
 
+import parameters
+
 
 class DmxBeatBlinker:
-    def __init__(self, universe: int = 1, channel: int = 1, samplerate: int = 44100):
+    def __init__(self, universe: int = parameters.UNIVERSE,
+                 channel: int = parameters.CHANNEL,
+                 samplerate: int = parameters.SAMPLERATE):
         self.universe = universe
         self.channel = channel
         self.samplerate = samplerate
@@ -82,8 +86,12 @@ class DmxBeatBlinker:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Blink DMX lights on detected beats from microphone")
-    parser.add_argument("--universe", type=int, default=1, help="DMX universe to control")
-    parser.add_argument("--channel", type=int, default=1, help="DMX channel to blink")
+    parser.add_argument("--universe", type=int,
+                        default=parameters.UNIVERSE,
+                        help="DMX universe to control")
+    parser.add_argument("--channel", type=int,
+                        default=parameters.CHANNEL,
+                        help="DMX channel to blink")
     args = parser.parse_args()
 
     blinker = DmxBeatBlinker(universe=args.universe, channel=args.channel)
