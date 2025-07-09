@@ -14,3 +14,8 @@ CHANNEL = 1
 
 # How often to print BPM and genre summaries, in seconds
 PRINT_INTERVAL = 10
+
+# Simple show settings
+SMOKE_CHANNEL = 115
+SMOKE_GAP = 30.0  # seconds between smoke bursts
+SMOKE_DURATION = 3.0  # seconds smoke stays on

@@ -25,6 +25,34 @@ Default values for the DMX universe, channel, audio samplerate and song
 detection thresholds are defined in `parameters.py`. You can edit that file or
 override them with command-line options.
 
+## Stage lighting and smoke demo
+
+`beat_dmx.py` can also trigger smoke bursts and print the current stage light
+color based on the estimated genre. LumiPar 12UAW5 units double as house lights
+and overhead effects pulse with BPM. Smoke bursts last 3 seconds with a
+30-second gap. The moving head stays on the artist during songs and points at
+the audience to end each song. Stage lights fade to black during songs and
+return when the moving head faces the crowd.
+
+```bash
+python beat_dmx.py --smoke-channel 115 --smoke-gap 30 --smoke-duration 3
+```
+
+Stage light color names such as "amber" are printed whenever BPM summaries are
+shown. "Smoke start" and "Smoke end" indicate each burst.
+
+Typical console output for a cue looks like:
+
+```
+Change:
+- Moving Light: Audience
+Current:
+- Moving Light: Audience
+- Stage Light: Off
+- Overhead Effects: Red (80%) Pulsing
+- Karaoke Lights: Red (10%)
+```
+
 ## Standalone beat detection
 
 If you just want to detect beats without sending DMX commands, use `beat_detection.py`:
