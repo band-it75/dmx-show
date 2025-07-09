@@ -6,7 +6,8 @@ This project contains utilities to drive DMX lights and detect beats from microp
 
 The `beat_dmx.py` script listens to microphone input, detects beats using `aubio`,
 and blinks a chosen DMX channel every time a beat is found. It also periodically
-prints the estimated BPM and a rough music genre classification.
+prints the estimated BPM and a rough music genre classification based on
+adjustable BPM ranges.
 
 ### Usage
 
@@ -38,7 +39,7 @@ command line flags:
 
 ```bash
 python beat_detection.py --amplitude-threshold 0.02 \
-    --start-duration 1.0 --end-duration 2.0
+    --start-duration 2.0 --end-duration 3.0
 ```
 
 On Windows, you can run `install_requirements.ps1` to install the Python dependencies.
