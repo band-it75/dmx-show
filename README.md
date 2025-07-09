@@ -5,7 +5,8 @@ This project contains utilities to drive DMX lights.
 ## Beat-controlled blinking
 
 The `beat_dmx.py` script listens to microphone input, detects beats using `aubio`,
-and blinks a chosen DMX channel every time a beat is found.
+and blinks a chosen DMX channel every time a beat is found. It also periodically
+prints the estimated BPM and a rough music genre classification.
 
 ### Usage
 
