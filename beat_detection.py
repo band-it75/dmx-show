@@ -25,13 +25,16 @@ class BeatDetector:
         self.last_loud_time = 0.0
 
     def _compute_bpm(self) -> float:
-        """Return the average BPM from recorded beat times."""
+        """Return the estimated BPM using recent beat intervals."""
         if len(self.beat_times) < 2:
             return 0.0
-        intervals = np.diff(self.beat_times)
+        # only keep the last few beat times for a more robust estimate
+        recent = self.beat_times[-8:]
+        intervals = np.diff(recent)
         if len(intervals) == 0:
             return 0.0
-        return 60.0 / np.mean(intervals)
+        # median is less sensitive to occasional mis-detected beats
+        return 60.0 / float(np.median(intervals))
 
     @staticmethod
     def _detect_genre(bpm: float) -> str:
