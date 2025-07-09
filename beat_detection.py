@@ -12,14 +12,16 @@ class BeatDetector:
     def __init__(self, samplerate: int = parameters.SAMPLERATE,
                  amplitude_threshold: float = parameters.AMPLITUDE_THRESHOLD,
                  start_duration: float = parameters.START_DURATION,
-                 end_duration: float = parameters.END_DURATION):
+                 end_duration: float = parameters.END_DURATION,
+                 print_interval: float = parameters.PRINT_INTERVAL):
         self.samplerate = samplerate
         self.tempo = aubio.tempo("default", 1024, 512, samplerate)
         self.beat_times = []
-        self.last_bpm_print = time.time()
+        self.last_print = time.time()
         self.amplitude_threshold = amplitude_threshold
         self.start_duration = start_duration
         self.end_duration = end_duration
+        self.print_interval = print_interval
         self.state = "Intermission"
         self.state_change_time = time.time()
         self.last_loud_time = 0.0
@@ -88,9 +90,8 @@ class BeatDetector:
                 self.state = "Intermission"
                 print("Intermission", flush=True)
         if self.tempo(samples):
-            print(f"Beat @ {self.tempo.get_last_s():.2f}s", flush=True)
             self.beat_times.append(now)
-        if now - self.last_bpm_print >= 10:
+        if now - self.last_print >= self.print_interval:
             bpm = self._compute_bpm()
             if bpm:
                 print(f"Estimated BPM: {bpm:.2f}", flush=True)
@@ -98,7 +99,7 @@ class BeatDetector:
                 print(f"Likely genre: {genre}", flush=True)
             else:
                 print("Insufficient data for BPM", flush=True)
-            self.last_bpm_print = now
+            self.last_print = now
             self.beat_times = [t for t in self.beat_times if now - t <= 60]
 
     def run(self):
@@ -126,12 +127,16 @@ def main() -> None:
     parser.add_argument("--end-duration", type=float,
                         default=parameters.END_DURATION,
                         help="Seconds audio must stay quiet to mark song end")
+    parser.add_argument("--print-interval", type=float,
+                        default=parameters.PRINT_INTERVAL,
+                        help="Seconds between BPM summaries")
     args = parser.parse_args()
 
     detector = BeatDetector(samplerate=args.samplerate,
                             amplitude_threshold=args.amplitude_threshold,
                             start_duration=args.start_duration,
-                            end_duration=args.end_duration)
+                            end_duration=args.end_duration,
+                            print_interval=args.print_interval)
     detector.run()
 
 

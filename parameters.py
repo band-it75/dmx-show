@@ -11,3 +11,6 @@ END_DURATION = 3.0          # seconds of quiet to mark song end
 # DMX blink script defaults
 UNIVERSE = 1
 CHANNEL = 1
+
+# How often to print BPM and genre summaries, in seconds
+PRINT_INTERVAL = 10

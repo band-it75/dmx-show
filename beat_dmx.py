@@ -12,7 +12,8 @@ import parameters
 class DmxBeatBlinker:
     def __init__(self, universe: int = parameters.UNIVERSE,
                  channel: int = parameters.CHANNEL,
-                 samplerate: int = parameters.SAMPLERATE):
+                 samplerate: int = parameters.SAMPLERATE,
+                 print_interval: float = parameters.PRINT_INTERVAL):
         self.universe = universe
         self.channel = channel
         self.samplerate = samplerate
@@ -20,7 +21,8 @@ class DmxBeatBlinker:
         self.client = self.wrapper.Client()
         self.tempo = aubio.tempo("default", 1024, 512, samplerate)
         self.beat_times = []
-        self.last_bpm_print = time.time()
+        self.last_print = time.time()
+        self.print_interval = print_interval
 
     def _send_dmx_value(self, value: int):
         data = bytearray(512)
@@ -61,10 +63,9 @@ class DmxBeatBlinker:
         samples = np.frombuffer(indata, dtype=np.float32)
         now = time.time()
         if self.tempo(samples):
-            print(f"Beat @ {self.tempo.get_last_s():.2f}s", flush=True)
             self._blink()
             self.beat_times.append(now)
-        if now - self.last_bpm_print >= 10:
+        if now - self.last_print >= self.print_interval:
             bpm = self._compute_bpm()
             if bpm:
                 print(f"Estimated BPM: {bpm:.2f}", flush=True)
@@ -72,7 +73,7 @@ class DmxBeatBlinker:
                 print(f"Likely genre: {genre}", flush=True)
             else:
                 print("Insufficient data for BPM", flush=True)
-            self.last_bpm_print = now
+            self.last_print = now
             self.beat_times = [t for t in self.beat_times if now - t <= 60]
 
     def run(self):
@@ -94,9 +95,13 @@ def main() -> None:
     parser.add_argument("--channel", type=int,
                         default=parameters.CHANNEL,
                         help="DMX channel to blink")
+    parser.add_argument("--print-interval", type=float,
+                        default=parameters.PRINT_INTERVAL,
+                        help="Seconds between BPM summaries")
     args = parser.parse_args()
 
-    blinker = DmxBeatBlinker(universe=args.universe, channel=args.channel)
+    blinker = DmxBeatBlinker(universe=args.universe, channel=args.channel,
+                             print_interval=args.print_interval)
     blinker.run()
 
 
