@@ -36,12 +36,14 @@ class BeatDetector:
     @staticmethod
     def _detect_genre(bpm: float) -> str:
         """Rough genre estimation based on BPM."""
-        if bpm > 140:
+        if bpm >= 160:
             return "Metal"
-        if bpm > 110:
+        if bpm >= 130:
             return "Rock"
-        if bpm > 90:
+        if bpm >= 100:
             return "Pop"
+        if bpm >= 80:
+            return "Jazz"
         return "Slow"
 
     def audio_callback(self, indata, frames, time_info, status):
