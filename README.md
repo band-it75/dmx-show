@@ -32,7 +32,10 @@ color based on the estimated genre. LumiPar 12UAW5 units double as house lights
 and overhead effects pulse with BPM. Smoke bursts last 3 seconds with a
 30-second gap. The moving head stays on the artist during songs and points at
 the audience to end each song. Stage lights fade to black during songs and
-return when the moving head faces the crowd.
+return at 50% warm white when the moving head faces the crowd.
+
+The beat detector now automatically turns the moving head toward the audience
+when a song is ending, providing a clear signal for applause.
 
 ```bash
 python beat_dmx.py --smoke-channel 115 --smoke-gap 30 --smoke-duration 3
@@ -96,7 +99,7 @@ by each fixture.
 | 055-064    | LumiPar 12UQPro #1     | 10-ch                    | Overhead effects     |
 | 069-078    | LumiPar 12UQPro #2     | 10-ch                    | Overhead effects     |
 | 085-107    | PixieWash              | 13-ch                    | Moving head front    |
-| 115-118    | Smoke machine          | 1-ch used, 3-ch reserved | Fog bursts on choruses |
+| 115-118    | Smoke machine          | 1-ch used, 3-ch reserved | Timed fog bursts |
 
 ## Show
 
@@ -106,6 +109,7 @@ The moving head stays on the artist during songs and aims at the audience to end
 
 ### Intermission
 House at 20% with slow wall fades.
+- 5-s smoke burst every 60 s.
 
 ### Song start
 Stage lights fade to black as overheads rise to 30% warm white. Moving head centers on the artist.
@@ -113,28 +117,29 @@ Stage lights fade to black as overheads rise to 30% warm white. Moving head cent
 ### Slow (BPM <80)
 - Overhead deep red pulse every 2 beats.
 - Moving head gentle pan on the artist.
-- 3‑s smoke burst each chorus.
+- 2-s smoke burst every 15 s.
 
 ### Jazz (80-110 BPM)
 - Overhead amber pulse each beat.
 - Moving head narrow sweeps.
-- 3‑s smoke burst each chorus.
+- 3-s smoke burst every 30 s.
 
 ### Pop (110-130 BPM)
 - Overhead pink chase each beat.
 - Moving head wide sweeps.
-- Smoke each chorus.
+- 3-s smoke burst every 30 s.
 
 ### Rock (130-160 BPM)
-- Overhead red pulse each beat with 1‑s white strobe every 8 beats.
+- Overhead red pulse each beat with 1-s white strobe every 8 beats.
 - Moving head fast pan and tilt.
-- Smoke each chorus.
+- 3-s smoke burst every 30 s.
 
 ### Metal (>160 BPM)
 - Overhead white strobe each beat.
 - Moving head erratic sweeps.
-- Smoke each chorus.
+- 3-s smoke burst every 30 s.
 
 ### Song end
-Moving head points at the audience while stage lights fade to 50% warm white.
-Smoke bursts last 3 seconds with at least 30 seconds between triggers.
+Moving head points at the audience while stage lights fade to 50% warm white
+for applause. Smoke bursts last 3 seconds with at least 30 seconds between
+triggers.
