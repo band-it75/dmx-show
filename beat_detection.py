@@ -25,9 +25,14 @@ class BeatDetector:
         self.print_interval = print_interval
         self.smoke_gap = smoke_gap
         self.smoke_duration = smoke_duration
+        self.slow_gap = 15.0
+        self.slow_duration = 2.0
+        self.intermission_gap = 60.0
+        self.intermission_duration = 5.0
         self.last_smoke_time = 0.0
         self.smoke_on = False
         self.smoke_start_time = 0.0
+        self.current_smoke_duration = smoke_duration
         self.state = "Intermission"
         self.state_change_time = time.time()
         self.last_loud_time = 0.0
@@ -39,6 +44,18 @@ class BeatDetector:
         }
         self.last_bpm = 0.0
         self.last_genre = ""
+
+    def _update_state_lighting(self) -> None:
+        """Update lights based on the current song state."""
+        if self.state == "Ending":
+            self._print_state_change(
+                moving_light="Audience",
+                stage_light="Warm White (50%)",
+            )
+        elif self.state in ("Starting", "Ongoing"):
+            self._print_state_change(moving_light="Artist", stage_light="Off")
+        elif self.state == "Intermission":
+            self._print_state_change(moving_light="Audience", stage_light="Off")
 
     def _compute_bpm(self) -> float:
         """Return the estimated BPM using recent beat intervals."""
@@ -75,12 +92,6 @@ class BeatDetector:
             "Metal": "white",
         }
         return mapping.get(genre, "white")
-
-    @staticmethod
-    def _stage_light_color(genre: str) -> str:
-        if genre in ("Slow", "Jazz"):
-            return "amber"
-        return "white"
 
     def _print_state_change(self, **updates) -> None:
         changes = {}
@@ -137,12 +148,14 @@ class BeatDetector:
             elif now - self.state_change_time >= self.end_duration:
                 self.state = "Intermission"
                 print("Intermission", flush=True)
+
+        # Update lights based on the detected state
+        self._update_state_lighting()
         if self.tempo(samples):
             self.beat_times.append(now)
             bpm = self._compute_bpm()
             if bpm:
                 genre = self._detect_genre(bpm)
-                stage_color = self._stage_light_color(genre)
                 effect_color = self._genre_color(genre)
                 if abs(bpm - self.last_bpm) >= 1 or genre != self.last_genre:
                     print(f"Estimated BPM: {bpm:.2f}", flush=True)
@@ -151,22 +164,30 @@ class BeatDetector:
                     self.last_genre = genre
                 self._print_state_change(
                     moving_light="Artist",
-                    stage_light=stage_color,
                     overhead_effects=f"{effect_color.capitalize()} (80%) Pulsing",
                     karaoke_lights=f"{effect_color.capitalize()} (10%)",
                 )
-                if not self.smoke_on and now - self.last_smoke_time >= self.smoke_gap:
+                gap = self.smoke_gap
+                duration = self.smoke_duration
+                if self.state == "Intermission":
+                    gap = self.intermission_gap
+                    duration = self.intermission_duration
+                elif self.state == "Ongoing" and genre == "Slow":
+                    gap = self.slow_gap
+                    duration = self.slow_duration
+                if not self.smoke_on and now - self.last_smoke_time >= gap:
                     print("Smoke start", flush=True)
                     self.smoke_on = True
                     self.smoke_start_time = now
                     self.last_smoke_time = now
+                    self.current_smoke_duration = duration
             else:
                 if (self.lighting_state["moving_light"] != "Audience" or
                         self.lighting_state["stage_light"] != "Off"):
                     print("Insufficient data for BPM", flush=True)
                     self._print_state_change(moving_light="Audience", stage_light="Off")
         # handle smoke timing
-        if self.smoke_on and now - self.smoke_start_time >= self.smoke_duration:
+        if self.smoke_on and now - self.smoke_start_time >= self.current_smoke_duration:
             print("Smoke end", flush=True)
             self.smoke_on = False
         self.beat_times = [t for t in self.beat_times if now - t <= 60]
