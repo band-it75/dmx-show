@@ -55,7 +55,10 @@ class BeatDetector:
         elif self.state in ("Starting", "Ongoing"):
             self._print_state_change(moving_light="Artist", stage_light="Off")
         elif self.state == "Intermission":
-            self._print_state_change(moving_light="Audience", stage_light="Off")
+            self._print_state_change(
+                moving_light="Off",
+                stage_light="Warm White (20%) Fading",
+            )
 
     def _compute_bpm(self) -> float:
         """Return the estimated BPM using recent beat intervals."""
@@ -163,7 +166,6 @@ class BeatDetector:
                     self.last_bpm = bpm
                     self.last_genre = genre
                 self._print_state_change(
-                    moving_light="Artist",
                     overhead_effects=f"{effect_color.capitalize()} (80%) Pulsing",
                     karaoke_lights=f"{effect_color.capitalize()} (10%)",
                 )

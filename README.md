@@ -110,6 +110,7 @@ The moving head stays on the artist during songs and aims at the audience to end
 ### Intermission
 House at 20% with slow wall fades.
 - 5-s smoke burst every 60 s.
+- Moving head off until songs start.
 
 ### Song start
 Stage lights fade to black as overheads rise to 30% warm white. Moving head centers on the artist.
