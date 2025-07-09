@@ -44,3 +44,37 @@ python beat_detection.py --amplitude-threshold 0.02 \
 ```
 
 On Windows, you can run `install_requirements.ps1` to install the Python dependencies.
+
+## Devices
+
+| Addr Range | Fixture                | Mode (ch)                | Notes            |
+| ---------- | ---------------------- | ------------------------ | ---------------- |
+| 001–005    | **LumiPar 12UAW5 #1**  | 5‑ch                     | Stage Lights     |
+| 010–014    | LumiPar 12UAW5 #2      | 5‑ch                     |                  |
+| 019–023    | LumiPar 12UAW5 #3      | 5‑ch                     |                  |
+| 030–036    | **LumiPar 7UTRI #1**   | 7‑ch                     | Karaoke Wall        |
+| 041–047    | LumiPar 7UTRI #2       | 7‑ch                     |                  |
+| 055–064    | **LumiPar 12UQPro #1** | 10‑ch                    | Disco Lights   |
+| 069–078    | LumiPar 12UQPro #2     | 10‑ch                    |                  |
+| 085–107    | **PixieWash**          | 13‑ch                    | Moving Head        |
+| 115–118    | **Smoke machine**      | 1‑ch used, 3‑ch reserved | Future expansion |
+
+## Show
+
+### Intermission
+
+### Song Starting
+
+### Song Ongoing
+
+#### Slow
+
+#### Jazz
+
+#### POP
+
+#### Rock
+
+#### Metal
+
+### Song Ending
