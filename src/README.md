@@ -11,6 +11,15 @@ Fixture implementation using the new `DmxDevice` base class. The class builds a
 channel map from the provided start address and relies on base-class helpers
 such as `set_color` and `set_dimmer` to construct DMX frames.
 
+# Additional fixture drivers
+
+- `Prolights_LumiPar12UAW5_7ch.py`
+- `Prolights_LumiPar12UQPro_4ch.py`
+- `Prolights_LumiPar12UQPro_9ch.py`
+- `Prolights_LumiPar7UTRI_3ch.py`
+- `Prolights_PixieWash_13ch.py`
+- `WhatSoftware_Generic_4ch.py`
+
 # main.py
 
 - Main script to run the DMX communication.
