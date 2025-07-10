@@ -7,16 +7,14 @@ import aubio
 from ola.ClientWrapper import ClientWrapper
 
 import parameters
+from parameters import Scenario
 
 
 class DmxBeatBlinker:
     def __init__(self, universe: int = parameters.UNIVERSE,
                  channel: int = parameters.CHANNEL,
                  samplerate: int = parameters.SAMPLERATE,
-                 print_interval: float = parameters.PRINT_INTERVAL,
-                 smoke_channel: int = parameters.SMOKE_CHANNEL,
-                 smoke_gap: float = parameters.SMOKE_GAP,
-                 smoke_duration: float = parameters.SMOKE_DURATION):
+                 print_interval: float = parameters.PRINT_INTERVAL):
         self.universe = universe
         self.channel = channel
         self.samplerate = samplerate
@@ -25,9 +23,10 @@ class DmxBeatBlinker:
         self.tempo = aubio.tempo("default", 1024, 512, samplerate)
         self.beat_times = []
         self.print_interval = print_interval
-        self.smoke_channel = smoke_channel
-        self.smoke_gap = smoke_gap
-        self.smoke_duration = smoke_duration
+        # fixed smoke parameters controlled by the show
+        self.smoke_channel = 115
+        self.smoke_gap = 30000  # milliseconds
+        self.smoke_duration = 3000  # milliseconds
         self.last_smoke_time = 0.0
         self.smoke_on = False
         self.smoke_start_time = 0.0
@@ -38,7 +37,7 @@ class DmxBeatBlinker:
             "karaoke": "Off",
         }
         self.last_bpm = 0.0
-        self.last_genre = ""
+        self.last_genre: Scenario | None = None
 
     def _send_dmx_value(self, channel: int, value: int) -> None:
         data = bytearray(512)
@@ -61,32 +60,24 @@ class DmxBeatBlinker:
         return 60.0 / np.mean(intervals)
 
     @staticmethod
-    def _detect_genre(bpm: float) -> str:
-        """Rough genre estimation based on BPM."""
-        if bpm >= 160:
-            return "Metal"
-        if bpm >= 130:
-            return "Rock"
-        if bpm >= 100:
-            return "Pop"
-        if bpm >= 80:
-            return "Jazz"
-        return "Slow"
+    def _detect_genre(bpm: float) -> Scenario:
+        """Return scenario for this BPM using ``parameters`` ranges."""
+        return parameters.scenario_for_bpm(bpm)
 
     @staticmethod
-    def _genre_color(genre: str) -> str:
+    def _genre_color(genre: Scenario) -> str:
         mapping = {
-            "Slow": "red",
-            "Jazz": "amber",
-            "Pop": "pink",
-            "Rock": "red",
-            "Metal": "white",
+            Scenario.SONG_ONGOING_SLOW: "red",
+            Scenario.SONG_ONGOING_JAZZ: "amber",
+            Scenario.SONG_ONGOING_POP: "pink",
+            Scenario.SONG_ONGOING_ROCK: "red",
+            Scenario.SONG_ONGOING_METAL: "white",
         }
         return mapping.get(genre, "white")
 
     @staticmethod
-    def _stage_light_color(genre: str) -> str:
-        if genre in ("Slow", "Jazz"):
+    def _stage_light_color(genre: Scenario) -> str:
+        if genre in (Scenario.SONG_ONGOING_SLOW, Scenario.SONG_ONGOING_JAZZ):
             return "amber"
         return "white"
 
@@ -112,7 +103,7 @@ class DmxBeatBlinker:
         samples = np.frombuffer(indata, dtype=np.float32)
         now = time.time()
         # handle smoke timing
-        if self.smoke_on and now - self.smoke_start_time >= self.smoke_duration:
+        if self.smoke_on and (now - self.smoke_start_time) * 1000 >= self.smoke_duration:
             print("Smoke end", flush=True)
             self._send_dmx_value(self.smoke_channel, 0)
             self.smoke_on = False
@@ -126,7 +117,7 @@ class DmxBeatBlinker:
                 effect_color = self._genre_color(genre)
                 if abs(bpm - self.last_bpm) >= 1 or genre != self.last_genre:
                     print(f"Estimated BPM: {bpm:.2f}", flush=True)
-                    print(f"Likely genre: {genre}", flush=True)
+                    print(f"Likely genre: {genre.value}", flush=True)
                     self.last_bpm = bpm
                     self.last_genre = genre
                 self._print_state_change(
@@ -135,7 +126,10 @@ class DmxBeatBlinker:
                     overhead=f"{effect_color.capitalize()} (80%) Pulsing",
                     karaoke=f"{effect_color.capitalize()} (10%)",
                 )
-                if not self.smoke_on and now - self.last_smoke_time >= self.smoke_gap:
+                if (
+                    not self.smoke_on
+                    and (now - self.last_smoke_time) * 1000 >= self.smoke_gap
+                ):
                     print("Smoke start", flush=True)
                     self._send_dmx_value(self.smoke_channel, 255)
                     self.smoke_on = True
@@ -170,22 +164,11 @@ def main() -> None:
     parser.add_argument("--print-interval", type=float,
                         default=parameters.PRINT_INTERVAL,
                         help="Seconds between BPM summaries")
-    parser.add_argument("--smoke-channel", type=int,
-                        default=parameters.SMOKE_CHANNEL,
-                        help="DMX channel controlling the smoke machine")
-    parser.add_argument("--smoke-gap", type=float,
-                        default=parameters.SMOKE_GAP,
-                        help="Seconds between automatic smoke bursts")
-    parser.add_argument("--smoke-duration", type=float,
-                        default=parameters.SMOKE_DURATION,
-                        help="Length of each smoke burst in seconds")
     args = parser.parse_args()
 
-    blinker = DmxBeatBlinker(universe=args.universe, channel=args.channel,
-                             print_interval=args.print_interval,
-                             smoke_channel=args.smoke_channel,
-                             smoke_gap=args.smoke_gap,
-                             smoke_duration=args.smoke_duration)
+    blinker = DmxBeatBlinker(universe=args.universe,
+                             channel=args.channel,
+                             print_interval=args.print_interval)
     blinker.run()
 
 

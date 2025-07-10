@@ -164,8 +164,23 @@ class DmxSerial:
 class DMX:
     """Manage multiple devices and continuously send combined frames."""
 
-    def __init__(self, devices: Iterable[Tuple[Type[DmxDevice], int]], port: str = "COM4", fps: int = 44) -> None:
-        self.devices = [cls(addr) for cls, addr in devices]
+    def __init__(self,
+                 devices: Iterable[Tuple[Type[DmxDevice], int] | Tuple[Type[DmxDevice], int, str]],
+                 port: str = "COM4",
+                 fps: int = 44) -> None:
+        self.devices: list[DmxDevice] = []
+        self.groups: Dict[str, list[DmxDevice]] = {}
+        for item in devices:
+            if len(item) == 2:
+                cls, addr = item  # type: ignore[misc]
+                name = None
+            else:
+                cls, addr, name = item  # type: ignore[misc]
+            device = cls(addr)
+            self.devices.append(device)
+            if name:
+                self.groups.setdefault(name, []).append(device)
+
         self.serial = DmxSerial(port)
         self.interval = 1.0 / float(fps)
         self._frame: Dict[int, int] = {}

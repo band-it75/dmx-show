@@ -47,7 +47,7 @@ The beat detector now automatically turns the moving head toward the audience
 when a song is ending, providing a clear signal for applause.
 
 ```bash
-python beat_dmx.py --smoke-channel 115 --smoke-gap 30 --smoke-duration 3
+python beat_dmx.py
 ```
 
 Stage light color names such as "amber" are printed whenever BPM summaries are
@@ -114,42 +114,50 @@ by each fixture.
 
 Lighting cues are BPM-driven. LumiPar 12UAW5 units double as house lights.
 Overheads pulse with BPM and smoke bursts last 3 seconds with a 30-second gap.
-The moving head stays on the artist during songs and aims at the audience to end each song.
+Beat updates briefly change overhead colors for 100 ms on each beat.
+Genre-specific colors guide intensity and timing. The moving head stays on the
+artist during songs and aims at the audience to end each song. Stage lights fade
+to black during songs and return when the moving head faces the audience.
+Each ``Scenario`` constant stores DMX updates, an optional beat mapping, BPM range
+and VU level along with predecessor and successor lists. ``Song Start`` follows
+``Intermission``. All ``Song Ongoing`` states can switch among themselves.
+``Song Ending`` only follows ``Song Ongoing`` and ``Intermission`` returns after
+``Song Ending``.
 
 ### Intermission
 House at 20% with slow wall fades.
 - 5-s smoke burst every 60 s.
 - Moving head off until songs start.
 
-### Song start
+### Song Start
 Stage lights fade to black as overheads rise to 30% warm white. Moving head centers on the artist.
 
-### Slow (BPM <80)
+### Song Ongoing - Slow (BPM <80)
 - Overhead deep red pulse every 2 beats.
 - Moving head gentle pan on the artist.
 - 2-s smoke burst every 15 s.
 
-### Jazz (80-110 BPM)
+### Song Ongoing - Jazz (80-110 BPM)
 - Overhead amber pulse each beat.
 - Moving head narrow sweeps.
 - 3-s smoke burst every 30 s.
 
-### Pop (110-130 BPM)
+### Song Ongoing - Pop (110-130 BPM)
 - Overhead pink chase each beat.
 - Moving head wide sweeps.
 - 3-s smoke burst every 30 s.
 
-### Rock (130-160 BPM)
+### Song Ongoing - Rock (130-160 BPM)
 - Overhead red pulse each beat with 1-s white strobe every 8 beats.
 - Moving head fast pan and tilt.
 - 3-s smoke burst every 30 s.
 
-### Metal (>160 BPM)
+### Song Ongoing - Metal (>160 BPM)
 - Overhead white strobe each beat.
 - Moving head erratic sweeps.
 - 3-s smoke burst every 30 s.
 
-### Song end
+### Song Ending
 Moving head points at the audience while stage lights fade to 50% warm white
 for applause. Smoke bursts last 3 seconds with at least 30 seconds between
 triggers.
