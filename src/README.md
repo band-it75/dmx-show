@@ -15,5 +15,6 @@ such as `set_color` and `set_dimmer` to construct DMX frames.
 
 - Main script to run the DMX communication.
 - For testing it starts one `Prolights_LumiPar7UTRI_8ch` on start address 1 and
-  toggles red and green every second.
+  toggles red and green every second. After changing colors, it calls
+  `DMX.update()` so the background thread keeps sending the new frame.
 - COM port 4
