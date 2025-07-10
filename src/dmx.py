@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Tuple, Type
+from typing import Dict, Iterable, Tuple, Type, Optional, Any
 import time
 
 try:
@@ -9,16 +9,104 @@ try:
 except Exception:  # pragma: no cover - serial only required when running on real hardware
     serial = None
 
-
 @dataclass
 class DmxDevice:
-    """Base class for DMX fixtures."""
+    """
+    Base class for any DMX fixture.  
+    - Define `channels` as a dict of feature → channel-offset (0-based).  
+    - Use the provided setters (or override compute_values) to update internal state.  
+    - Call frame() to get {offset: value} ready for your DMX output pipeline.
+    """
 
-    start_address: int
+    def __init__(self, channels: Dict[str, int]) -> None:
+        """
+        :param channels: mapping of logical feature names to relative DMX offsets.
+                         e.g. {"red":0, "green":1, "blue":2, "fog":3, "pan":4, ...}
+        """
+        # Validate & store channel offsets
+        self.channels: Dict[str, int] = {}
+        for name, off in channels.items():
+            off = int(off)
+            if off < 0:
+                raise ValueError(f"Offset for '{name}' must be ≥ 0")
+            self.channels[name] = off
+
+        # Initialize all channel values to 0
+        self._values: Dict[str, int] = {name: 0 for name in self.channels}
+
+    def set_channel(self, name: str, value: int) -> None:
+        """Set one channel by logical name (0–255)."""
+        if name not in self.channels:
+            raise KeyError(f"No such channel: '{name}'")
+        self._values[name] = max(0, min(255, int(value)))
+
+    def get_channel(self, name: str) -> int:
+        """Get current value for a logical channel (defaults to 0)."""
+        return self._values.get(name, 0)
+
+    # Convenience color methods:
+
+    def set_color(self, red: int, green: int, blue: int, white: int = 0, amber: int = 0, uv: int = 0) -> None:
+        for name, val in (("red", red), ("green", green), ("blue", blue),
+                          ("white", white), ("amber", amber), ("uv", uv)):
+            if name in self.channels:
+                self._values[name] = max(0, min(255, int(val)))
+
+    def set_dimmer(self, value: int) -> None:
+        if "dimmer" not in self.channels:
+            raise KeyError("No 'dimmer' channel defined")
+        self._values["dimmer"] = max(0, min(255, int(value)))
+
+    def set_strobe(self, value: int) -> None:
+        for key in ("strobe", "shutter"):
+            if key in self.channels:
+                self._values[key] = max(0, min(255, int(value)))
+                return
+        raise KeyError("No strobe/shutter channel defined")
+
+    # Movement:
+
+    def set_pan_tilt(self, pan: int, tilt: int) -> None:
+        # Pan
+        if "pan" not in self.channels:
+            raise KeyError("No 'pan' channel defined")
+        pan = max(0, int(pan))
+        if "pan_fine" in self.channels:
+            self._values["pan"] = pan >> 8
+            self._values["pan_fine"] = pan & 0xFF
+        else:
+            self._values["pan"] = min(255, pan)
+
+        # Tilt
+        if "tilt" not in self.channels:
+            raise KeyError("No 'tilt' channel defined")
+        tilt = max(0, int(tilt))
+        if "tilt_fine" in self.channels:
+            self._values["tilt"] = tilt >> 8
+            self._values["tilt_fine"] = tilt & 0xFF
+        else:
+            self._values["tilt"] = min(255, tilt)
+
+    # Hook for subclasses to inject computed values before framing:
+    def compute_values(self) -> None:
+        """
+        Override this in subclasses if you need to calculate channel values
+        dynamically (e.g. moving-head effects, chases, etc.).
+        By default, does nothing—relies on manual setters.
+        """
+        pass
 
     def frame(self) -> Dict[int, int]:
-        """Return a mapping of channel numbers to values."""
-        raise NotImplementedError
+        """
+        Returns a dict mapping *relative* channel-offset → 0–255 value.
+        Call compute_values() first, so any dynamic logic runs.
+        """
+        self.compute_values()
+        # Only include channels that exist in self.channels
+        return {
+            offset: max(0, min(255, self._values[name]))
+            for name, offset in self.channels.items()
+        }
 
 
 class DmxSerial:
