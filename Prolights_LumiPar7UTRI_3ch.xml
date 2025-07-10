@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device type="DMXDevice"
+        dmxaddresscount="3"
+        dmxcversion="3.3.0"
+        ddfversion="1.0.0">
+
+  <information>
+    <model>LumiPar 7 UTRI</model>
+    <vendor>Prolights</vendor>
+    <author>Bjorn T. Nostdahl</author>
+    <mode>3ch – RGB</mode>
+  </information>
+
+  <functions>
+    <rgb>
+      <red   dmxchannel="0"/>
+      <green dmxchannel="1"/>
+      <blue  dmxchannel="2"/>
+    </rgb>
+  </functions>
+</device>

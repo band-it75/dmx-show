@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device type="DMXDevice"
+        dmxaddresscount="8"
+        dmxcversion="3.3.0"
+        ddfversion="1.0.0">
+
+  <information>
+    <model>LumiPar 7 UTRI</model>
+    <vendor>Prolights</vendor>
+    <author>Bjorn T. Nostdahl</author>
+    <mode>8ch – Standard</mode>
+    <comment>Channel layout based on the official user manual.</comment>
+  </information>
+
+  <functions>
+
+    <!-- RGB colour mixing -->
+    <rgb>
+      <red   dmxchannel="0"/>
+      <green dmxchannel="1"/>
+      <blue  dmxchannel="2"/>
+    </rgb>
+
+    <!-- Colour‑macro selector -->
+    <rawstep dmxchannel="3" name="color‑macros">
+      <step  mindmx="0"  maxdmx="15"  caption="No function"/>
+      <range mindmx="16" maxdmx="255" caption="Colour macros"/>
+    </rawstep>
+
+    <!-- Strobe -->
+    <strobe dmxchannel="4">
+      <step  type="open"   mindmx="0"  maxdmx="15"  caption="Open"/>
+      <range type="linear" mindmx="16" maxdmx="255"
+             minval="0.5"  maxval="20"
+             caption="Strobe slow→fast"/>
+    </strobe>
+
+    <!-- Internal programs -->
+    <rawstep dmxchannel="5" name="programs">
+      <step mindmx="0"   maxdmx="31"  caption="No function"/>
+      <step mindmx="32"  maxdmx="63"  caption="0→100 % fade"/>
+      <step mindmx="64"  maxdmx="95"  caption="100→0 % fade"/>
+      <step mindmx="96"  maxdmx="127" caption="100→0→100 %"/>
+      <step mindmx="128" maxdmx="159" caption="Colours fade"/>
+      <step mindmx="160" maxdmx="191" caption="3‑colour snap"/>
+      <step mindmx="192" maxdmx="223" caption="7‑colour snap"/>
+      <step mindmx="224" maxdmx="255" caption="Sound control"/>
+    </rawstep>
+
+    <!-- Master dimmer -->
+    <dimmer dmxchannel="6"/>
+
+    <!-- Dimmer speed curve -->
+    <rawstep dmxchannel="7" name="dimmer‑speed‑mode">
+      <step mindmx="0"   maxdmx="51"  caption="Preset (display)"/>
+      <step mindmx="52"  maxdmx="101" caption="Off"/>
+      <step mindmx="102" maxdmx="152" caption="Mode 1 – fast"/>
+      <step mindmx="153" maxdmx="203" caption="Mode 2 – middle"/>
+      <step mindmx="204" maxdmx="255" caption="Mode 3 – slow"/>
+    </rawstep>
+
+  </functions>
+</device>

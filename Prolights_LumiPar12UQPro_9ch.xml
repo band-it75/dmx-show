@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device image="Lumipar12UQPro.png"
+        type="DMXDevice"
+        dmxaddresscount="9"
+        dmxcversion="3.3.0"
+        ddfversion="1.0.0">
+  <information>
+    <model>LumiPar 12 UQ Pro</model>
+    <vendor>Prolights</vendor>
+    <author>Your Name</author>
+    <mode>9 ch – Extended</mode>
+  </information>
+
+  <functions>
+    <!-- Primary colour mix -->
+    <rgb>
+      <red   dmxchannel="0"/>
+      <green dmxchannel="1"/>
+      <blue  dmxchannel="2"/>
+      <white dmxchannel="3"/>
+    </rgb>
+
+    <!-- Colour‑macro channel -->
+    <rawstep dmxchannel="4" name="Colour macros">
+      <step caption="Off"           mindmx="0"  maxdmx="15"/>
+      <step caption="Factory macros" mindmx="16" maxdmx="255"/>
+    </rawstep>
+
+    <!-- Strobe (1 – 28 Hz) -->
+    <strobe dmxchannel="5">
+      <step type="open" mindmx="0"  maxdmx="15"/>
+      <range type="linear" mindmx="16" maxdmx="255" minval="1" maxval="28"/>
+    </strobe>
+
+    <!-- Auto / sound programmes -->
+    <rawstep dmxchannel="6" name="Internal programmes">
+      <step caption="Off"              mindmx="0"   maxdmx="31"/>
+      <step caption="Auto 0‑100 %"     mindmx="32"  maxdmx="63"/>
+      <step caption="Auto 100‑0 %"     mindmx="64"  maxdmx="95"/>
+      <step caption="Auto 100‑0‑100 %" mindmx="96"  maxdmx="127"/>
+      <step caption="Colours fade"     mindmx="128" maxdmx="159"/>
+      <step caption="4‑colour snap"    mindmx="160" maxdmx="191"/>
+      <step caption="15‑colour snap"   mindmx="192" maxdmx="223"/>
+      <step caption="Sound‑active"     mindmx="224" maxdmx="255"/>
+    </rawstep>
+
+    <!-- Master dimmer -->
+    <dimmer dmxchannel="7"/>
+
+    <!-- Dimming‑curve selector -->
+    <rawstep dmxchannel="8" name="Dimmer curve">
+      <step caption="Curve Off"    mindmx="0"   maxdmx="51"/>
+      <step caption="Curve Fast"   mindmx="52"  maxdmx="101"/>
+      <step caption="Curve Medium" mindmx="102" maxdmx="152"/>
+      <step caption="Curve Slow"   mindmx="153" maxdmx="255"/>
+    </rawstep>
+  </functions>
+</device>

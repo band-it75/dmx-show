@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device
+    type="DMXDevice"
+    dmxaddresscount="7"
+    dmxcversion="3.2.3"
+    ddfversion="1.0.0">
+
+  <information>
+    <model>LumiPar 12 UAW5</model>
+    <vendor>Prolights</vendor>
+    <author>ChatGPT</author>
+    <mode>7‑ch Extended</mode>
+  </information>
+
+  <functions>
+    <!-- Colour mixing group for amber and white LEDs -->
+    <rgb>
+      <!-- placeholders for required base colors -->
+      <red/>
+      <green/>
+      <blue/>
+      <!-- actual channels: warm white, cold white and amber -->
+      <warmwhite dmxchannel="2"/>
+      <coldwhite dmxchannel="1"/>
+      <amber     dmxchannel="0"/>
+    </rgb>
+
+    <!-- Strobe / shutter -->
+    <strobe dmxchannel="3">
+      <range type="switch" mindmx="0"   maxdmx="15"  minval="0"  maxval="0"/>
+      <range type="linear" mindmx="16"  maxdmx="255" minval="1"  maxval="20"/>
+    </strobe>
+
+    <!-- Internal macro programs -->
+    <rawstep dmxchannel="4" name="Macro programs">
+      <step caption="Off"              mindmx="0"   maxdmx="31"/>
+      <step caption="3‑colour fade"    mindmx="32"  maxdmx="63"/>
+      <step caption="3‑colour snap"    mindmx="64"  maxdmx="95"/>
+      <step caption="7‑colour snap"    mindmx="96"  maxdmx="127"/>
+      <step caption="Sound chase"      mindmx="128" maxdmx="159"/>
+      <step caption="Colour‑fade loop" mindmx="160" maxdmx="255"/>
+    </rawstep>
+
+    <!-- Master dimmer -->
+    <dimmer dmxchannel="5"/>
+
+    <!-- Dimmer‑curve selector -->
+    <rawstep dmxchannel="6" name="Dimmer curve">
+      <step caption="Curve Off"    mindmx="0"   maxdmx="51"/>
+      <step caption="Curve Fast"   mindmx="52"  maxdmx="101"/>
+      <step caption="Curve Medium" mindmx="102" maxdmx="152"/>
+      <step caption="Curve Slow"   mindmx="153" maxdmx="203"/>
+      <step caption="Curve Very slow" mindmx="204" maxdmx="255"/>
+    </rawstep>
+  </functions>
+</device>

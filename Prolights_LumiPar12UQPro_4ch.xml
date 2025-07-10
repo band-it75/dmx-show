@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device image="Lumipar12UQPro.png"
+        type="DMXDevice"
+        dmxaddresscount="4"
+        dmxcversion="3.3.0"
+        ddfversion="1.0.0">
+  <information>
+    <model>LumiPar 12 UQ Pro</model>
+    <vendor>Prolights</vendor>
+    <author>Your Name</author>
+    <mode>4 ch – Basic RGBW</mode>
+  </information>
+
+  <functions>
+    <!-- RGBW colour mixing (no dedicated dimmer in this mode) -->
+    <rgb>
+      <red   dmxchannel="0"/>
+      <green dmxchannel="1"/>
+      <blue  dmxchannel="2"/>
+      <white dmxchannel="3"/>
+    </rgb>
+  </functions>
+</device>

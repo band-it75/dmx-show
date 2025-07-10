@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device type="DMXDevice"
+        dmxaddresscount="13"
+        dmxcversion="3.3.0"
+        ddfversion="1.0.0">
+
+  <information>
+    <model>PIXIEWASH</model>
+    <vendor>Prolights</vendor>
+    <mode>13 channel</mode>
+    <author>Bjorn T. Nostdahl</author>
+  </information>
+
+  <functions>
+
+    <!-- Pan / Tilt (16‑bit) -->
+    <position>
+      <pan  dmxchannel="0" finedmxchannel="1"><range range="540"/></pan>
+      <tilt dmxchannel="2" finedmxchannel="3"><range range="270"/></tilt>
+    </position>
+
+    <!-- Pan‑Tilt speed -->
+    <ptspeed dmxchannel="4">
+      <range type="linear" mindmx="255" maxdmx="0" minval="0" maxval="100"/>
+    </ptspeed>
+
+    <!-- Special‑function channel -->
+    <rawstep dmxchannel="5" name="special-functions">
+      <step caption="No Function"    mindmx="0"   maxdmx="49"/>
+      <step caption="Pan/Tilt Reset" mindmx="50"  maxdmx="99"/>
+      <step caption="No Function"    mindmx="100" maxdmx="149"/>
+      <step caption="Zoom Reset"     mindmx="150" maxdmx="199"/>
+      <step caption="No Function"    mindmx="200" maxdmx="255"/>
+    </rawstep>
+
+    <!-- Master dimmer -->
+    <dimmer dmxchannel="6"/>
+
+    <!-- Shutter / Strobe -->
+    <shutter dmxchannel="7">
+      <step  type="closed" caption="Closed" mindmx="0"  maxdmx="31"/>
+      <step  type="open"   caption="Open"   mindmx="32" maxdmx="63"/>
+      <range type="strobe" caption="Strobe" mindmx="64" maxdmx="95"  minval="1" maxval="25"/>
+      <step  caption="Pulse"                mindmx="128" maxdmx="159"/>
+      <range type="random" caption="Random" mindmx="192" maxdmx="223" minval="1" maxval="25"/>
+    </shutter>
+
+    <!-- RGBW mixing -->
+    <rgb>
+      <red   dmxchannel="8"/>
+      <green dmxchannel="9"/>
+      <blue  dmxchannel="10"/>
+      <white dmxchannel="11"/>
+    </rgb>
+
+    <!-- Colour macros -->
+    <rawstep dmxchannel="12" name="color-macros">
+      <step caption="Macro 1"  mindmx="0"   maxdmx="13"/>
+      <step caption="Macro 2"  mindmx="14"  maxdmx="27"/>
+      <step caption="Macro 3"  mindmx="28"  maxdmx="41"/>
+      <step caption="Macro 4"  mindmx="42"  maxdmx="55"/>
+      <step caption="Macro 5"  mindmx="56"  maxdmx="69"/>
+      <step caption="Macro 6"  mindmx="70"  maxdmx="83"/>
+      <step caption="Macro 7"  mindmx="84"  maxdmx="97"/>
+      <step caption="Macro 8"  mindmx="98"  maxdmx="111"/>
+      <step caption="Macro 9"  mindmx="112" maxdmx="125"/>
+      <step caption="Macro 10" mindmx="126" maxdmx="139"/>
+      <step caption="Macro 11" mindmx="140" maxdmx="153"/>
+      <step caption="Macro 12" mindmx="154" maxdmx="167"/>
+      <step caption="Macro 13" mindmx="168" maxdmx="181"/>
+      <step caption="Macro 14" mindmx="182" maxdmx="191"/>
+    </rawstep>
+
+  </functions>
+
+  <procedures/>
+</device>

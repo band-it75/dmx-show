@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device image="smoke_machine.png"
+        type="DMXDevice"
+        dmxaddresscount="4"
+        dmxcversion="3.2.3"
+        ddfversion="1.0.0"
+        subdevice="no">
+
+  <!-- ───────────── 1. INFORMATION ───────────── -->
+  <information>
+    <model>Generic</model>           <!-- Fixture name -->
+    <vendor>WhatSoftware</vendor>    <!-- Your software / vendor tag -->
+    <author>Bjorn T. Nostdahl</author>       <!-- Replace with your name or company -->
+    <mode channels="4">4ch</mode>    <!-- Mode label appears in DMXControl -->
+    <comment>CH1 = Fog | CH2‑4 reserved (0)</comment>
+  </information>
+
+  <!-- ───────────── 2. FUNCTIONS ───────────── -->
+  <functions>
+    <!-- CH 1 – Fog output -->
+    <fog dmxchannel="0" />
+
+    <!-- CH 2‑4 – Reserved (held at DMX 0) -->
+    <const dmxchannel="1" name="Reserved 2" val="0" />
+    <const dmxchannel="2" name="Reserved 3" val="0" />
+    <const dmxchannel="3" name="Reserved 4" val="0" />
+  </functions>
+
+  <!-- ───────────── 3. PROCEDURES ───────────── -->
+  <procedures/>
+</device>
