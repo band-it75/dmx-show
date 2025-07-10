@@ -9,8 +9,8 @@ from ola.ClientWrapper import ClientWrapper
 import parameters
 
 
-class DmxBeatBlinker:
-    """Blink one DMX channel whenever a beat is detected."""
+class BeatTrigger:
+    """Trigger callbacks and optional DMX blinks on detected beats."""
 
     def __init__(
         self,
@@ -97,10 +97,10 @@ def main() -> None:
                         help="Seconds between BPM summaries")
     args = parser.parse_args()
 
-    blinker = DmxBeatBlinker(universe=args.universe,
-                             channel=args.channel,
-                             print_interval=args.print_interval)
-    blinker.run()
+    trigger = BeatTrigger(universe=args.universe,
+                          channel=args.channel,
+                          print_interval=args.print_interval)
+    trigger.run()
 
 
 if __name__ == "__main__":

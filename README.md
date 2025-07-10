@@ -48,7 +48,7 @@ python beat_dmx.py
 ```
 
 The script prints "Estimated BPM" every few seconds. You can attach a callback
-to ``DmxBeatBlinker.on_beat`` to trigger other effects.
+to ``BeatTrigger.on_beat`` to trigger other effects.
 
 ## Standalone beat detection
 
