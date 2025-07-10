@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Tuple, Type, Optional, Any
+from typing import Dict, Iterable, Tuple, Type, Optional
+import threading
 import time
 
 try:
@@ -161,21 +162,60 @@ class DmxSerial:
 
 
 class DMX:
-    """Manage multiple devices and send combined frames."""
+    """Manage multiple devices and continuously send combined frames."""
 
-    def __init__(self, devices: Iterable[Tuple[Type[DmxDevice], int]], port: str = "COM4") -> None:
+    def __init__(self, devices: Iterable[Tuple[Type[DmxDevice], int]], port: str = "COM4", fps: int = 44) -> None:
         self.devices = [cls(addr) for cls, addr in devices]
         self.serial = DmxSerial(port)
+        self.interval = 1.0 / float(fps)
+        self._frame: Dict[int, int] = {}
+        self._lock = threading.Lock()
+        self._running = False
+        self._thread: Optional[threading.Thread] = None
 
-    def send_frame(self) -> None:
+    def _compute_frame(self) -> Dict[int, int]:
         frame: Dict[int, int] = {}
         for device in self.devices:
             frame.update(device.frame())
+        return frame
+
+    def update(self) -> None:
+        """Compute the current frame from devices and store it."""
+        frame = self._compute_frame()
+        with self._lock:
+            self._frame = frame
+
+    def send_frame(self) -> None:
+        self.update()
+        with self._lock:
+            frame = dict(self._frame)
         self.serial.send(frame)
+
+    def _loop(self) -> None:
+        while self._running:
+            with self._lock:
+                frame = dict(self._frame)
+            self.serial.send(frame)
+            time.sleep(self.interval)
+
+    def start(self) -> None:
+        if not self._running:
+            self._running = True
+            self._thread = threading.Thread(target=self._loop, daemon=True)
+            self._thread.start()
+
+    def stop(self) -> None:
+        self._running = False
+        if self._thread is not None:
+            self._thread.join()
+            self._thread = None
 
     def __enter__(self) -> "DMX":
         self.serial.__enter__()
+        self.update()
+        self.start()
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
+        self.stop()
         self.serial.__exit__(exc_type, exc, tb)
