@@ -29,13 +29,14 @@ def main() -> None:
     with DMX([(Prolights_LumiPar7UTRI_8ch, 1)], port="COM4") as controller:
         fixture = controller.devices[0]
         fixture.set_dimmer(255)
+        controller.update()
         red = True
         while True:
             if red:
                 fixture.set_color(255, 0, 0)
             else:
                 fixture.set_color(0, 255, 0)
-            controller.serial.send(fixture.frame())
+            controller.update()
             red = not red
             time.sleep(1)
 
