@@ -25,6 +25,15 @@ Default values for the DMX universe, channel, audio samplerate and song
 detection thresholds are defined in `parameters.py`. You can edit that file or
 override them with command-line options.
 
+## Quick LumiPar 7UTRI blink
+
+Run `blink_red.py` to flash a LumiPar 7UTRI fixture without beat detection:
+
+```bash
+python blink_red.py --port /dev/ttyUSB0 --start-address 1 --blink-times 3
+```
+
+
 ## Stage lighting and smoke demo
 
 `beat_dmx.py` can also trigger smoke bursts and print the current stage light
