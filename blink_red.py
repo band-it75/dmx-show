@@ -1,7 +1,11 @@
 import argparse
+import sys
+import pathlib
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "src"))
 
 from dmx import DmxSerial
-from Prolights_LumiPar7UTRI_8ch import blink_red
+from main import blink_red
 
 
 def main() -> None:
