@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Dict, Iterable, Tuple, Type
+import time
 
 try:
     import serial  # type: ignore
@@ -40,7 +41,14 @@ class DmxSerial:
         if serial is None:
             raise RuntimeError("pyserial not available")
         if self._serial is None:
-            self._serial = serial.Serial(self.port, self.baudrate)
+            # DMX512 uses 8 data bits, no parity and two stop bits
+            self._serial = serial.Serial(
+                self.port,
+                self.baudrate,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_TWO,
+            )
 
     def close(self) -> None:
         if self._serial is not None:
@@ -55,6 +63,11 @@ class DmxSerial:
                 data[channel - 1] = max(0, min(255, value))
         if self._serial is None:
             raise RuntimeError("Serial port not open")
+        # Break (>=88us) and mark after break (>=8us)
+        self._serial.break_condition = True
+        time.sleep(0.0001)
+        self._serial.break_condition = False
+        time.sleep(0.000012)
         # Start code (0) + data
         self._serial.write(bytes([0]) + data)
 
