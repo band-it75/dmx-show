@@ -1,8 +1,9 @@
 # dmx.py
 
 - Base class for DMX devices.
-- Communication class for sending DMX signals. `DMX` takes device classes and start
-  addresses as parameters.
+ - Communication class for sending DMX signals. `DMX` now runs a background
+   thread that repeats the last frame until new data is computed. Device classes
+   and start addresses are passed to the constructor.
 
 # Prolights_LumiPar7UTRI_8ch.py
 
