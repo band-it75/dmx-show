@@ -28,10 +28,14 @@ def main() -> None:
     """Toggle red and green on a single fixture for testing."""
     with DMX([(Prolights_LumiPar7UTRI_8ch, 1)], port="COM4") as controller:
         fixture = controller.devices[0]
+        fixture.set_dimmer(255)
         red = True
         while True:
-            color = fixture.frame_from_rgb(255, 0, 0) if red else fixture.frame_from_rgb(0, 255, 0)
-            controller.serial.send(color)
+            if red:
+                fixture.set_color(255, 0, 0)
+            else:
+                fixture.set_color(0, 255, 0)
+            controller.serial.send(fixture.frame())
             red = not red
             time.sleep(1)
 
