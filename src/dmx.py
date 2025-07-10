@@ -69,12 +69,23 @@ def _parse_pair(text: str) -> Tuple[int, int]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Send a DMX frame once")
-    parser.add_argument("pairs", metavar="CH:VAL", nargs="+", type=_parse_pair,
-                        help="DMX channel and value pairs")
+    parser.add_argument(
+        "pairs",
+        metavar="CH:VAL",
+        nargs="*",
+        type=_parse_pair,
+        default=[],
+        help="DMX channel and value pairs",
+    )
     parser.add_argument("--port", default="COM4", help="Serial port")
     parser.add_argument("--channels", type=int, default=512,
                         help="Number of DMX channels")
     args = parser.parse_args()
+
+    if not args.pairs:
+        parser.print_usage()
+        print("No channel/value pairs provided. Example: python dmx.py 1:255")
+        return
 
     values = dict(args.pairs)
     with DmxSerial(port=args.port, channels=args.channels) as dmx:
