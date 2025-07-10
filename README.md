@@ -34,36 +34,21 @@ python blink_red.py --port /dev/ttyUSB0 --start-address 1 --blink-times 3
 ```
 
 
-## Stage lighting and smoke demo
+## Stage lighting demo
 
-`beat_dmx.py` can also trigger smoke bursts and print the current stage light
-color based on the estimated genre. LumiPar 12UAW5 units double as house lights
-and overhead effects pulse with BPM. Smoke bursts last 3 seconds with a
+`beat_dmx.py` simply blinks one channel whenever a beat is detected. It prints
+the estimated BPM every few seconds. LumiPar 12UAW5 units double as house
+lights and overhead effects pulse with BPM. Smoke bursts last 3 seconds with a
 30-second gap. The moving head stays on the artist during songs and points at
 the audience to end each song. Stage lights fade to black during songs and
 return at 50% warm white when the moving head faces the crowd.
-
-The beat detector now automatically turns the moving head toward the audience
-when a song is ending, providing a clear signal for applause.
 
 ```bash
 python beat_dmx.py
 ```
 
-Stage light color names such as "amber" are printed whenever BPM summaries are
-shown. "Smoke start" and "Smoke end" indicate each burst.
-
-Typical console output for a cue looks like:
-
-```
-Change:
-- Moving Light: Audience
-Current:
-- Moving Light: Audience
-- Stage Light: Off
-- Overhead Effects: Red (80%) Pulsing
-- Karaoke Lights: Red (10%)
-```
+The script prints "Estimated BPM" every few seconds. You can attach a callback
+to ``DmxBeatBlinker.on_beat`` to trigger other effects.
 
 ## Standalone beat detection
 
