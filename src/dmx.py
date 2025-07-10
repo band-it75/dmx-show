@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import time
-from typing import Mapping
+from typing import Mapping, Tuple
+import argparse
 
 import serial
 
@@ -47,3 +48,38 @@ class DmxSerial:
 
     def __exit__(self, exc_type, exc, tb) -> None:
         self.close()
+
+
+def _parse_pair(text: str) -> Tuple[int, int]:
+    """Return a ``(channel, value)`` tuple from ``CH:VAL`` input."""
+    if ":" not in text:
+        raise argparse.ArgumentTypeError("Expected CH:VAL")
+    ch_str, val_str = text.split(":", 1)
+    try:
+        ch = int(ch_str)
+        val = int(val_str)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("Channel and value must be integers") from exc
+    if not 1 <= ch <= 512:
+        raise argparse.ArgumentTypeError("Channel must be 1-512")
+    if not 0 <= val <= 255:
+        raise argparse.ArgumentTypeError("Value must be 0-255")
+    return ch, val
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Send a DMX frame once")
+    parser.add_argument("pairs", metavar="CH:VAL", nargs="+", type=_parse_pair,
+                        help="DMX channel and value pairs")
+    parser.add_argument("--port", default="COM4", help="Serial port")
+    parser.add_argument("--channels", type=int, default=512,
+                        help="Number of DMX channels")
+    args = parser.parse_args()
+
+    values = dict(args.pairs)
+    with DmxSerial(port=args.port, channels=args.channels) as dmx:
+        dmx.send(values)
+
+
+if __name__ == "__main__":
+    main()
