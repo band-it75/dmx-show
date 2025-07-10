@@ -1,0 +1,1 @@
+# Implement the scenario here. Detecting sound beats and triggering DMX events.
