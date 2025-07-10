@@ -1,5 +1,5 @@
 import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
-from Prolights_LumiPar7UTRI_8ch import blink_red
+from main import blink_red
 
 def test_blink_red_sends_correct_frames(monkeypatch):
     calls = []
