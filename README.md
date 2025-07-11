@@ -95,7 +95,8 @@ Librosa is installed automatically for spectral analysis.
 and chorus sections. These rely on RMS loudness trends, harmonic/percussive
 ratios and spectral flatness. Results are heuristic and may produce occasional
 false triggers but can be useful for debugging lighting ideas. Their status is
-visible in dashboard mode.
+visible in dashboard mode. Chorus and crescendo detection now include a
+0.5-second debounce interval to reduce erratic short bursts.
 
 ## Devices
 
