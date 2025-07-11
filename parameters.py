@@ -30,14 +30,15 @@ CHANNEL = 1
 PRINT_INTERVAL = 10
 
 # Display a static dashboard instead of logging lines
-SHOW_DASHBOARD = False
+SHOW_DASHBOARD = True
 
 # DMX hardware port
 COM_PORT = "COM4"
 
 # List of (fixture class, start_address, name) tuples describing the rig
 DEVICES = [
-    (Prolights_LumiPar12UAW5_7ch, 1, "House Lights"),
+    # (Prolights_LumiPar12UAW5_7ch, 1, "House Lights"),
+    (Prolights_LumiPar7UTRI_8ch, 1, "House Lights"),
     (Prolights_LumiPar12UAW5_7ch, 10, "House Lights"),
     (Prolights_LumiPar12UAW5_7ch, 19, "House Lights"),
     (Prolights_LumiPar7UTRI_8ch, 30, "Karaoke Lights"),
