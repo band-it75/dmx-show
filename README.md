@@ -127,6 +127,8 @@ Beat updates briefly change overhead colors for 100 ms on each beat.
 Genre-specific colors guide intensity and timing. The moving head stays on the
 artist during songs and aims at the audience to end each song. Stage lights fade
 to black during songs and return when the moving head faces the audience.
+Avoid cues that rely on solos or other musical details the software cannot
+sense.
 Each ``Scenario`` constant stores DMX updates, an optional beat mapping, BPM range
 and VU level along with predecessor and successor lists. ``Song Start`` follows
 ``Intermission``. All ``Song Ongoing`` states can switch among themselves.
