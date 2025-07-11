@@ -57,6 +57,8 @@ console dashboard instead of log lines. Only changed DMX values, BPM and smoke
 state refresh on screen so the current lighting status is always visible. The
 dashboard also shows the current VU level along with minimum and maximum
 readings.
+Current song state and detected genre are displayed at the top.
+Running the show writes VU and dimmer levels to ``vu_dimmer.log`` for debugging.
 
 ## Standalone beat detection
 

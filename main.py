@@ -25,7 +25,7 @@ class Dashboard:
     """Simple console dashboard that refreshes on state changes."""
 
     def __init__(self) -> None:
-        self.scenario = ""
+        self.genre = ""
         self.song_state = ""
         self.bpm = 0.0
         self.vu = 0.0
@@ -36,8 +36,8 @@ class Dashboard:
         self.groups: Dict[str, Dict[str, int]] = {}
         self._last_out = ""
 
-    def set_scenario(self, name: str) -> None:
-        self.scenario = name
+    def set_genre(self, name: str) -> None:
+        self.genre = name
         self._render()
 
     def set_state(self, state: str) -> None:
@@ -70,8 +70,8 @@ class Dashboard:
 
     def _render(self) -> None:
         lines = [
-            f"Scenario: {self.scenario}",
-            f"Song state: {self.song_state}",
+            f"Genre: {self.genre}",
+            f"State: {self.song_state}",
             f"BPM: {self.bpm:.2f}",
             f"VU: {self.vu:.3f} (Min: {self.min_vu:.3f} Max: {self.max_vu:.3f})",
             f"Smoke: {'On' if self.smoke else 'Off'}",
@@ -89,7 +89,8 @@ class Dashboard:
 
 class BeatDMXShow:
     def __init__(self, samplerate: int = parameters.SAMPLERATE,
-                 dashboard: bool = parameters.SHOW_DASHBOARD) -> None:
+                 dashboard: bool = parameters.SHOW_DASHBOARD,
+                 log_path: str = "vu_dimmer.log") -> None:
         self.samplerate = samplerate
         self.dashboard_enabled = dashboard
         self.dashboard = Dashboard() if dashboard else None
@@ -114,6 +115,14 @@ class BeatDMXShow:
         self._beat_line: str | None = None
         self.last_vu_dimmer = -1
         self.current_vu = 0.0
+        self.log_file = None
+        self.log_path = log_path
+
+    @staticmethod
+    def _genre_label(scn: Scenario | None) -> str:
+        if scn and " - " in scn.value:
+            return scn.value.split(" - ", 1)[1]
+        return ""
 
     def _flush_beat_line(self) -> None:
         if self._beat_line is not None:
@@ -164,10 +173,8 @@ class BeatDMXShow:
         if scn != self.scenario:
             self._flush_beat_line()
             if not self.dashboard_enabled:
-                print(f"Scenario changed to {scn.value}", flush=True)
+                print(f"Genre changed to {scn.value}", flush=True)
         self.scenario = scn
-        if self.dashboard_enabled:
-            self.dashboard.set_scenario(scn.value)
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(
             scn
         )
@@ -185,8 +192,10 @@ class BeatDMXShow:
         self._flush_beat_line()
         if self.dashboard_enabled:
             self.dashboard.set_state(state.value)
+            genre = "" if state == SongState.INTERMISSION else self._genre_label(self.last_genre)
+            self.dashboard.set_genre(genre)
         else:
-            print(f"Song state changed to {state.value}", flush=True)
+            print(f"State changed to {state.value}", flush=True)
         mapping = {
             SongState.INTERMISSION: Scenario.INTERMISSION,
             SongState.STARTING: Scenario.SONG_START,
@@ -212,6 +221,8 @@ class BeatDMXShow:
                 self.last_genre = genre
                 if self.current_state == SongState.ONGOING:
                     self._set_scenario(genre)
+                if self.dashboard_enabled and self.current_state != SongState.INTERMISSION:
+                    self.dashboard.set_genre(self._genre_label(genre))
 
             if (
                 not self.smoke_on
@@ -259,6 +270,11 @@ class BeatDMXShow:
     def _update_overhead_from_vu(self, _ctrl: DMX) -> None:
         """Set Overhead Effects dimmer based on the latest VU reading."""
         level = int(min(1.0, self.current_vu / parameters.VU_FULL) * 255)
+        if self.log_file:
+            self.log_file.write(
+                f"{time.time():.3f} VU:{self.current_vu:.3f} dimmer:{level}\n"
+            )
+            self.log_file.flush()
         if level != self.last_vu_dimmer:
             self._apply_update("Overhead Effects", {"dimmer": level})
             self.last_vu_dimmer = level
@@ -298,12 +314,18 @@ class BeatDMXShow:
 
     def run(self) -> None:
         devices = parameters.DEVICES
-        with DMX(devices, port=parameters.COM_PORT, pre_send=self._update_overhead_from_vu) as ctrl, sd.InputStream(
-            channels=1,
-            callback=self.audio_callback,
-            samplerate=self.samplerate,
-            blocksize=512,
-        ):
+        with open(self.log_path, "a") as log, \
+            DMX(
+                devices,
+                port=parameters.COM_PORT,
+                pre_send=self._update_overhead_from_vu,
+            ) as ctrl, sd.InputStream(
+                channels=1,
+                callback=self.audio_callback,
+                samplerate=self.samplerate,
+                blocksize=512,
+            ):
+            self.log_file = log
             self.controller = ctrl
             self.groups = ctrl.groups
             smoke_group = ctrl.groups.get("Smoke Machine")
@@ -318,9 +340,11 @@ class BeatDMXShow:
             self._flush_beat_line()
             if self.dashboard_enabled:
                 self.dashboard.set_state(self.current_state.value)
-                self.dashboard.set_scenario(self.scenario.value)
+                genre = "" if self.current_state == SongState.INTERMISSION else self._genre_label(self.last_genre)
+                self.dashboard.set_genre(genre)
             else:
-                print(f"Initial scenario {self.scenario.value}", flush=True)
+                init_genre = self._genre_label(self.last_genre) if self.current_state != SongState.INTERMISSION else ""
+                print(f"Initial genre {init_genre}", flush=True)
             self._print_state_change(self.scenario.updates)
             self._flush_beat_line()
             if not self.dashboard_enabled:
@@ -332,6 +356,7 @@ class BeatDMXShow:
                 self._flush_beat_line()
                 if not self.dashboard_enabled:
                     print("Stopping")
+        self.log_file = None
 
 
 def main() -> None:
