@@ -9,8 +9,9 @@ and blinks a chosen DMX channel every time a beat is found. It periodically
 prints a summary of the estimated BPM and a rough music genre classification
 every 10 seconds based on adjustable BPM ranges. BPM is derived from the median
 of the most recent beat intervals, which helps smooth out occasional
-mis-detected beats. The detector also provides lightweight heuristics for chorus
-and drum solo detection using spectral features.
+mis-detected beats. The detector also provides lightweight heuristics for chorus,
+crescendo
+and drum solo detection using spectral features with a 0.5-second debounce.
 
 ### Usage
 
@@ -98,6 +99,8 @@ ratios and spectral flatness. Results are heuristic and may produce occasional
 false triggers but can be useful for debugging lighting ideas. Their status is
 visible in dashboard mode. Chorus and crescendo detection now include a
 0.5-second debounce interval to reduce erratic short bursts.
+You can tweak this debounce time by editing the ``BeatDetector``
+``chorus_debounce`` and ``crescendo_debounce`` parameters.
 
 ## Devices
 
