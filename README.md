@@ -62,6 +62,7 @@ dashboard also shows the current VU level along with minimum and maximum
 readings. Chorus, drum solo and crescendo flags appear alongside the song
 state and detected genre at the top.
 Running the show writes VU and dimmer levels to ``vu_dimmer.log`` for debugging.
+Genre classifier details are also logged to ``ai.log``.
 
 ## Standalone beat detection
 

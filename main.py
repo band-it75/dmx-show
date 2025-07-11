@@ -130,10 +130,15 @@ class Dashboard:
 
 
 class BeatDMXShow:
-    def __init__(self, samplerate: int = parameters.SAMPLERATE,
-                 dashboard: bool = parameters.SHOW_DASHBOARD,
-                 log_path: str = "vu_dimmer.log",
-                 genre_model: GenreClassifier | None | object = _GENRE_SENTINEL) -> None:
+    def __init__(
+        self,
+        samplerate: int = parameters.SAMPLERATE,
+        dashboard: bool = parameters.SHOW_DASHBOARD,
+        log_path: str = "vu_dimmer.log",
+        *,
+        ai_log_path: str = "ai.log",
+        genre_model: GenreClassifier | None | object = _GENRE_SENTINEL,
+    ) -> None:
         self.samplerate = samplerate
         self.dashboard_enabled = dashboard
         self.dashboard = Dashboard() if dashboard else None
@@ -154,9 +159,10 @@ class BeatDMXShow:
         self.current_vu = 0.0
         self.log_file = None
         self.log_path = log_path
+        self.ai_log_path = ai_log_path
         if genre_model is _GENRE_SENTINEL:
             from src.audio import GenreClassifier as GC
-            self.genre_classifier = GC()
+            self.genre_classifier = GC(log_file=self.ai_log_path, verbose=True)
         else:
             self.genre_classifier = genre_model
         self.audio_buffer: list[np.ndarray] = []
@@ -175,6 +181,12 @@ class BeatDMXShow:
         if self._beat_line is not None:
             print()
             self._beat_line = None
+
+    def _ai_log(self, msg: str) -> None:
+        log = getattr(self.genre_classifier, "log_file", None)
+        if log:
+            log.write(msg + "\n")
+            log.flush()
 
     def _apply_update(self, group: str, values: Dict[str, int]) -> None:
         fixtures = self.groups.get(group, [])
@@ -241,6 +253,8 @@ class BeatDMXShow:
             try:
                 label = self.genre_classifier.classify(samples, self.samplerate)
                 scenario = self._scenario_from_label(label)
+                self._ai_log(f"Genre label: {label}")
+                self._ai_log(f"Scenario: {scenario.value}")
                 self.genre_label = label
                 self.last_genre = scenario
                 if self.current_state == SongState.ONGOING:
@@ -250,6 +264,7 @@ class BeatDMXShow:
             except Exception as exc:  # pragma: no cover - model errors
                 if not self.dashboard_enabled:
                     print(f"Genre classification error: {exc}", flush=True)
+                self._ai_log(f"Genre classification error: {exc}")
             finally:
                 self.classifying = False
 
