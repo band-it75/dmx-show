@@ -16,6 +16,7 @@ heuristics for chorus, crescendo and drum solo detection using a
 
 ```bash
 pip install -r requirements.txt
+pip install torch  # required for genre classification
 python beat_dmx.py --universe 1 --channel 1
 ```
 
@@ -68,6 +69,7 @@ If you just want to detect beats without sending DMX commands, use `beat_detecti
 
 ```bash
 pip install -r requirements.txt
+pip install torch
 python beat_detection.py
 ```
 
