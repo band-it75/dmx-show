@@ -37,16 +37,17 @@ COM_PORT = "COM4"
 
 # List of (fixture class, start_address, name) tuples describing the rig
 DEVICES = [
-    # (Prolights_LumiPar12UAW5_7ch, 1, "House Lights"),
-    (Prolights_LumiPar7UTRI_8ch, 1, "House Lights"),
-    (Prolights_LumiPar12UAW5_7ch, 10, "House Lights"),
-    (Prolights_LumiPar12UAW5_7ch, 19, "House Lights"),
-    (Prolights_LumiPar7UTRI_8ch, 30, "Karaoke Lights"),
-    (Prolights_LumiPar7UTRI_8ch, 41, "Karaoke Lights"),
-    (Prolights_LumiPar12UQPro_9ch, 55, "Overhead Effects"),
-    (Prolights_LumiPar12UQPro_9ch, 69, "Overhead Effects"),
-    (Prolights_PixieWash_13ch, 85, "Moving Head"),
-    (WhatSoftware_Generic_4ch, 115, "Smoke Machine"),
+    #(Prolights_LumiPar12UAW5_7ch, 1, "House Lights"),
+    #(Prolights_LumiPar7UTRI_8ch, 1, "House Lights"),
+    #(Prolights_LumiPar12UAW5_7ch, 10, "House Lights"),
+    #(Prolights_LumiPar12UAW5_7ch, 19, "House Lights"),
+    #(Prolights_LumiPar7UTRI_8ch, 30, "Karaoke Lights"),
+    #(Prolights_LumiPar7UTRI_8ch, 41, "Karaoke Lights"),
+    #(Prolights_LumiPar12UQPro_9ch, 55, "Overhead Effects"),
+    #(Prolights_LumiPar12UQPro_9ch, 69, "Overhead Effects"),
+    #(Prolights_PixieWash_13ch, 85, "Moving Head"),
+    #(WhatSoftware_Generic_4ch, 115, "Smoke Machine"),
+    (Prolights_LumiPar7UTRI_8ch, 1, "Overhead Effects"),
 ]
 
 
