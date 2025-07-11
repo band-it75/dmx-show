@@ -138,9 +138,10 @@ class BeatDMXShow:
                     fx.set_pan_tilt(pan or 0, tilt or 0)
                 except KeyError:
                     pass
-            for ch, val in values.items():
+            for ch in fx.channels:
                 if ch in {"pan", "tilt"}:
                     continue
+                val = values.get(ch, 0)
                 try:
                     fx.set_channel(ch, val)
                 except KeyError:
