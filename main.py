@@ -360,7 +360,11 @@ class BeatDMXShow:
     def audio_callback(self, indata, frames, time_info, status) -> None:
         if status:
             self._flush_beat_line()
-            print(status, flush=True)
+            msg = str(status).strip()
+            if self.dashboard_enabled:
+                self.dashboard.set_status(msg)
+            else:
+                print(msg, flush=True)
         samples = np.frombuffer(indata, dtype=np.float32)
         now = time.time()
 
