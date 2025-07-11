@@ -9,6 +9,7 @@ from typing import Tuple
 import numpy as np
 import sounddevice as sd
 import aubio
+import librosa
 
 
 class SongState(Enum):
@@ -33,6 +34,8 @@ class BeatDetector:
     ) -> None:
         self.samplerate = samplerate
         self.tempo = aubio.tempo("default", 1024, 512, samplerate)
+        self.onset = aubio.onset("default", 1024, 512, samplerate)
+        self.centroid_desc = aubio.specdesc("centroid", 1024)
         self.beat_times: list[float] = []
         self.amplitude_threshold = amplitude_threshold
         self.start_duration = start_duration
@@ -43,6 +46,12 @@ class BeatDetector:
         self.last_loud_time = 0.0
         self.last_print = 0.0
         self.last_amplitude = 0.0
+        self.previous_rms = 0.0
+        self.is_drum_solo = False
+        self.is_chorus = False
+        self.is_crescendo = False
+        self.snare_hit = False
+        self.kick_hit = False
 
     # ------------------------------------------------------------------
     def _compute_bpm(self) -> float:
@@ -70,6 +79,28 @@ class BeatDetector:
         state_changed = False
         if loud:
             self.last_loud_time = now
+
+        # Feature extraction for section detection
+        rms = float(librosa.feature.rms(y=samples).mean())
+        flatness = float(librosa.feature.spectral_flatness(y=samples).mean())
+        self.is_chorus = rms > 0.1 and flatness < 0.2
+        self.is_crescendo = rms > self.previous_rms * 1.1
+        self.previous_rms = rms
+
+        y_harm, y_perc = librosa.effects.hpss(samples)
+        perc_energy = float(np.sum(y_perc ** 2))
+        harm_energy = float(np.sum(y_harm ** 2))
+        self.is_drum_solo = perc_energy > 3 * harm_energy
+
+        # Transient detection for snare/kick hits
+        self.snare_hit = False
+        self.kick_hit = False
+        if self.onset(samples):
+            centroid = float(self.centroid_desc(samples)[0])
+            if centroid > 4000:
+                self.snare_hit = True
+            elif centroid < 500:
+                self.kick_hit = True
 
         # song state machine
         if self.state == SongState.INTERMISSION and loud:

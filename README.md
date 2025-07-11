@@ -7,9 +7,10 @@ This project contains utilities to drive DMX lights and detect beats from microp
 The `beat_dmx.py` script listens to microphone input, detects beats using `aubio`,
 and blinks a chosen DMX channel every time a beat is found. It periodically
 prints a summary of the estimated BPM and a rough music genre classification
-every 10 seconds based on
-adjustable BPM ranges. BPM is derived from the median of the most recent beat
-intervals, which helps smooth out any occasional mis-detected beats.
+every 10 seconds based on adjustable BPM ranges. BPM is derived from the median
+of the most recent beat intervals, which helps smooth out occasional
+mis-detected beats. The detector also provides lightweight heuristics for chorus
+and drum solo detection using spectral features.
 
 ### Usage
 
@@ -56,8 +57,8 @@ Set ``SHOW_DASHBOARD`` in ``parameters.py`` to ``True`` to display a static
 console dashboard instead of log lines. Only changed DMX values, BPM and smoke
 state refresh on screen so the current lighting status is always visible. The
 dashboard also shows the current VU level along with minimum and maximum
-readings.
-Current song state and detected genre are displayed at the top.
+readings. Chorus, drum solo and crescendo flags appear alongside the song
+state and detected genre at the top.
 Running the show writes VU and dimmer levels to ``vu_dimmer.log`` for debugging.
 
 ## Standalone beat detection
@@ -86,6 +87,15 @@ python beat_detection.py --amplitude-threshold 0.02 \
 ```
 
 On Windows, you can run `install_requirements.ps1` to install the Python dependencies.
+Librosa is installed automatically for spectral analysis.
+
+### Additional detection features
+
+`beat_detection.py` also exposes simple detection of drum solos, crescendo events
+and chorus sections. These rely on RMS loudness trends, harmonic/percussive
+ratios and spectral flatness. Results are heuristic and may produce occasional
+false triggers but can be useful for debugging lighting ideas. Their status is
+visible in dashboard mode.
 
 ## Devices
 

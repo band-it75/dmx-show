@@ -33,6 +33,11 @@ class Dashboard:
         self.max_vu = 0.0
         self.smoke = False
         self.status = ""
+        self.chorus = False
+        self.drum_solo = False
+        self.crescendo = False
+        self.snare = False
+        self.kick = False
         self.groups: Dict[str, Dict[str, int]] = {}
         self._last_out = ""
 
@@ -68,6 +73,26 @@ class Dashboard:
         self.status = status
         self._render()
 
+    def set_chorus(self, value: bool) -> None:
+        self.chorus = value
+        self._render()
+
+    def set_drum_solo(self, value: bool) -> None:
+        self.drum_solo = value
+        self._render()
+
+    def set_crescendo(self, value: bool) -> None:
+        self.crescendo = value
+        self._render()
+
+    def set_snare(self, value: bool) -> None:
+        self.snare = value
+        self._render()
+
+    def set_kick(self, value: bool) -> None:
+        self.kick = value
+        self._render()
+
     def _render(self) -> None:
         lines = [
             f"Genre: {self.genre}",
@@ -75,6 +100,11 @@ class Dashboard:
             f"BPM: {self.bpm:.2f}",
             f"VU: {self.vu:.3f} (Min: {self.min_vu:.3f} Max: {self.max_vu:.3f})",
             f"Smoke: {'On' if self.smoke else 'Off'}",
+            f"Chorus: {'Yes' if self.chorus else 'No'}",
+            f"Drum Solo: {'Yes' if self.drum_solo else 'No'}",
+            f"Crescendo: {'Yes' if self.crescendo else 'No'}",
+            f"Snare: {'Hit' if self.snare else 'No'}",
+            f"Kick: {'Hit' if self.kick else 'No'}",
             f"Status: {self.status}",
             "",
             "Groups:",
@@ -286,6 +316,13 @@ class BeatDMXShow:
         now = time.time()
 
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
+
+        if self.dashboard_enabled:
+            self.dashboard.set_chorus(self.detector.is_chorus)
+            self.dashboard.set_drum_solo(self.detector.is_drum_solo)
+            self.dashboard.set_crescendo(self.detector.is_crescendo)
+            self.dashboard.set_snare(self.detector.snare_hit)
+            self.dashboard.set_kick(self.detector.kick_hit)
 
         for group, end in list(self.beat_ends.items()):
             if now >= end:
