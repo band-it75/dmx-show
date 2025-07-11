@@ -143,12 +143,12 @@ Stage lights fade to black as overheads rise to 30% warm white. Moving head cent
 - 3-s smoke burst every 30 s.
 
 ### Song Ongoing - Rock (130-160 BPM)
-- Overhead red pulse each beat with 1-s white strobe every 8 beats.
+- Overhead red pulse each beat using beat detection.
 - Moving head fast pan and tilt.
 - 3-s smoke burst every 30 s.
 
 ### Song Ongoing - Metal (>160 BPM)
-- Overhead white strobe each beat.
+- Overhead bright white pulse each beat.
 - Moving head erratic sweeps.
 - 3-s smoke burst every 30 s.
 

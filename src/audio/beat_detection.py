@@ -42,6 +42,7 @@ class BeatDetector:
         self.state_change_time = time.time()
         self.last_loud_time = 0.0
         self.last_print = 0.0
+        self.last_amplitude = 0.0
 
     # ------------------------------------------------------------------
     def _compute_bpm(self) -> float:
@@ -53,14 +54,18 @@ class BeatDetector:
             return 0.0
         return 60.0 / float(np.median(intervals))
 
-    def process(self, samples: np.ndarray, now: float | None = None) -> Tuple[bool, float, bool]:
-        """Process raw audio samples.
+    def process(
+        self, samples: np.ndarray, now: float | None = None
+    ) -> Tuple[bool, float, bool, float]:
+        """Process raw audio samples and return analysis results.
 
-        Returns a tuple ``(beat_detected, bpm, state_changed)``.
+        Returns ``(beat_detected, bpm, state_changed, vu)`` where ``vu`` is the
+        RMS level of ``samples``.
         """
         if now is None:
             now = time.time()
         amplitude = float(np.sqrt(np.mean(np.square(samples))))
+        self.last_amplitude = amplitude
         loud = amplitude > self.amplitude_threshold
         state_changed = False
         if loud:
@@ -109,7 +114,7 @@ class BeatDetector:
                 self.last_print = now
 
         self.beat_times = [t for t in self.beat_times if now - t <= 60]
-        return beat, bpm, state_changed
+        return beat, bpm, state_changed, amplitude
 
     # ------------------------------------------------------------------
     def audio_callback(self, indata, frames, time_info, status):
