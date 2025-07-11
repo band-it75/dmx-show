@@ -6,9 +6,13 @@ from pathlib import Path
 from typing import Dict
 
 import numpy as np
-import sounddevice as sd
 
-from src.audio import BeatDetector, SongState, GenreClassifier
+try:
+    import sounddevice as sd
+except Exception:  # pragma: no cover - optional dependency for tests
+    sd = None
+
+from src.audio import GenreClassifier, SongState
 
 import parameters
 from parameters import Scenario
@@ -125,15 +129,9 @@ class BeatDMXShow:
         self.samplerate = samplerate
         self.dashboard_enabled = dashboard
         self.dashboard = Dashboard() if dashboard else None
-        self.detector = BeatDetector(
-            samplerate=samplerate,
-            amplitude_threshold=parameters.AMPLITUDE_THRESHOLD,
-            start_duration=parameters.START_DURATION,
-            end_duration=parameters.END_DURATION,
-            print_interval=parameters.PRINT_INTERVAL,
-        )
+        self.detector = None
         self.last_genre: Scenario | None = None
-        self.current_state: SongState = self.detector.state
+        self.current_state = SongState.INTERMISSION
         self.smoke_on = False
         self.smoke_start = 0.0
         self.last_smoke_time = 0.0
@@ -408,6 +406,19 @@ class BeatDMXShow:
             self.dashboard.set_vu(vu)
 
     def run(self) -> None:
+        if sd is None:  # pragma: no cover - skip when sounddevice unavailable
+            import sounddevice as sd_mod
+            globals()['sd'] = sd_mod
+        if self.detector is None:
+            from src.audio import BeatDetector
+            self.detector = BeatDetector(
+                samplerate=self.samplerate,
+                amplitude_threshold=parameters.AMPLITUDE_THRESHOLD,
+                start_duration=parameters.START_DURATION,
+                end_duration=parameters.END_DURATION,
+                print_interval=parameters.PRINT_INTERVAL,
+            )
+            self.current_state = self.detector.state
         devices = parameters.DEVICES
         with open(self.log_path, "a") as log, \
             DMX(
