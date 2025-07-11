@@ -139,13 +139,14 @@ class BeatDMXShow:
             self._apply_update(name, vals)
 
 
-    def _set_scenario(self, name: parameters.Scenario) -> None:
+    def _set_scenario(self, name: parameters.Scenario, force: bool = False) -> None:
         scn = parameters.SCENARIO_MAP.get(name)
         if scn is None:
             return
         current = self.scenario
         if (
-            name != current
+            not force
+            and name != current
             and (current not in name.predecessors or name not in current.successors)
         ):
             return
@@ -181,7 +182,7 @@ class BeatDMXShow:
             SongState.ONGOING: self.last_genre or Scenario.SONG_START,
             SongState.ENDING: Scenario.SONG_ENDING,
         }
-        self._set_scenario(mapping.get(state, Scenario.INTERMISSION))
+        self._set_scenario(mapping.get(state, Scenario.INTERMISSION), force=True)
         self.current_state = state
 
     def _handle_beat(self, bpm: float, now: float) -> None:
