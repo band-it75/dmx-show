@@ -37,6 +37,7 @@ class Dashboard:
         self.scenario = ""
         self.song_state = ""
         self.bpm = 0.0
+        self.vu = 0.0
         self.smoke = False
         self.status = ""
         self.groups: Dict[str, Dict[str, int]] = {}
@@ -52,6 +53,10 @@ class Dashboard:
 
     def set_bpm(self, bpm: float) -> None:
         self.bpm = bpm
+        self._render()
+
+    def set_vu(self, vu: float) -> None:
+        self.vu = vu
         self._render()
 
     def set_smoke(self, on: bool) -> None:
@@ -71,6 +76,7 @@ class Dashboard:
             f"Scenario: {self.scenario}",
             f"Song state: {self.song_state}",
             f"BPM: {self.bpm:.2f}",
+            f"VU: {self.vu:.3f}",
             f"Smoke: {'On' if self.smoke else 'Off'}",
             f"Status: {self.status}",
             "",
@@ -282,10 +288,12 @@ class BeatDMXShow:
 
         # Update overhead dimmer based on VU level every callback
         # Scale VU level so overhead dimmer varies smoothly up to full
-        level = int(min(1.0, vu * 20.0) * 255)
+        level = int(min(1.0, vu * parameters.VU_SCALING) * 255)
         if level != self.last_vu_dimmer:
             self._apply_update("Overhead Effects", {"dimmer": level})
             self.last_vu_dimmer = level
+        if self.dashboard_enabled:
+            self.dashboard.set_vu(vu)
 
     def run(self) -> None:
         devices = parameters.DEVICES

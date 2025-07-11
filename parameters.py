@@ -29,6 +29,9 @@ CHANNEL = 1
 # How often to print BPM and genre summaries, in seconds
 PRINT_INTERVAL = 10
 
+# Scale factor for VU-based intensity updates
+VU_SCALING = 100.0
+
 # Display a static dashboard instead of logging lines
 SHOW_DASHBOARD = True
 
