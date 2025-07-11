@@ -16,7 +16,8 @@ from typing import Dict
 
 import numpy as np
 import sounddevice as sd
-import aubio
+
+from src.audio.beat_detection import BeatDetector, SongState
 
 import parameters
 from parameters import Scenario
@@ -32,17 +33,19 @@ from dmx.dmx import DMX
 class BeatDMXShow:
     def __init__(self, samplerate: int = parameters.SAMPLERATE) -> None:
         self.samplerate = samplerate
-        self.tempo = aubio.tempo("default", 1024, 512, samplerate)
-        self.beat_times = []
-        self.last_bpm = 0.0
-        self.last_genre: parameters.Scenario | None = None
-        self.state = "Intermission"
-        self.state_change = time.time()
-        self.last_loud = 0.0
+        self.detector = BeatDetector(
+            samplerate=samplerate,
+            amplitude_threshold=parameters.AMPLITUDE_THRESHOLD,
+            start_duration=parameters.START_DURATION,
+            end_duration=parameters.END_DURATION,
+            print_interval=parameters.PRINT_INTERVAL,
+        )
+        self.last_genre: Scenario | None = None
+        self.current_state: SongState = self.detector.state
         self.smoke_on = False
         self.smoke_start = 0.0
         self.last_smoke_time = 0.0
-        self.scenario = parameters.SCENARIO_MAP[parameters.Scenario.INTERMISSION]
+        self.scenario = parameters.SCENARIO_MAP[Scenario.INTERMISSION]
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(
             self.scenario
         )
@@ -72,14 +75,6 @@ class BeatDMXShow:
         for name, vals in updates.items():
             self._apply_update(name, vals)
 
-    def _compute_bpm(self) -> float:
-        if len(self.beat_times) < 2:
-            return 0.0
-        recent = self.beat_times[-8:]
-        intervals = np.diff(recent)
-        if len(intervals) == 0:
-            return 0.0
-        return 60.0 / float(np.median(intervals))
 
     def _set_scenario(self, name: parameters.Scenario) -> None:
         scn = parameters.SCENARIO_MAP.get(name)
@@ -105,82 +100,69 @@ class BeatDMXShow:
         """Return scenario for this BPM using ``parameters`` ranges."""
         return parameters.scenario_for_bpm(bpm)
 
+    def _handle_state_change(self, state: SongState) -> None:
+        mapping = {
+            SongState.INTERMISSION: Scenario.INTERMISSION,
+            SongState.STARTING: Scenario.SONG_START,
+            SongState.ONGOING: self.last_genre or Scenario.SONG_START,
+            SongState.ENDING: Scenario.SONG_ENDING,
+        }
+        self._set_scenario(mapping.get(state, Scenario.INTERMISSION))
+        self.current_state = state
+
+    def _handle_beat(self, bpm: float, now: float) -> None:
+        if bpm:
+            genre = self._detect_genre(bpm)
+            if genre != self.last_genre or self.scenario != genre:
+                self.last_genre = genre
+                if self.current_state == SongState.ONGOING:
+                    self._set_scenario(genre)
+
+            if (
+                not self.smoke_on
+                and (now - self.last_smoke_time) * 1000 >= self.smoke_gap_ms
+            ):
+                self.smoke.set_channel("fog", 255)
+                self.controller.update()
+                self.smoke_on = True
+                self.smoke_start = now
+                self.last_smoke_time = now
+
+            if self.scenario.beat:
+                for group, vals in self.scenario.beat.items():
+                    dur = vals.get("duration", 0) / 1000.0
+                    update = {k: v for k, v in vals.items() if k != "duration"}
+                    self._apply_update(group, update)
+                    self.beat_ends[group] = now + dur
+
+    def _tick(self, now: float) -> None:
+        if self.smoke_on and (now - self.smoke_start) * 1000 >= self.smoke_duration_ms:
+            self.smoke.set_channel("fog", 0)
+            self.controller.update()
+            self.smoke_on = False
+
     def audio_callback(self, indata, frames, time_info, status) -> None:
         if status:
             print(status, flush=True)
         samples = np.frombuffer(indata, dtype=np.float32)
         now = time.time()
+
+        beat, bpm, state_changed = self.detector.process(samples, now)
+
         for group, end in list(self.beat_ends.items()):
             if now >= end:
                 base = self.scenario.updates.get(group, {})
                 if base:
                     self._apply_update(group, base)
                 del self.beat_ends[group]
-        amp = float(np.sqrt(np.mean(np.square(samples))))
-        loud = amp > parameters.AMPLITUDE_THRESHOLD
-        if loud:
-            self.last_loud = now
 
-        if self.state == "Intermission" and loud:
-            self.state = "Starting"
-            self.state_change = now
-            self._set_scenario(parameters.Scenario.SONG_START)
-        elif self.state == "Starting":
-            if now - self.state_change >= parameters.START_DURATION:
-                self.state = "Ongoing" if loud else "Intermission"
-                if self.state == "Intermission":
-                    self._set_scenario(parameters.Scenario.INTERMISSION)
-            elif not loud and now - self.last_loud > parameters.END_DURATION:
-                self.state = "Intermission"
-                self._set_scenario(parameters.Scenario.INTERMISSION)
-        elif (
-            self.state == "Ongoing"
-            and not loud
-            and now - self.last_loud > parameters.END_DURATION
-        ):
-            self.state = "Ending"
-            self.state_change = now
-            self._set_scenario(parameters.Scenario.SONG_ENDING)
-        elif self.state == "Ending":
-            if loud:
-                self.state = "Starting"
-                self.state_change = now
-                self._set_scenario(parameters.Scenario.SONG_START)
-            elif now - self.state_change >= parameters.END_DURATION:
-                self.state = "Intermission"
-                self._set_scenario(parameters.Scenario.INTERMISSION)
+        if state_changed:
+            self._handle_state_change(self.detector.state)
 
+        if beat:
+            self._handle_beat(bpm, now)
 
-        if self.tempo(samples):
-            self.beat_times.append(now)
-            bpm = self._compute_bpm()
-            if bpm:
-                genre = self._detect_genre(bpm)
-                if genre != self.last_genre or self.scenario != genre:
-                    self.last_genre = genre
-                    self._set_scenario(genre)
-                if (
-                    not self.smoke_on
-                    and (now - self.last_smoke_time) * 1000 >= self.smoke_gap_ms
-                ):
-                    self.smoke.set_channel("fog", 255)
-                    self.controller.update()
-                    self.smoke_on = True
-                    self.smoke_start = now
-                    self.last_smoke_time = now
-                if self.scenario.beat:
-                    for group, vals in self.scenario.beat.items():
-                        dur = vals.get("duration", 0) / 1000.0
-                        update = {k: v for k, v in vals.items() if k != "duration"}
-                        self._apply_update(group, update)
-                        self.beat_ends[group] = now + dur
-
-        if self.smoke_on and (now - self.smoke_start) * 1000 >= self.smoke_duration_ms:
-            self.smoke.set_channel("fog", 0)
-            self.controller.update()
-            self.smoke_on = False
-
-        self.beat_times = [t for t in self.beat_times if now - t <= 60]
+        self._tick(now)
 
     def run(self) -> None:
         devices = parameters.DEVICES
