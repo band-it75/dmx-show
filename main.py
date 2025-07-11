@@ -160,16 +160,28 @@ class BeatDMXShow:
         self.log_file = None
         self.log_path = log_path
         self.ai_log_path = ai_log_path
+        self.ai_log_handle = open(self.ai_log_path, "a")
         if genre_model is _GENRE_SENTINEL:
             from src.audio import GenreClassifier as GC
             self.genre_classifier = GC(log_file=self.ai_log_path, verbose=True)
         else:
             self.genre_classifier = genre_model
+        if self.genre_classifier is None:
+            self._ai_log("Genre classifier disabled")
+        else:
+            self._ai_log("AI logging started")
         self.audio_buffer: list[np.ndarray] = []
         self.classifying = False
         self.genre_label = ""
         self.audio_queue: queue.Queue[np.ndarray] = queue.Queue(maxsize=20)
         self.running = False
+
+    def __del__(self) -> None:  # pragma: no cover - cleanup
+        if hasattr(self, "ai_log_handle") and self.ai_log_handle:
+            try:
+                self.ai_log_handle.close()
+            except Exception:
+                pass
 
     @staticmethod
     def _genre_label(scn: Scenario | None) -> str:
@@ -183,8 +195,11 @@ class BeatDMXShow:
             self._beat_line = None
 
     def _ai_log(self, msg: str) -> None:
+        if hasattr(self, "ai_log_handle") and self.ai_log_handle:
+            self.ai_log_handle.write(msg + "\n")
+            self.ai_log_handle.flush()
         log = getattr(self.genre_classifier, "log_file", None)
-        if log:
+        if log and log is not self.ai_log_handle:
             log.write(msg + "\n")
             log.flush()
 
