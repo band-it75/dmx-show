@@ -4,6 +4,8 @@ import sys
 import time
 from pathlib import Path
 from typing import Dict
+import threading
+import queue
 
 import numpy as np
 
@@ -150,6 +152,8 @@ class BeatDMXShow:
         self.audio_buffer: list[np.ndarray] = []
         self.classifying = False
         self.genre_label = ""
+        self.audio_queue: queue.Queue[np.ndarray] = queue.Queue(maxsize=20)
+        self.running = False
 
     @staticmethod
     def _genre_label(scn: Scenario | None) -> str:
@@ -362,22 +366,17 @@ class BeatDMXShow:
             self._apply_update("Overhead Effects", {"dimmer": level})
             self.last_vu_dimmer = level
 
-    def audio_callback(self, indata, frames, time_info, status) -> None:
-        if status:
-            self._flush_beat_line()
-            msg = str(status).strip()
-            if self.dashboard_enabled:
-                self.dashboard.set_status(msg)
-            else:
-                print(msg, flush=True)
-        samples = np.frombuffer(indata, dtype=np.float32)
+    def _process_samples(self, samples: np.ndarray) -> None:
         now = time.time()
-
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
 
         if self.detector.state == SongState.STARTING:
             self.audio_buffer.append(samples.copy())
-        elif self.detector.state == SongState.ONGOING and not self.classifying and self.last_genre is None:
+        elif (
+            self.detector.state == SongState.ONGOING
+            and not self.classifying
+            and self.last_genre is None
+        ):
             self.audio_buffer.append(samples.copy())
             total = sum(len(buf) for buf in self.audio_buffer)
             if total >= self.samplerate * 5:
@@ -425,6 +424,29 @@ class BeatDMXShow:
         self.current_vu = vu
         if self.dashboard_enabled:
             self.dashboard.set_vu(vu)
+
+    def _process_audio_queue(self) -> None:
+        while self.running or not self.audio_queue.empty():
+            try:
+                samples = self.audio_queue.get(timeout=0.1)
+            except queue.Empty:
+                continue
+            self._process_samples(samples)
+            self.audio_queue.task_done()
+
+    def audio_callback(self, indata, frames, time_info, status) -> None:
+        if status:
+            self._flush_beat_line()
+            msg = str(status).strip()
+            if self.dashboard_enabled:
+                self.dashboard.set_status(msg)
+            else:
+                print(msg, flush=True)
+        samples = np.frombuffer(indata, dtype=np.float32)
+        try:
+            self.audio_queue.put_nowait(samples)
+        except queue.Full:
+            pass
 
     def run(self) -> None:
         if sd is None:  # pragma: no cover - skip when sounddevice unavailable
@@ -475,6 +497,11 @@ class BeatDMXShow:
                 print(f"Initial genre {init_genre}", flush=True)
             self._print_state_change(self.scenario.updates)
             self._flush_beat_line()
+            self.running = True
+            worker = threading.Thread(
+                target=self._process_audio_queue, daemon=True
+            )
+            worker.start()
             if not self.dashboard_enabled:
                 print("Listening for beats. Press Ctrl+C to stop.")
             try:
@@ -484,6 +511,9 @@ class BeatDMXShow:
                 self._flush_beat_line()
                 if not self.dashboard_enabled:
                     print("Stopping")
+            finally:
+                self.running = False
+                worker.join()
         self.log_file = None
 
 
