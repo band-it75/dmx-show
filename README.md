@@ -4,14 +4,12 @@ This project contains utilities to drive DMX lights and detect beats from microp
 
 ## Beat-controlled blinking
 
-The `beat_dmx.py` script listens to microphone input, detects beats using `aubio`,
-and blinks a chosen DMX channel every time a beat is found. It periodically
-prints a summary of the estimated BPM and a rough music genre classification
-every 10 seconds based on adjustable BPM ranges. BPM is derived from the median
-of the most recent beat intervals, which helps smooth out occasional
-mis-detected beats. The detector also provides lightweight heuristics for chorus,
-crescendo
-and drum solo detection using spectral features with a 0.5-second debounce.
+The `beat_dmx.py` script listens to microphone input, detects beats using
+`aubio`, and blinks a chosen DMX channel on each beat. It prints the estimated
+BPM every few seconds and runs a genre classifier based on the
+`music_genres_classification` transformer model. The detector also provides
+lightweight heuristics for chorus, crescendo and drum solo detection using a
+0.5-second debounce.
 
 ### Usage
 

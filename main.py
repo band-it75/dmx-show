@@ -219,10 +219,6 @@ class BeatDMXShow:
         updates.pop("Smoke Machine", None)
         self._print_state_change(updates)
 
-    @staticmethod
-    def _detect_genre(bpm: float) -> parameters.Scenario:
-        """Return scenario for this BPM using ``parameters`` ranges."""
-        return parameters.scenario_for_bpm(bpm)
 
     def _start_genre_classification(self) -> None:
         if self.classifying or not self.audio_buffer:
@@ -290,8 +286,8 @@ class BeatDMXShow:
 
     def _handle_beat(self, bpm: float, now: float) -> None:
         if bpm:
-            genre = self.last_genre or self._detect_genre(bpm)
-            line = f"Beat at {bpm:.2f} BPM - genre {genre.value}"
+            label = self._genre_label(self.last_genre)
+            line = f"Beat at {bpm:.2f} BPM" + (f" - genre {label}" if label else "")
             if self.dashboard_enabled:
                 self.dashboard.set_bpm(bpm)
             else:
@@ -300,11 +296,6 @@ class BeatDMXShow:
                     prefix = "\r" if self._beat_line is not None else ""
                     print(prefix + line + pad, end="", flush=True)
                     self._beat_line = line
-            if self.last_genre is None and self.scenario != genre:
-                if self.current_state == SongState.ONGOING:
-                    self._set_scenario(genre)
-                if self.dashboard_enabled and self.current_state != SongState.INTERMISSION:
-                    self.dashboard.set_genre(self._genre_label(genre))
 
             if (
                 not self.smoke_on
