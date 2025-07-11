@@ -256,7 +256,7 @@ class BeatDMXShow:
             self.controller.update()
             self.smoke_on = False
 
-    def _update_overhead_from_vu(self) -> None:
+    def _update_overhead_from_vu(self, _ctrl: DMX) -> None:
         """Set Overhead Effects dimmer based on the latest VU reading."""
         level = int(min(1.0, self.current_vu / parameters.VU_FULL) * 255)
         if level != self.last_vu_dimmer:
