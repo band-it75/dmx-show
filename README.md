@@ -55,7 +55,8 @@ to ``BeatTrigger.on_beat`` to trigger other effects.
 Set ``SHOW_DASHBOARD`` in ``parameters.py`` to ``True`` to display a static
 console dashboard instead of log lines. Only changed DMX values, BPM and smoke
 state refresh on screen so the current lighting status is always visible. The
-dashboard also prints the current VU level.
+dashboard also shows the current VU level along with minimum and maximum
+readings.
 
 ## Standalone beat detection
 

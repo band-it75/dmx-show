@@ -38,6 +38,8 @@ class Dashboard:
         self.song_state = ""
         self.bpm = 0.0
         self.vu = 0.0
+        self.min_vu = float('inf')
+        self.max_vu = 0.0
         self.smoke = False
         self.status = ""
         self.groups: Dict[str, Dict[str, int]] = {}
@@ -57,6 +59,10 @@ class Dashboard:
 
     def set_vu(self, vu: float) -> None:
         self.vu = vu
+        if vu < self.min_vu:
+            self.min_vu = vu
+        if vu > self.max_vu:
+            self.max_vu = vu
         self._render()
 
     def set_smoke(self, on: bool) -> None:
@@ -76,7 +82,7 @@ class Dashboard:
             f"Scenario: {self.scenario}",
             f"Song state: {self.song_state}",
             f"BPM: {self.bpm:.2f}",
-            f"VU: {self.vu:.3f}",
+            f"VU: {self.vu:.3f} (Min: {self.min_vu:.3f} Max: {self.max_vu:.3f})",
             f"Smoke: {'On' if self.smoke else 'Off'}",
             f"Status: {self.status}",
             "",
