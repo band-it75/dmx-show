@@ -87,7 +87,8 @@ python beat_detection.py --amplitude-threshold 0.02 \
     --start-duration 2.0 --end-duration 3.0 --print-interval 5
 ```
 
-On Windows, you can run `install_requirements.ps1` to install the Python dependencies.
+On Windows, run `install_requirements.ps1` to install dependencies and preload
+the genre classification model under `models/music_genres_classification`.
 Librosa is installed automatically for spectral analysis.
 
 ### Additional detection features
