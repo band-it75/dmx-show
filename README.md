@@ -50,6 +50,12 @@ python beat_dmx.py
 The script prints "Estimated BPM" every few seconds. You can attach a callback
 to ``BeatTrigger.on_beat`` to trigger other effects.
 
+### Dashboard mode
+
+Set ``SHOW_DASHBOARD`` in ``parameters.py`` to ``True`` to display a static
+console dashboard instead of log lines. Only changed DMX values, BPM and smoke
+state refresh on screen so the current lighting status is always visible.
+
 ## Standalone beat detection
 
 If you just want to detect beats without sending DMX commands, use `beat_detection.py`:
