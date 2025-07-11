@@ -38,6 +38,9 @@ SHOW_DASHBOARD = True
 # DMX hardware port
 COM_PORT = "COM4"
 
+# How many DMX frames to send per second
+DMX_FPS = 30
+
 # List of (fixture class, start_address, name) tuples describing the rig
 DEVICES = [
     #(Prolights_LumiPar12UAW5_7ch, 1, "House Lights"),
