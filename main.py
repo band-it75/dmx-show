@@ -174,7 +174,8 @@ class BeatDMXShow:
         ):
             self.controller = ctrl
             self.groups = ctrl.groups
-            self.smoke = ctrl.groups.get("Smoke Machine", ctrl.devices[8])
+            smoke_group = ctrl.groups.get("Smoke Machine")
+            self.smoke = smoke_group[0] if smoke_group else ctrl.devices[8]
             self._print_state_change(self.scenario.updates)
             print("Listening for beats. Press Ctrl+C to stop.")
             try:
