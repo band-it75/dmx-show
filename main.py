@@ -202,6 +202,7 @@ class BeatDMXShow:
 
             if (
                 not self.smoke_on
+                and self.smoke is not None
                 and (now - self.last_smoke_time) * 1000 >= self.smoke_gap_ms
             ):
                 self._flush_beat_line()
@@ -228,7 +229,11 @@ class BeatDMXShow:
                     self.beat_ends[group] = now + dur
 
     def _tick(self, now: float) -> None:
-        if self.smoke_on and (now - self.smoke_start) * 1000 >= self.smoke_duration_ms:
+        if (
+            self.smoke_on
+            and self.smoke is not None
+            and (now - self.smoke_start) * 1000 >= self.smoke_duration_ms
+        ):
             self._flush_beat_line()
             if self.dashboard_enabled:
                 self.dashboard.set_smoke(False)
@@ -278,7 +283,7 @@ class BeatDMXShow:
             self.controller = ctrl
             self.groups = ctrl.groups
             smoke_group = ctrl.groups.get("Smoke Machine")
-            self.smoke = smoke_group[0] if smoke_group else ctrl.devices[8]
+            self.smoke = smoke_group[0] if smoke_group else None
             self._flush_beat_line()
             if self.dashboard_enabled:
                 self.dashboard.set_state(self.current_state.value)
