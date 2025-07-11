@@ -113,7 +113,7 @@ class Scenario(Enum):
             "Moving Head": {"pan": 32768, "tilt": 49152, "dimmer": 255},
             "Overhead Effects": {"white": 77, "dimmer": 77},
             "Karaoke Lights": {"dimmer": 0},
-            "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
+            "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
         },
     )
     SONG_ONGOING_SLOW = (
@@ -139,7 +139,7 @@ class Scenario(Enum):
             "Moving Head": {"dimmer": 255},
             "Overhead Effects": {"red": 255, "dimmer": 255},
             "Karaoke Lights": {"red": 26, "dimmer": 26},
-            "Smoke Machine": {"smoke_gap": 15000, "duration": 2000},
+            "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100},
@@ -168,7 +168,7 @@ class Scenario(Enum):
             "Moving Head": {"dimmer": 255},
             "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255},
             "Karaoke Lights": {"red": 26, "green": 10, "dimmer": 26},
-            "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
+            "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
         },
         {
             "Overhead Effects": {
@@ -202,7 +202,7 @@ class Scenario(Enum):
             "Moving Head": {"dimmer": 255},
             "Overhead Effects": {"red": 255, "blue": 96, "dimmer": 255},
             "Karaoke Lights": {"red": 26, "blue": 10, "dimmer": 26},
-            "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
+            "Smoke Machine": {"smoke_gap": 10000, "duration": 5000},
         },
         {
             "Overhead Effects": {
@@ -236,7 +236,7 @@ class Scenario(Enum):
             "Moving Head": {"dimmer": 255},
             "Overhead Effects": {"red": 255, "dimmer": 255},
             "Karaoke Lights": {"red": 26, "dimmer": 26},
-            "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
+            "Smoke Machine": {"smoke_gap": 20000, "duration": 5000},
         },
         {
             "Overhead Effects": {
@@ -269,7 +269,7 @@ class Scenario(Enum):
             "Moving Head": {"dimmer": 255},
             "Overhead Effects": {"white": 255, "dimmer": 255},
             "Karaoke Lights": {"white": 26, "dimmer": 26},
-            "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
+            "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
         },
         {
             "Overhead Effects": {
@@ -296,7 +296,7 @@ class Scenario(Enum):
             "Moving Head": {"pan": 32768, "tilt": 16384, "dimmer": 255},
             "Overhead Effects": {"dimmer": 0},
             "Karaoke Lights": {"dimmer": 0},
-            "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
+            "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
         },
     )
 
