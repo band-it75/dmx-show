@@ -120,6 +120,8 @@ label selects the closest lighting scenario:
 - blues, country, reggae or classical -> Song Ongoing - Slow
 
 This model runs in a background thread so beat detection remains responsive.
+If the genre remains blank, create ``GenreClassifier(verbose=True)`` to see
+model loading details and the raw label returned.
 
 ## Devices
 
