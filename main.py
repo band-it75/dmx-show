@@ -30,9 +30,60 @@ if str(SRC_DIR) not in sys.path:
 from dmx.dmx import DMX
 
 
+class Dashboard:
+    """Simple console dashboard that refreshes on state changes."""
+
+    def __init__(self) -> None:
+        self.scenario = ""
+        self.song_state = ""
+        self.bpm = 0.0
+        self.smoke = False
+        self.groups: Dict[str, Dict[str, int]] = {}
+        self._last_out = ""
+
+    def set_scenario(self, name: str) -> None:
+        self.scenario = name
+        self._render()
+
+    def set_state(self, state: str) -> None:
+        self.song_state = state
+        self._render()
+
+    def set_bpm(self, bpm: float) -> None:
+        self.bpm = bpm
+        self._render()
+
+    def set_smoke(self, on: bool) -> None:
+        self.smoke = on
+        self._render()
+
+    def set_group(self, group: str, values: Dict[str, int]) -> None:
+        self.groups[group] = values
+        self._render()
+
+    def _render(self) -> None:
+        lines = [
+            f"Scenario: {self.scenario}",
+            f"Song state: {self.song_state}",
+            f"BPM: {self.bpm:.2f}",
+            f"Smoke: {'On' if self.smoke else 'Off'}",
+            "",
+            "Groups:",
+        ]
+        for name, vals in self.groups.items():
+            lines.append(f"  {name}: {vals}")
+        out = "\n".join(lines)
+        if out != self._last_out:
+            print("\033[H\033[J" + out, end="", flush=True)
+            self._last_out = out
+
+
 class BeatDMXShow:
-    def __init__(self, samplerate: int = parameters.SAMPLERATE) -> None:
+    def __init__(self, samplerate: int = parameters.SAMPLERATE,
+                 dashboard: bool = parameters.SHOW_DASHBOARD) -> None:
         self.samplerate = samplerate
+        self.dashboard_enabled = dashboard
+        self.dashboard = Dashboard() if dashboard else None
         self.detector = BeatDetector(
             samplerate=samplerate,
             amplitude_threshold=parameters.AMPLITUDE_THRESHOLD,
@@ -80,7 +131,10 @@ class BeatDMXShow:
     def _print_state_change(self, updates: Dict[str, Dict[str, int]]) -> None:
         for name, vals in updates.items():
             self._flush_beat_line()
-            print(f"DMX update for {name}: {vals}", flush=True)
+            if self.dashboard_enabled:
+                self.dashboard.set_group(name, vals)
+            else:
+                print(f"DMX update for {name}: {vals}", flush=True)
             self._apply_update(name, vals)
 
 
@@ -96,8 +150,11 @@ class BeatDMXShow:
             return
         if scn != self.scenario:
             self._flush_beat_line()
-            print(f"Scenario changed to {scn.value}", flush=True)
+            if not self.dashboard_enabled:
+                print(f"Scenario changed to {scn.value}", flush=True)
         self.scenario = scn
+        if self.dashboard_enabled:
+            self.dashboard.set_scenario(scn.value)
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(
             scn
         )
@@ -113,7 +170,10 @@ class BeatDMXShow:
 
     def _handle_state_change(self, state: SongState) -> None:
         self._flush_beat_line()
-        print(f"Song state changed to {state.value}", flush=True)
+        if self.dashboard_enabled:
+            self.dashboard.set_state(state.value)
+        else:
+            print(f"Song state changed to {state.value}", flush=True)
         mapping = {
             SongState.INTERMISSION: Scenario.INTERMISSION,
             SongState.STARTING: Scenario.SONG_START,
@@ -127,11 +187,14 @@ class BeatDMXShow:
         if bpm:
             genre = self._detect_genre(bpm)
             line = f"Beat at {bpm:.2f} BPM - genre {genre.value}"
-            pad = "" if self._beat_line is None else " " * max(0, len(self._beat_line) - len(line))
-            if line != self._beat_line:
-                prefix = "\r" if self._beat_line is not None else ""
-                print(prefix + line + pad, end="", flush=True)
-                self._beat_line = line
+            if self.dashboard_enabled:
+                self.dashboard.set_bpm(bpm)
+            else:
+                pad = "" if self._beat_line is None else " " * max(0, len(self._beat_line) - len(line))
+                if line != self._beat_line:
+                    prefix = "\r" if self._beat_line is not None else ""
+                    print(prefix + line + pad, end="", flush=True)
+                    self._beat_line = line
             if genre != self.last_genre or self.scenario != genre:
                 self.last_genre = genre
                 if self.current_state == SongState.ONGOING:
@@ -142,7 +205,10 @@ class BeatDMXShow:
                 and (now - self.last_smoke_time) * 1000 >= self.smoke_gap_ms
             ):
                 self._flush_beat_line()
-                print("Smoke on", flush=True)
+                if self.dashboard_enabled:
+                    self.dashboard.set_smoke(True)
+                else:
+                    print("Smoke on", flush=True)
                 self.smoke.set_channel("fog", 255)
                 self.controller.update()
                 self.smoke_on = True
@@ -154,14 +220,20 @@ class BeatDMXShow:
                     dur = vals.get("duration", 0) / 1000.0
                     update = {k: v for k, v in vals.items() if k != "duration"}
                     self._flush_beat_line()
-                    print(f"Beat update {group}: {update}", flush=True)
+                    if self.dashboard_enabled:
+                        self.dashboard.set_group(group, update)
+                    else:
+                        print(f"Beat update {group}: {update}", flush=True)
                     self._apply_update(group, update)
                     self.beat_ends[group] = now + dur
 
     def _tick(self, now: float) -> None:
         if self.smoke_on and (now - self.smoke_start) * 1000 >= self.smoke_duration_ms:
             self._flush_beat_line()
-            print("Smoke off", flush=True)
+            if self.dashboard_enabled:
+                self.dashboard.set_smoke(False)
+            else:
+                print("Smoke off", flush=True)
             self.smoke.set_channel("fog", 0)
             self.controller.update()
             self.smoke_on = False
@@ -180,7 +252,10 @@ class BeatDMXShow:
                 base = self.scenario.updates.get(group, {})
                 if base:
                     self._flush_beat_line()
-                    print(f"Restore {group}: {base}", flush=True)
+                    if self.dashboard_enabled:
+                        self.dashboard.set_group(group, base)
+                    else:
+                        print(f"Restore {group}: {base}", flush=True)
                     self._apply_update(group, base)
                 del self.beat_ends[group]
 
@@ -205,16 +280,22 @@ class BeatDMXShow:
             smoke_group = ctrl.groups.get("Smoke Machine")
             self.smoke = smoke_group[0] if smoke_group else ctrl.devices[8]
             self._flush_beat_line()
-            print(f"Initial scenario {self.scenario.value}", flush=True)
+            if self.dashboard_enabled:
+                self.dashboard.set_state(self.current_state.value)
+                self.dashboard.set_scenario(self.scenario.value)
+            else:
+                print(f"Initial scenario {self.scenario.value}", flush=True)
             self._print_state_change(self.scenario.updates)
             self._flush_beat_line()
-            print("Listening for beats. Press Ctrl+C to stop.")
+            if not self.dashboard_enabled:
+                print("Listening for beats. Press Ctrl+C to stop.")
             try:
                 while True:
                     sd.sleep(1000)
             except KeyboardInterrupt:
                 self._flush_beat_line()
-                print("Stopping")
+                if not self.dashboard_enabled:
+                    print("Stopping")
 
 
 def main() -> None:
