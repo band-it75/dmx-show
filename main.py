@@ -103,6 +103,7 @@ class BeatDMXShow:
         self.groups: Dict[str, list] = {}
         self.beat_ends: Dict[str, float] = {}
         self._beat_line: str | None = None
+        self.last_vu_dimmer = -1
 
     def _flush_beat_line(self) -> None:
         if self._beat_line is not None:
@@ -250,7 +251,7 @@ class BeatDMXShow:
         samples = np.frombuffer(indata, dtype=np.float32)
         now = time.time()
 
-        beat, bpm, state_changed = self.detector.process(samples, now)
+        beat, bpm, state_changed, vu = self.detector.process(samples, now)
 
         for group, end in list(self.beat_ends.items()):
             if now >= end:
@@ -271,6 +272,12 @@ class BeatDMXShow:
             self._handle_beat(bpm, now)
 
         self._tick(now)
+
+        # Update overhead dimmer based on VU level every callback
+        level = int(min(1.0, vu * 50.0) * 255)
+        if level != self.last_vu_dimmer:
+            self._apply_update("Overhead Effects", {"dimmer": level})
+            self.last_vu_dimmer = level
 
     def run(self) -> None:
         devices = parameters.DEVICES
