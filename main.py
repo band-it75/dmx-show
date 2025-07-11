@@ -1,14 +1,5 @@
 from __future__ import annotations
 
-"""Beat-driven DMX show controller.
-
-LumiPar 12UAW5 units double as house lights. Overhead effects pulse with BPM.
-Smoke bursts last 3 seconds with a 30-second gap. Genre-specific colors guide
-intensity and timing. The moving head stays on the artist during songs and
-points at the audience to end each song. Stage lights fade to black during
-songs and return when the moving head faces the audience.
-"""
-
 import sys
 import time
 from pathlib import Path
