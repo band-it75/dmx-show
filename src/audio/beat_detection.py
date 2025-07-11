@@ -10,6 +10,7 @@ import numpy as np
 import sounddevice as sd
 import aubio
 import librosa
+from .debounce import DebouncedFlag
 
 
 class SongState(Enum):
@@ -31,6 +32,8 @@ class BeatDetector:
         start_duration: float = 2.0,
         end_duration: float = 3.0,
         print_interval: float = 10.0,
+        chorus_debounce: float = 0.5,
+        crescendo_debounce: float = 0.5,
     ) -> None:
         self.samplerate = samplerate
         self.tempo = aubio.tempo("default", 1024, 512, samplerate)
@@ -51,6 +54,8 @@ class BeatDetector:
         self.is_crescendo = False
         self.snare_hit = False
         self.kick_hit = False
+        self.chorus_flag = DebouncedFlag(chorus_debounce)
+        self.crescendo_flag = DebouncedFlag(crescendo_debounce)
 
     # ------------------------------------------------------------------
     def _compute_bpm(self) -> float:
@@ -89,8 +94,10 @@ class BeatDetector:
         # Feature extraction for section detection
         rms = float(librosa.feature.rms(y=samples).mean())
         flatness = float(librosa.feature.spectral_flatness(y=samples).mean())
-        self.is_chorus = rms > 0.1 and flatness < 0.2
-        self.is_crescendo = rms > self.previous_rms * 1.1
+        chorus_raw = rms > 0.1 and flatness < 0.2
+        crescendo_raw = rms > self.previous_rms * 1.1
+        self.is_chorus = self.chorus_flag.update(chorus_raw, now)
+        self.is_crescendo = self.crescendo_flag.update(crescendo_raw, now)
         self.previous_rms = rms
 
         y_harm, y_perc = librosa.effects.hpss(samples)
