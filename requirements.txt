@@ -5,3 +5,4 @@ scipy
 pyserial
 librosa
 transformers
+torch

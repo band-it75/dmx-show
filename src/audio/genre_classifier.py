@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from transformers import pipeline
+from transformers import pipeline, is_torch_available, is_tf_available
 import numpy as np
 
 
@@ -14,6 +14,11 @@ class GenreClassifier:
         self.model_path = Path(model_path)
         if not self.model_path.exists():
             raise FileNotFoundError(f"Genre model not found at {self.model_path}")
+
+        if not is_torch_available() and not is_tf_available():
+            raise ImportError(
+                "PyTorch or TensorFlow is required for genre classification"
+            )
 
         self._classifier = None
 
