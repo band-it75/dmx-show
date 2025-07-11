@@ -54,13 +54,20 @@ class BeatDetector:
 
     # ------------------------------------------------------------------
     def _compute_bpm(self) -> float:
-        if len(self.beat_times) < 2:
+        if len(self.beat_times) < 4:
             return 0.0
         recent = self.beat_times[-8:]
         intervals = np.diff(recent)
         if len(intervals) == 0:
             return 0.0
-        return 60.0 / float(np.median(intervals))
+        median = float(np.median(intervals))
+        if median <= 0:
+            return 0.0
+        bpm = 60.0 / median
+        if bpm > 120:
+            if np.std(intervals) > median * 0.2 or self.last_amplitude < 0.1:
+                bpm /= 2.0
+        return bpm
 
     def process(
         self, samples: np.ndarray, now: float | None = None
