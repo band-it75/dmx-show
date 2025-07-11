@@ -113,6 +113,7 @@ class BeatDMXShow:
         self.beat_ends: Dict[str, float] = {}
         self._beat_line: str | None = None
         self.last_vu_dimmer = -1
+        self.current_vu = 0.0
 
     def _flush_beat_line(self) -> None:
         if self._beat_line is not None:
@@ -255,6 +256,13 @@ class BeatDMXShow:
             self.controller.update()
             self.smoke_on = False
 
+    def _update_overhead_from_vu(self) -> None:
+        """Set Overhead Effects dimmer based on the latest VU reading."""
+        level = int(min(1.0, self.current_vu / parameters.VU_FULL) * 255)
+        if level != self.last_vu_dimmer:
+            self._apply_update("Overhead Effects", {"dimmer": level})
+            self.last_vu_dimmer = level
+
     def audio_callback(self, indata, frames, time_info, status) -> None:
         if status:
             self._flush_beat_line()
@@ -284,18 +292,13 @@ class BeatDMXShow:
 
         self._tick(now)
 
-        # Update overhead dimmer based on VU level every callback
-        # Scale VU level so overhead dimmer varies smoothly up to full
-        level = int(min(1.0, vu * parameters.VU_SCALING) * 255)
-        if level != self.last_vu_dimmer:
-            self._apply_update("Overhead Effects", {"dimmer": level})
-            self.last_vu_dimmer = level
+        self.current_vu = vu
         if self.dashboard_enabled:
             self.dashboard.set_vu(vu)
 
     def run(self) -> None:
         devices = parameters.DEVICES
-        with DMX(devices, port=parameters.COM_PORT) as ctrl, sd.InputStream(
+        with DMX(devices, port=parameters.COM_PORT, pre_send=self._update_overhead_from_vu) as ctrl, sd.InputStream(
             channels=1,
             callback=self.audio_callback,
             samplerate=self.samplerate,

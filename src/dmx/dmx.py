@@ -210,10 +210,22 @@ class DmxSerial:
 class DMX:
     """Manage multiple devices and continuously send combined frames."""
 
-    def __init__(self,
-                 devices: Iterable[Tuple[Type[DmxDevice], int] | Tuple[Type[DmxDevice], int, str]],
-                 port: str = "COM4",
-                 fps: int = 44) -> None:
+    def __init__(
+        self,
+        devices: Iterable[
+            Tuple[Type[DmxDevice], int] | Tuple[Type[DmxDevice], int, str]
+        ],
+        port: str = "COM4",
+        fps: int = 44,
+        pre_send: Callable[["DMX"], None] | None = None,
+    ) -> None:
+        """Create a DMX controller.
+
+        ``pre_send`` is an optional callback executed in the sending thread
+        right before each frame is transmitted. It can update device values
+        without risking a backlog of pending frames.
+        """
+
         self.devices: list[DmxDevice] = []
         self.groups: Dict[str, list[DmxDevice]] = {}
         for item in devices:
@@ -233,6 +245,7 @@ class DMX:
         self._lock = threading.Lock()
         self._running = False
         self._thread: Optional[threading.Thread] = None
+        self.pre_send = pre_send
 
     def _compute_frame(self) -> Dict[int, int]:
         frame: Dict[int, int] = {}
@@ -254,6 +267,11 @@ class DMX:
 
     def _loop(self) -> None:
         while self._running:
+            if self.pre_send:
+                try:
+                    self.pre_send(self)
+                except Exception:
+                    pass
             with self._lock:
                 frame = dict(self._frame)
             self.serial.send(frame)
