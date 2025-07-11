@@ -281,7 +281,8 @@ class BeatDMXShow:
         self._tick(now)
 
         # Update overhead dimmer based on VU level every callback
-        level = int(min(1.0, vu * 50.0) * 255)
+        # Scale VU level so overhead dimmer varies smoothly up to full
+        level = int(min(1.0, vu * 20.0) * 255)
         if level != self.last_vu_dimmer:
             self._apply_update("Overhead Effects", {"dimmer": level})
             self.last_vu_dimmer = level
