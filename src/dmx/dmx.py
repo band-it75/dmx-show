@@ -157,6 +157,7 @@ class DmxSerial:
         self.port = port
         self.baudrate = baudrate
         self._serial = None
+        self.error: Optional[str] = None
 
     def __enter__(self) -> "DmxSerial":
         self.open()
@@ -168,16 +169,21 @@ class DmxSerial:
     # -- serial helpers -------------------------------------------------
     def open(self) -> None:
         if serial is None:
-            raise RuntimeError("pyserial not available")
+            self.error = "pyserial not available"
+            return
         if self._serial is None:
-            # DMX512 uses 8 data bits, no parity and two stop bits
-            self._serial = serial.Serial(
-                self.port,
-                self.baudrate,
-                bytesize=serial.EIGHTBITS,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_TWO,
-            )
+            try:
+                # DMX512 uses 8 data bits, no parity and two stop bits
+                self._serial = serial.Serial(
+                    self.port,
+                    self.baudrate,
+                    bytesize=serial.EIGHTBITS,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_TWO,
+                )
+                self.error = None
+            except Exception:
+                self.error = f"{self.port} not available"
 
     def close(self) -> None:
         if self._serial is not None:
@@ -191,7 +197,7 @@ class DmxSerial:
             if 1 <= channel <= 512:
                 data[channel - 1] = max(0, min(255, value))
         if self._serial is None:
-            raise RuntimeError("Serial port not open")
+            return
         # Break (>=88us) and mark after break (>=8us)
         self._serial.break_condition = True
         time.sleep(0.0001)
