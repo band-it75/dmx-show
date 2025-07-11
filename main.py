@@ -347,10 +347,15 @@ class BeatDMXShow:
 
     def _update_overhead_from_vu(self, _ctrl: DMX) -> None:
         """Set Overhead Effects dimmer based on the latest VU reading."""
+        now = time.time()
+        end = self.beat_ends.get("Overhead Effects", 0.0)
+        if now < end:
+            return
+
         level = int(min(1.0, self.current_vu / parameters.VU_FULL) * 255)
         if self.log_file:
             self.log_file.write(
-                f"{time.time():.3f} VU:{self.current_vu:.3f} dimmer:{level}\n"
+                f"{now:.3f} VU:{self.current_vu:.3f} dimmer:{level}\n"
             )
             self.log_file.flush()
         if level != self.last_vu_dimmer:
