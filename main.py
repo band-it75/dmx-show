@@ -8,7 +8,7 @@ from typing import Dict
 import numpy as np
 import sounddevice as sd
 
-from src.audio.beat_detection import BeatDetector, SongState
+from src.audio import BeatDetector, SongState, GenreClassifier
 
 import parameters
 from parameters import Scenario
@@ -120,7 +120,8 @@ class Dashboard:
 class BeatDMXShow:
     def __init__(self, samplerate: int = parameters.SAMPLERATE,
                  dashboard: bool = parameters.SHOW_DASHBOARD,
-                 log_path: str = "vu_dimmer.log") -> None:
+                 log_path: str = "vu_dimmer.log",
+                 genre_model: GenreClassifier | None = None) -> None:
         self.samplerate = samplerate
         self.dashboard_enabled = dashboard
         self.dashboard = Dashboard() if dashboard else None
@@ -147,6 +148,10 @@ class BeatDMXShow:
         self.current_vu = 0.0
         self.log_file = None
         self.log_path = log_path
+        self.genre_classifier = genre_model or GenreClassifier()
+        self.audio_buffer: list[np.ndarray] = []
+        self.classifying = False
+        self.genre_label = ""
 
     @staticmethod
     def _genre_label(scn: Scenario | None) -> str:
@@ -217,6 +222,49 @@ class BeatDMXShow:
         """Return scenario for this BPM using ``parameters`` ranges."""
         return parameters.scenario_for_bpm(bpm)
 
+    def _start_genre_classification(self) -> None:
+        if self.classifying or not self.audio_buffer:
+            return
+        samples = np.concatenate(self.audio_buffer)
+        self.audio_buffer.clear()
+        self.classifying = True
+
+        def work() -> None:
+            try:
+                label = self.genre_classifier.classify(samples, self.samplerate)
+                scenario = self._scenario_from_label(label)
+                self.genre_label = label
+                self.last_genre = scenario
+                if self.current_state == SongState.ONGOING:
+                    self._set_scenario(scenario)
+                if self.dashboard_enabled:
+                    self.dashboard.set_genre(label)
+            except Exception as exc:  # pragma: no cover - model errors
+                if not self.dashboard_enabled:
+                    print(f"Genre classification error: {exc}", flush=True)
+            finally:
+                self.classifying = False
+
+        import threading
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @staticmethod
+    def _scenario_from_label(label: str) -> Scenario:
+        """Map model label to a show scenario."""
+        lbl = label.lower()
+        if "rock" in lbl:
+            return Scenario.SONG_ONGOING_ROCK
+        if "metal" in lbl:
+            return Scenario.SONG_ONGOING_METAL
+        if "jazz" in lbl:
+            return Scenario.SONG_ONGOING_JAZZ
+        if "pop" in lbl or "disco" in lbl:
+            return Scenario.SONG_ONGOING_POP
+        if lbl in {"blues", "country", "reggae", "classical", "hip hop", "hip-hop"}:
+            return Scenario.SONG_ONGOING_SLOW
+        return Scenario.SONG_ONGOING_SLOW
+
     def _handle_state_change(self, state: SongState) -> None:
         self._flush_beat_line()
         if self.dashboard_enabled:
@@ -228,15 +276,19 @@ class BeatDMXShow:
         mapping = {
             SongState.INTERMISSION: Scenario.INTERMISSION,
             SongState.STARTING: Scenario.SONG_START,
-            SongState.ONGOING: self.last_genre or Scenario.SONG_START,
+            SongState.ONGOING: Scenario.SONG_START,
             SongState.ENDING: Scenario.SONG_ENDING,
         }
         self._set_scenario(mapping.get(state, Scenario.INTERMISSION))
+        if state == SongState.STARTING:
+            self.audio_buffer.clear()
+        elif state == SongState.ONGOING:
+            self._start_genre_classification()
         self.current_state = state
 
     def _handle_beat(self, bpm: float, now: float) -> None:
         if bpm:
-            genre = self._detect_genre(bpm)
+            genre = self.last_genre or self._detect_genre(bpm)
             line = f"Beat at {bpm:.2f} BPM - genre {genre.value}"
             if self.dashboard_enabled:
                 self.dashboard.set_bpm(bpm)
@@ -246,8 +298,7 @@ class BeatDMXShow:
                     prefix = "\r" if self._beat_line is not None else ""
                     print(prefix + line + pad, end="", flush=True)
                     self._beat_line = line
-            if genre != self.last_genre or self.scenario != genre:
-                self.last_genre = genre
+            if self.last_genre is None and self.scenario != genre:
                 if self.current_state == SongState.ONGOING:
                     self._set_scenario(genre)
                 if self.dashboard_enabled and self.current_state != SongState.INTERMISSION:
@@ -316,6 +367,14 @@ class BeatDMXShow:
         now = time.time()
 
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
+
+        if self.detector.state == SongState.STARTING:
+            self.audio_buffer.append(samples.copy())
+        elif self.detector.state == SongState.ONGOING and not self.classifying and self.last_genre is None:
+            self.audio_buffer.append(samples.copy())
+            total = sum(len(buf) for buf in self.audio_buffer)
+            if total >= self.samplerate * 5:
+                self._start_genre_classification()
 
         if self.dashboard_enabled:
             self.dashboard.set_chorus(self.detector.is_chorus)

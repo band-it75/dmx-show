@@ -99,6 +99,20 @@ false triggers but can be useful for debugging lighting ideas. Their status is
 visible in dashboard mode. Chorus and crescendo detection now include a
 0.5-second debounce interval to reduce erratic short bursts.
 
+## Genre classification
+
+When a song begins, audio from the first few seconds feeds a pre-trained
+`music_genres_classification` model via the Transformers pipeline. The predicted
+label selects the closest lighting scenario:
+
+- rock -> Song Ongoing - Rock
+- metal -> Song Ongoing - Metal
+- jazz -> Song Ongoing - Jazz
+- pop/disco -> Song Ongoing - Pop
+- blues, country, reggae or classical -> Song Ongoing - Slow
+
+This model runs in a background thread so beat detection remains responsive.
+
 ## Devices
 
 The following table lists the DMX fixtures currently configured for the
