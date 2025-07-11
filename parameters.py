@@ -30,7 +30,7 @@ CHANNEL = 1
 PRINT_INTERVAL = 10
 
 # Scale factor for VU-based intensity updates
-VU_SCALING = 100.0
+VU_SCALING = 25.0
 
 # Display a static dashboard instead of logging lines
 SHOW_DASHBOARD = True
