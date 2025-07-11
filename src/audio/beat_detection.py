@@ -35,7 +35,6 @@ class BeatDetector:
         self.samplerate = samplerate
         self.tempo = aubio.tempo("default", 1024, 512, samplerate)
         self.onset = aubio.onset("default", 1024, 512, samplerate)
-        self.centroid_desc = aubio.specdesc("centroid", 1024)
         self.beat_times: list[float] = []
         self.amplitude_threshold = amplitude_threshold
         self.start_duration = start_duration
@@ -96,7 +95,9 @@ class BeatDetector:
         self.snare_hit = False
         self.kick_hit = False
         if self.onset(samples):
-            centroid = float(self.centroid_desc(samples)[0])
+            centroid = float(
+                librosa.feature.spectral_centroid(y=samples, sr=self.samplerate).mean()
+            )
             if centroid > 4000:
                 self.snare_hit = True
             elif centroid < 500:
