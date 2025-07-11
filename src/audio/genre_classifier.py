@@ -7,7 +7,10 @@ import numpy as np
 
 class GenreClassifier:
     """Wrapper around a pre-trained genre classification pipeline."""
-    def __init__(self, model_path: str | Path | None = None) -> None:
+
+    def __init__(
+        self, model_path: str | Path | None = None, verbose: bool = False
+    ) -> None:
         if model_path is None:
             root_dir = Path(__file__).resolve().parents[2]
             model_path = root_dir / "models" / "music_genres_classification"
@@ -21,14 +24,29 @@ class GenreClassifier:
             )
 
         self._classifier = None
+        self.verbose = verbose
 
     def classify(self, samples: np.ndarray, samplerate: int) -> str:
         """Return the top predicted genre label for the given audio."""
         if self._classifier is None:
+            if self.verbose:
+                print(f"Loading genre model from {self.model_path}", flush=True)
             self._classifier = pipeline(
                 "audio-classification",
                 model=str(self.model_path),
                 local_files_only=True,
             )
-        result = self._classifier({"array": samples, "sampling_rate": samplerate})[0]
-        return result["label"]
+        if self.verbose:
+            print(
+                f"classify: samples={samples.shape} samplerate={samplerate}",
+                flush=True,
+            )
+        result = self._classifier({"array": samples, "sampling_rate": samplerate})
+        if not result:
+            if self.verbose:
+                print("genre model returned no predictions", flush=True)
+            return ""
+        label = result[0].get("label", "")
+        if self.verbose:
+            print(f"Genre label returned: {label}", flush=True)
+        return label
