@@ -35,11 +35,36 @@ class DmxDevice:
         # Initialize all channel values to 0
         self._values: Dict[str, int] = {name: 0 for name in self.channels}
 
+    def _approximate_channel(self, name: str, value: int) -> bool:
+        """Fallback for abstract color channels.
+
+        Returns ``True`` if the value was mapped to existing channels.
+        """
+        if name in {"white", "warm_white", "cold_white"}:
+            if "white" in self.channels:
+                self._values["white"] = max(0, min(255, int(value)))
+                return True
+            if {"red", "green", "blue"}.issubset(self.channels):
+                val = max(0, min(255, int(value)))
+                self.set_color(val, val, val)
+                return True
+        if name == "amber":
+            if "amber" in self.channels:
+                self._values["amber"] = max(0, min(255, int(value)))
+                return True
+            if {"red", "green"}.issubset(self.channels):
+                val = max(0, min(255, int(value)))
+                # simple approximation using mostly red
+                self.set_color(val, int(val * 0.5), 0)
+                return True
+        return False
+
     def set_channel(self, name: str, value: int) -> None:
         """Set one channel by logical name (0–255)."""
-        if name not in self.channels:
+        if name in self.channels:
+            self._values[name] = max(0, min(255, int(value)))
+        elif not self._approximate_channel(name, value):
             raise KeyError(f"No such channel: '{name}'")
-        self._values[name] = max(0, min(255, int(value)))
 
     def get_channel(self, name: str) -> int:
         """Get current value for a logical channel (defaults to 0)."""
@@ -48,10 +73,20 @@ class DmxDevice:
     # Convenience color methods:
 
     def set_color(self, red: int, green: int, blue: int, white: int = 0, amber: int = 0, uv: int = 0) -> None:
-        for name, val in (("red", red), ("green", green), ("blue", blue),
-                          ("white", white), ("amber", amber), ("uv", uv)):
-            if name in self.channels:
-                self._values[name] = max(0, min(255, int(val)))
+        """Set multiple color channels at once with fallbacks."""
+        for name, val in (
+            ("red", red),
+            ("green", green),
+            ("blue", blue),
+            ("white", white),
+            ("amber", amber),
+            ("uv", uv),
+        ):
+            try:
+                self.set_channel(name, val)
+            except KeyError:
+                # Ignore unknown channels if they cannot be approximated
+                pass
 
     def set_dimmer(self, value: int) -> None:
         if "dimmer" not in self.channels:

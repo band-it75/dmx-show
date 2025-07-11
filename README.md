@@ -101,6 +101,10 @@ by each fixture.
 | 085-107    | PixieWash              | 13-ch                    | Moving head front    |
 | 115-118    | Smoke machine          | 1-ch used, 3-ch reserved | Timed fog bursts |
 
+Note: the Overhead Effects group expects LumiPar 12UQPro fixtures with a white
+channel. When testing with a LumiPar 7UTRI the controller now maps ``white`` to
+equal RGB values so scenarios need no manual changes.
+
 ## Show
 
 Lighting cues are BPM-driven. LumiPar 12UAW5 units double as house lights.
