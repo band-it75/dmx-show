@@ -51,6 +51,12 @@ class BeatDMXShow:
         )
         self.groups: Dict[str, list] = {}
         self.beat_ends: Dict[str, float] = {}
+        self._beat_line: str | None = None
+
+    def _flush_beat_line(self) -> None:
+        if self._beat_line is not None:
+            print()
+            self._beat_line = None
 
     def _apply_update(self, group: str, values: Dict[str, int]) -> None:
         fixtures = self.groups.get(group, [])
@@ -73,6 +79,7 @@ class BeatDMXShow:
 
     def _print_state_change(self, updates: Dict[str, Dict[str, int]]) -> None:
         for name, vals in updates.items():
+            self._flush_beat_line()
             print(f"DMX update for {name}: {vals}", flush=True)
             self._apply_update(name, vals)
 
@@ -88,6 +95,7 @@ class BeatDMXShow:
         ):
             return
         if scn != self.scenario:
+            self._flush_beat_line()
             print(f"Scenario changed to {scn.value}", flush=True)
         self.scenario = scn
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(
@@ -104,6 +112,7 @@ class BeatDMXShow:
         return parameters.scenario_for_bpm(bpm)
 
     def _handle_state_change(self, state: SongState) -> None:
+        self._flush_beat_line()
         print(f"Song state changed to {state.value}", flush=True)
         mapping = {
             SongState.INTERMISSION: Scenario.INTERMISSION,
@@ -117,7 +126,12 @@ class BeatDMXShow:
     def _handle_beat(self, bpm: float, now: float) -> None:
         if bpm:
             genre = self._detect_genre(bpm)
-            print(f"Beat at {bpm:.2f} BPM - genre {genre.value}", flush=True)
+            line = f"Beat at {bpm:.2f} BPM - genre {genre.value}"
+            pad = "" if self._beat_line is None else " " * max(0, len(self._beat_line) - len(line))
+            if line != self._beat_line:
+                prefix = "\r" if self._beat_line is not None else ""
+                print(prefix + line + pad, end="", flush=True)
+                self._beat_line = line
             if genre != self.last_genre or self.scenario != genre:
                 self.last_genre = genre
                 if self.current_state == SongState.ONGOING:
@@ -127,6 +141,7 @@ class BeatDMXShow:
                 not self.smoke_on
                 and (now - self.last_smoke_time) * 1000 >= self.smoke_gap_ms
             ):
+                self._flush_beat_line()
                 print("Smoke on", flush=True)
                 self.smoke.set_channel("fog", 255)
                 self.controller.update()
@@ -138,12 +153,14 @@ class BeatDMXShow:
                 for group, vals in self.scenario.beat.items():
                     dur = vals.get("duration", 0) / 1000.0
                     update = {k: v for k, v in vals.items() if k != "duration"}
+                    self._flush_beat_line()
                     print(f"Beat update {group}: {update}", flush=True)
                     self._apply_update(group, update)
                     self.beat_ends[group] = now + dur
 
     def _tick(self, now: float) -> None:
         if self.smoke_on and (now - self.smoke_start) * 1000 >= self.smoke_duration_ms:
+            self._flush_beat_line()
             print("Smoke off", flush=True)
             self.smoke.set_channel("fog", 0)
             self.controller.update()
@@ -151,6 +168,7 @@ class BeatDMXShow:
 
     def audio_callback(self, indata, frames, time_info, status) -> None:
         if status:
+            self._flush_beat_line()
             print(status, flush=True)
         samples = np.frombuffer(indata, dtype=np.float32)
         now = time.time()
@@ -161,6 +179,7 @@ class BeatDMXShow:
             if now >= end:
                 base = self.scenario.updates.get(group, {})
                 if base:
+                    self._flush_beat_line()
                     print(f"Restore {group}: {base}", flush=True)
                     self._apply_update(group, base)
                 del self.beat_ends[group]
@@ -185,13 +204,16 @@ class BeatDMXShow:
             self.groups = ctrl.groups
             smoke_group = ctrl.groups.get("Smoke Machine")
             self.smoke = smoke_group[0] if smoke_group else ctrl.devices[8]
+            self._flush_beat_line()
             print(f"Initial scenario {self.scenario.value}", flush=True)
             self._print_state_change(self.scenario.updates)
+            self._flush_beat_line()
             print("Listening for beats. Press Ctrl+C to stop.")
             try:
                 while True:
                     sd.sleep(1000)
             except KeyboardInterrupt:
+                self._flush_beat_line()
                 print("Stopping")
 
 
