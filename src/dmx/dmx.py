@@ -46,7 +46,10 @@ class DmxDevice:
                 return True
             if {"red", "green", "blue"}.issubset(self.channels):
                 val = max(0, min(255, int(value)))
-                self.set_color(val, val, val)
+                # Avoid recursion by setting RGB directly
+                self._values["red"] = val
+                self._values["green"] = val
+                self._values["blue"] = val
                 return True
         if name == "amber":
             if "amber" in self.channels:
@@ -55,7 +58,9 @@ class DmxDevice:
             if {"red", "green"}.issubset(self.channels):
                 val = max(0, min(255, int(value)))
                 # simple approximation using mostly red
-                self.set_color(val, int(val * 0.5), 0)
+                # Set RGB directly to prevent recursive calls
+                self._values["red"] = val
+                self._values["green"] = int(val * 0.5)
                 return True
         return False
 
