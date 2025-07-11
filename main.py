@@ -383,6 +383,18 @@ class BeatDMXShow:
             self.dashboard.set_snare(self.detector.snare_hit)
             self.dashboard.set_kick(self.detector.kick_hit)
 
+        if self.detector.snare_hit:
+            update = {"dimmer": 255}
+            self._flush_beat_line()
+            if self.dashboard_enabled:
+                self.dashboard.set_group("Overhead Effects", update)
+            else:
+                print(f"Snare flash: {update}", flush=True)
+            self._apply_update("Overhead Effects", update)
+            self.beat_ends["Overhead Effects"] = max(
+                self.beat_ends.get("Overhead Effects", 0.0), now + 0.1
+            )
+
         for group, end in list(self.beat_ends.items()):
             if now >= end:
                 base = self.scenario.updates.get(group, {})

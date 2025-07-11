@@ -180,6 +180,7 @@ Stage lights fade to black as overheads rise to 30% warm white. Moving head cent
 
 * Overhead **candy pink** chase each beat (RGB: 255, 64, 200).
 * Accent color: **bright cyan** flashes synchronized with detected snare hits (high-frequency spectral peaks) (RGB: 0, 200, 255).
+* Snare hits push Overhead Effects to full intensity for 100 ms.
 * Moving head executes wide, energetic sweeps.
 * **3-second smoke burst** every **30 seconds**.
 
