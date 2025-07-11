@@ -14,7 +14,13 @@ try:
 except Exception:  # pragma: no cover - optional dependency for tests
     sd = None
 
-from src.audio import GenreClassifier, SongState
+from src.audio import SongState
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.audio.genre_classifier import GenreClassifier
+
+_GENRE_SENTINEL = object()
 
 import parameters
 from parameters import Scenario
@@ -127,7 +133,7 @@ class BeatDMXShow:
     def __init__(self, samplerate: int = parameters.SAMPLERATE,
                  dashboard: bool = parameters.SHOW_DASHBOARD,
                  log_path: str = "vu_dimmer.log",
-                 genre_model: GenreClassifier | None = None) -> None:
+                 genre_model: GenreClassifier | None | object = _GENRE_SENTINEL) -> None:
         self.samplerate = samplerate
         self.dashboard_enabled = dashboard
         self.dashboard = Dashboard() if dashboard else None
@@ -148,7 +154,11 @@ class BeatDMXShow:
         self.current_vu = 0.0
         self.log_file = None
         self.log_path = log_path
-        self.genre_classifier = genre_model or GenreClassifier()
+        if genre_model is _GENRE_SENTINEL:
+            from src.audio import GenreClassifier as GC
+            self.genre_classifier = GC()
+        else:
+            self.genre_classifier = genre_model
         self.audio_buffer: list[np.ndarray] = []
         self.classifying = False
         self.genre_label = ""
@@ -221,7 +231,7 @@ class BeatDMXShow:
 
 
     def _start_genre_classification(self) -> None:
-        if self.classifying or not self.audio_buffer:
+        if self.classifying or not self.audio_buffer or self.genre_classifier is None:
             return
         samples = np.concatenate(self.audio_buffer)
         self.audio_buffer.clear()
