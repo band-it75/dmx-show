@@ -38,6 +38,7 @@ class Dashboard:
         self.song_state = ""
         self.bpm = 0.0
         self.smoke = False
+        self.status = ""
         self.groups: Dict[str, Dict[str, int]] = {}
         self._last_out = ""
 
@@ -61,12 +62,17 @@ class Dashboard:
         self.groups[group] = values
         self._render()
 
+    def set_status(self, status: str) -> None:
+        self.status = status
+        self._render()
+
     def _render(self) -> None:
         lines = [
             f"Scenario: {self.scenario}",
             f"Song state: {self.song_state}",
             f"BPM: {self.bpm:.2f}",
             f"Smoke: {'On' if self.smoke else 'Off'}",
+            f"Status: {self.status}",
             "",
             "Groups:",
         ]
@@ -182,7 +188,7 @@ class BeatDMXShow:
             SongState.ONGOING: self.last_genre or Scenario.SONG_START,
             SongState.ENDING: Scenario.SONG_ENDING,
         }
-        self._set_scenario(mapping.get(state, Scenario.INTERMISSION), force=True)
+        self._set_scenario(mapping.get(state, Scenario.INTERMISSION))
         self.current_state = state
 
     def _handle_beat(self, bpm: float, now: float) -> None:
@@ -292,6 +298,13 @@ class BeatDMXShow:
             self.groups = ctrl.groups
             smoke_group = ctrl.groups.get("Smoke Machine")
             self.smoke = smoke_group[0] if smoke_group else None
+            if self.dashboard_enabled:
+                if ctrl.serial.error:
+                    self.dashboard.set_status(f"DMX Error, {ctrl.serial.error}")
+                else:
+                    self.dashboard.set_status("DMX OK")
+            elif ctrl.serial.error:
+                print(f"Status: DMX Error, {ctrl.serial.error}", flush=True)
             self._flush_beat_line()
             if self.dashboard_enabled:
                 self.dashboard.set_state(self.current_state.value)
