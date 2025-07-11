@@ -25,6 +25,7 @@ daemon is running to handle the DMX output.
 Default values for the DMX universe, channel, audio samplerate and song
 detection thresholds are defined in `parameters.py`. You can edit that file or
 override them with command-line options.
+`DMX_FPS` in that file sets how many frames are sent each second.
 
 ## Quick LumiPar 7UTRI blink
 

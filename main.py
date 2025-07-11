@@ -354,6 +354,7 @@ class BeatDMXShow:
             DMX(
                 devices,
                 port=parameters.COM_PORT,
+                fps=parameters.DMX_FPS,
                 pre_send=self._update_overhead_from_vu,
             ) as ctrl, sd.InputStream(
                 channels=1,
