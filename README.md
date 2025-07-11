@@ -106,7 +106,9 @@ You can tweak this debounce time by editing the ``BeatDetector``
 ## Genre classification
 
 When a song begins, audio from the first few seconds feeds a pre-trained
-`music_genres_classification` model via the Transformers pipeline. The predicted
+`music_genres_classification` model via the Transformers pipeline. The
+classifier loads the model from `models/music_genres_classification`. The
+predicted
 label selects the closest lighting scenario:
 
 - rock -> Song Ongoing - Rock
