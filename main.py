@@ -73,6 +73,7 @@ class BeatDMXShow:
 
     def _print_state_change(self, updates: Dict[str, Dict[str, int]]) -> None:
         for name, vals in updates.items():
+            print(f"DMX update for {name}: {vals}", flush=True)
             self._apply_update(name, vals)
 
 
@@ -86,6 +87,8 @@ class BeatDMXShow:
             and (current not in name.predecessors or name not in current.successors)
         ):
             return
+        if scn != self.scenario:
+            print(f"Scenario changed to {scn.value}", flush=True)
         self.scenario = scn
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(
             scn
@@ -101,6 +104,7 @@ class BeatDMXShow:
         return parameters.scenario_for_bpm(bpm)
 
     def _handle_state_change(self, state: SongState) -> None:
+        print(f"Song state changed to {state.value}", flush=True)
         mapping = {
             SongState.INTERMISSION: Scenario.INTERMISSION,
             SongState.STARTING: Scenario.SONG_START,
@@ -113,6 +117,7 @@ class BeatDMXShow:
     def _handle_beat(self, bpm: float, now: float) -> None:
         if bpm:
             genre = self._detect_genre(bpm)
+            print(f"Beat at {bpm:.2f} BPM - genre {genre.value}", flush=True)
             if genre != self.last_genre or self.scenario != genre:
                 self.last_genre = genre
                 if self.current_state == SongState.ONGOING:
@@ -122,6 +127,7 @@ class BeatDMXShow:
                 not self.smoke_on
                 and (now - self.last_smoke_time) * 1000 >= self.smoke_gap_ms
             ):
+                print("Smoke on", flush=True)
                 self.smoke.set_channel("fog", 255)
                 self.controller.update()
                 self.smoke_on = True
@@ -132,11 +138,13 @@ class BeatDMXShow:
                 for group, vals in self.scenario.beat.items():
                     dur = vals.get("duration", 0) / 1000.0
                     update = {k: v for k, v in vals.items() if k != "duration"}
+                    print(f"Beat update {group}: {update}", flush=True)
                     self._apply_update(group, update)
                     self.beat_ends[group] = now + dur
 
     def _tick(self, now: float) -> None:
         if self.smoke_on and (now - self.smoke_start) * 1000 >= self.smoke_duration_ms:
+            print("Smoke off", flush=True)
             self.smoke.set_channel("fog", 0)
             self.controller.update()
             self.smoke_on = False
@@ -153,6 +161,7 @@ class BeatDMXShow:
             if now >= end:
                 base = self.scenario.updates.get(group, {})
                 if base:
+                    print(f"Restore {group}: {base}", flush=True)
                     self._apply_update(group, base)
                 del self.beat_ends[group]
 
@@ -176,6 +185,7 @@ class BeatDMXShow:
             self.groups = ctrl.groups
             smoke_group = ctrl.groups.get("Smoke Machine")
             self.smoke = smoke_group[0] if smoke_group else ctrl.devices[8]
+            print(f"Initial scenario {self.scenario.value}", flush=True)
             self._print_state_change(self.scenario.updates)
             print("Listening for beats. Press Ctrl+C to stop.")
             try:
