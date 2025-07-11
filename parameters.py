@@ -88,7 +88,7 @@ class Scenario(Enum):
         {
             "House Lights": {"warm_white": 51, "dimmer": 51},
             "Moving Head": {"dimmer": 0},
-            "Overhead Effects": {"dimmer": 0},
+            "Overhead Effects": {"dimmer": 0, "strobe": 0},
             "Karaoke Lights": {"dimmer": 0},
             "Smoke Machine": {"smoke_gap": 60000, "duration": 5000},
         },
@@ -108,7 +108,7 @@ class Scenario(Enum):
         {
             "House Lights": {"dimmer": 0},
             "Moving Head": {"pan": 32768, "tilt": 49152, "dimmer": 255},
-            "Overhead Effects": {"white": 77, "dimmer": 77},
+            "Overhead Effects": {"white": 77, "dimmer": 77, "strobe": 0},
             "Karaoke Lights": {"dimmer": 0},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
         },
@@ -134,7 +134,7 @@ class Scenario(Enum):
         {
             "House Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255, "dimmer": 255},
+            "Overhead Effects": {"red": 255, "dimmer": 255, "strobe": 0},
             "Karaoke Lights": {"red": 26, "dimmer": 26},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 2000},
         },
@@ -163,7 +163,7 @@ class Scenario(Enum):
         {
             "House Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255},
+            "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255, "strobe": 0},
             "Karaoke Lights": {"red": 26, "green": 10, "dimmer": 26},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
         },
@@ -197,7 +197,7 @@ class Scenario(Enum):
         {
             "House Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255, "blue": 96, "dimmer": 255},
+            "Overhead Effects": {"red": 255, "blue": 96, "dimmer": 255, "strobe": 0},
             "Karaoke Lights": {"red": 26, "blue": 10, "dimmer": 26},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
         },
@@ -293,7 +293,7 @@ class Scenario(Enum):
         {
             "House Lights": {"warm_white": 128, "dimmer": 128},
             "Moving Head": {"pan": 32768, "tilt": 16384, "dimmer": 255},
-            "Overhead Effects": {"dimmer": 0},
+            "Overhead Effects": {"dimmer": 0, "strobe": 0},
             "Karaoke Lights": {"dimmer": 0},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 3000},
         },
