@@ -7,8 +7,9 @@ This project contains utilities to drive DMX lights and detect beats from microp
 The `beat_dmx.py` script listens to microphone input, detects beats using
 `aubio`, and blinks a chosen DMX channel on each beat. It prints the estimated
 BPM every few seconds and runs a genre classifier based on the
-`music_genres_classification` transformer model. The detector also provides
-lightweight heuristics for chorus, crescendo and drum solo detection using a
+`music_genres_classification` transformer model stored under
+`models/music_genres_classification`. The detector also provides lightweight
+heuristics for chorus, crescendo and drum solo detection using a
 0.5-second debounce.
 
 ### Usage
@@ -165,36 +166,38 @@ Stage lights fade to black as overheads rise to 30% warm white. Moving head cent
 ### Song Ongoing - Slow (BPM <80)
 
 * Overhead **deep indigo** pulse every 2 beats (RGB: 54, 0, 88).
-* Accent color: **soft lavender** highlights during crescendos detected by gradual RMS loudness increases (RGB: 200, 160, 255).
+* Accent color: **soft lavender** highlights crescendos (RGB: 200, 160, 255).
 * Moving head gentle pan focusing on the artist.
 * **2-second smoke burst** every **15 seconds**.
 
 ### Song Ongoing - Jazz (80-110 BPM)
 
 * Overhead **amber** pulse each beat (RGB: 255, 147, 41).
-* Accent color: **teal** accents triggered by detection of instrumental solos (stable mid/high-frequency harmonic content) (RGB: 0, 128, 128).
+* Accent color: **teal** accents highlight dynamic sections (RGB: 0, 128, 128).
 * Moving head performs narrow, rhythmic sweeps.
 * **3-second smoke burst** every **30 seconds**.
 
 ### Song Ongoing - Pop (110-130 BPM)
 
 * Overhead **candy pink** chase each beat (RGB: 255, 64, 200).
-* Accent color: **bright cyan** flashes synchronized with detected snare hits (high-frequency spectral peaks) (RGB: 0, 200, 255).
-* Snare hits push Overhead Effects to full intensity for 100 ms in addition to the VU-driven level.
+* Accent color: **bright cyan** flashes on strong beats (RGB: 0, 200, 255).
+* Beat accents push Overhead Effects to full intensity for 100 ms beyond the VU level.
 * Moving head executes wide, energetic sweeps.
 * **3-second smoke burst** every **30 seconds**.
 
 ### Song Ongoing - Rock (130-160 BPM)
 
-* Overhead **fire red** pulse each beat utilizing kick drum beat detection (strong low-frequency energy peaks) (RGB: 255, 0, 0).
-* Accent color: **electric blue** during verses (RGB: 0, 64, 255) and **golden amber** on chorus downbeats detected via increased harmonic richness and loudness (RGB: 255, 180, 0).
+* Overhead **fire red** pulse each beat using strong low-frequency peaks (RGB: 255, 0, 0).
+* Accent color: **electric blue** in sustained sections (RGB: 0, 64, 255).
+* Chorus downbeats switch to **golden amber** (RGB: 255, 180, 0).
 * Moving head rapid pan and tilt movements.
 * **3-second smoke burst** every **30 seconds**.
 
 ### Song Ongoing - Metal (>160 BPM)
 
 * Overhead **icy white** pulse each beat (RGB: 255, 255, 255).
-* Accent color: **UV purple** washes during riffs (repetitive melodic mid-frequency patterns) (RGB: 128, 0, 255) and **blood red** bursts on detected kick drum hits (low-frequency energy peaks) (RGB: 180, 0, 0).
+* Accent color: **UV purple** washes during intense passages (RGB: 128, 0, 255).
+* **Blood red** bursts on strong low-frequency hits (RGB: 180, 0, 0).
 * Moving head performs rapid, erratic sweeps.
 * **3-second smoke burst** every **30 seconds**.
 

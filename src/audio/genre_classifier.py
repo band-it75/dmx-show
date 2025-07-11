@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from transformers import pipeline
 import numpy as np
 
@@ -7,7 +8,10 @@ import numpy as np
 class GenreClassifier:
     """Wrapper around a pre-trained genre classification pipeline."""
 
-    def __init__(self, model_name: str = "dima806/music_genres_classification") -> None:
+    def __init__(self, model_name: str | None = None) -> None:
+        if model_name is None:
+            root = Path(__file__).resolve().parents[2]
+            model_name = str(root / "models" / "music_genres_classification")
         self.model_name = model_name
         self._classifier = None
 
