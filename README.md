@@ -134,37 +134,38 @@ Stage lights fade to black as overheads rise to 30% warm white. Moving head cent
 ### Song Ongoing - Slow (BPM <80)
 
 * Overhead **deep indigo** pulse every 2 beats (RGB: 54, 0, 88).
-* Accent color: **soft lavender** highlights during crescendos (RGB: 200, 160, 255).
+* Accent color: **soft lavender** highlights during crescendos detected by gradual RMS loudness increases (RGB: 200, 160, 255).
 * Moving head gentle pan focusing on the artist.
 * **2-second smoke burst** every **15 seconds**.
 
 ### Song Ongoing - Jazz (80-110 BPM)
 
 * Overhead **amber** pulse each beat (RGB: 255, 147, 41).
-* Accent color: **teal** accents on instrumental solos (RGB: 0, 128, 128).
+* Accent color: **teal** accents triggered by detection of instrumental solos (stable mid/high-frequency harmonic content) (RGB: 0, 128, 128).
 * Moving head performs narrow, rhythmic sweeps.
 * **3-second smoke burst** every **30 seconds**.
 
 ### Song Ongoing - Pop (110-130 BPM)
 
 * Overhead **candy pink** chase each beat (RGB: 255, 64, 200).
-* Accent color: **bright cyan** flashes synchronized with snare hits (RGB: 0, 200, 255).
+* Accent color: **bright cyan** flashes synchronized with detected snare hits (high-frequency spectral peaks) (RGB: 0, 200, 255).
 * Moving head executes wide, energetic sweeps.
 * **3-second smoke burst** every **30 seconds**.
 
 ### Song Ongoing - Rock (130-160 BPM)
 
-* Overhead **fire red** pulse each beat utilizing beat detection (RGB: 255, 0, 0).
-* Accent color: **electric blue** during verses (RGB: 0, 64, 255) and **golden amber** on chorus downbeats (RGB: 255, 180, 0).
+* Overhead **fire red** pulse each beat utilizing kick drum beat detection (strong low-frequency energy peaks) (RGB: 255, 0, 0).
+* Accent color: **electric blue** during verses (RGB: 0, 64, 255) and **golden amber** on chorus downbeats detected via increased harmonic richness and loudness (RGB: 255, 180, 0).
 * Moving head rapid pan and tilt movements.
 * **3-second smoke burst** every **30 seconds**.
 
 ### Song Ongoing - Metal (>160 BPM)
 
 * Overhead **icy white** pulse each beat (RGB: 255, 255, 255).
-* Accent color: **UV purple** washes during riffs (RGB: 128, 0, 255) and **blood red** bursts on kick drum hits (RGB: 180, 0, 0).
+* Accent color: **UV purple** washes during riffs (repetitive melodic mid-frequency patterns) (RGB: 128, 0, 255) and **blood red** bursts on detected kick drum hits (low-frequency energy peaks) (RGB: 180, 0, 0).
 * Moving head performs rapid, erratic sweeps.
 * **3-second smoke burst** every **30 seconds**.
+
 
 
 ### Song Ending
