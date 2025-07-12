@@ -396,10 +396,20 @@ class BeatDMXShow:
             self.classify_after = None
             self.pre_song_buffer.clear()
         elif state == SongState.ONGOING:
+            if (
+                self.current_state == SongState.STARTING
+                and not self.classifying
+                and self.last_genre is None
+            ):
+                log.info("FORCE classification launch on ONGOING (no genre set)")
+                self._launch_genre_classifier_immediately()
             self.buffering = True
             self.buffer_start_time = time.time()
             self.classify_after = self.buffer_start_time + 5.0
             self.pre_song_buffer.clear()
+        elif state == SongState.ENDING:
+            self.buffering = False
+            self.classify_after = None
         else:
             self.buffering = False
             self.classify_after = None
