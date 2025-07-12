@@ -5,7 +5,7 @@
 Dashboard shows real-time audio and lighting status
 
 # State
-New
+Active
 
 # User Story
 As a Karaoke Host, I want a console dashboard that displays BPM, VU and cue states
@@ -21,5 +21,7 @@ so that I can monitor the show at a glance.
 
 # Implementation Proposal
 
-
+* Build a curses-based dashboard to render BPM, VU and scenario data.
+* Update the display each loop using metrics from the main application.
+* Highlight chorus and crescendo flags with minimal flicker.
 

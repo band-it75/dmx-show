@@ -5,7 +5,7 @@
 Beat-driven lighting scenarios
 
 # State
-New
+Active
 
 # User Story
 As a Karaoke Host, I want the lights to react to beats and song states so that the
@@ -21,5 +21,7 @@ show energy matches the music.
 
 # Implementation Proposal
 
-
+* Integrate beat detection events with the scenario engine.
+* Map each beat to DMX group updates defined in `parameters.py`.
+* Ensure state transitions continue to follow the song state machine.
 

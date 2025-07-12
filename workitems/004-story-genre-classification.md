@@ -5,7 +5,7 @@
 Genre classification sets lighting scenarios
 
 # State
-New
+Active
 
 # User Story
 As a Karaoke Host, I want the show to classify the music genre so that lighting
@@ -22,5 +22,7 @@ changes to a matching scenario automatically.
 
 # Implementation Proposal
 
-
+* Buffer five seconds of audio before launching the genre classifier thread.
+* Map the resulting label to a scenario with `_scenario_from_label`.
+* If no label is returned, fall back to `scenario_for_bpm`.
 

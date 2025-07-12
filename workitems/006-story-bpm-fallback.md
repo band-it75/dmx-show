@@ -5,7 +5,7 @@
 Apply BPM-based scenario when genre is unknown
 
 # State
-New
+Active
 
 # User Story
 As a Karaoke Host, I want the show to select a scenario by BPM if genre
@@ -21,5 +21,7 @@ classification fails so that lighting does not remain stuck in Song Start.
 
 # Implementation Proposal
 
-
+* Add a `scenario_for_bpm(bpm)` helper that maps tempo ranges to scenarios.
+* When genre classification fails, call this helper using the current BPM.
+* Replace the scenario if a genre label arrives later.
 
