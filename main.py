@@ -272,7 +272,8 @@ class BeatDMXShow:
             try:
                 label = self.genre_classifier.classify(samples, self.samplerate)
                 scenario = self._scenario_from_label(label)
-                self._ai_log(f"Genre label: {label}")
+                print(f"Predicted genre label: {label}", flush=True)
+                self._ai_log(f"Predicted genre: {label}")
                 self._ai_log(f"Scenario: {scenario.value}")
                 self.genre_label = label
                 self.last_genre = scenario
@@ -330,8 +331,9 @@ class BeatDMXShow:
             self.audio_buffer.clear()
             self.last_genre = None
             self.genre_label = ""
+        # genre classification starts once enough audio is buffered
         elif state == SongState.ONGOING:
-            self._start_genre_classification()
+            pass
         self.current_state = state
 
     def _handle_beat(self, bpm: float, now: float) -> None:
