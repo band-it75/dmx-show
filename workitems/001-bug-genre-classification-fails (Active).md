@@ -37,10 +37,10 @@ Actual: Genre stays empty, leaving the show stuck in Song Start.
 - `ai.log` records every state change and classification result without
   duplicates.
 - Genre state resets when a new song begins so classification can run again.
-- Fixed buffering logic to start classification after five seconds of audio.
+- Buffer now starts only when a song reaches Ongoing and classification waits
+  five seconds before launching.
 - Reset stored genre on startup and clear persisted value.
 - Keep a rolling 5-second buffer of audio before songs.
-- Start classification immediately when a song becomes Ongoing.
 - Guard threads with a song ID so results from old songs are dropped.
 - Print state changes and genre results using the logging module.
 
