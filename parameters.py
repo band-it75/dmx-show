@@ -81,8 +81,8 @@ class Scenario(Enum):
         obj.successor_names = successors
         obj.updates = updates
         obj.beat = beat
-        obj.predecessors: list["Scenario"] = []
-        obj.successors: list["Scenario"] = []
+        obj.predecessors = []  # type: list["Scenario"]
+        obj.successors = []    # type: list["Scenario"]
         return obj
 
     INTERMISSION = (
