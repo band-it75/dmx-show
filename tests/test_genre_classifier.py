@@ -1,3 +1,8 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from parameters import Scenario
 from main import BeatDMXShow
 
@@ -15,7 +20,11 @@ def test_ai_log_single_entry(tmp_path, monkeypatch):
         def __init__(self, log_file=None, verbose=False):
             self.log_file = log_file
 
-    monkeypatch.setattr("src.audio.GenreClassifier", DummyGC)
+    import types, sys
+    import src.audio as audio
+
+    sys.modules["src.audio.genre_classifier"] = types.SimpleNamespace(GenreClassifier=DummyGC)
+    audio.GenreClassifier = DummyGC
     show = BeatDMXShow(ai_log_path=str(log_file))
     show._ai_log("entry")
     show.ai_log_handle.close()

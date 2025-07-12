@@ -41,7 +41,7 @@ class Dashboard:
         self.song_state = ""
         self.bpm = 0.0
         self.vu = 0.0
-        self.min_vu = float('inf')
+        self.min_vu = float("inf")
         self.max_vu = 0.0
         self.smoke = False
         self.status = ""
@@ -149,9 +149,7 @@ class BeatDMXShow:
         self.smoke_start = 0.0
         self.last_smoke_time = 0.0
         self.scenario = parameters.SCENARIO_MAP[Scenario.INTERMISSION]
-        self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(
-            self.scenario
-        )
+        self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(self.scenario)
         self.groups: Dict[str, list] = {}
         self.beat_ends: Dict[str, float] = {}
         self._beat_line: str | None = None
@@ -163,6 +161,7 @@ class BeatDMXShow:
         self.ai_log_handle = open(self.ai_log_path, "a")
         if genre_model is _GENRE_SENTINEL:
             from src.audio import GenreClassifier as GC
+
             self.genre_classifier = GC(log_file=self.ai_log_handle, verbose=True)
         else:
             self.genre_classifier = genre_model
@@ -231,7 +230,6 @@ class BeatDMXShow:
                 print(f"DMX update for {name}: {vals}", flush=True)
             self._apply_update(name, vals)
 
-
     def _set_scenario(self, name: parameters.Scenario, force: bool = False) -> None:
         scn = parameters.SCENARIO_MAP.get(name)
         if scn is None:
@@ -247,25 +245,28 @@ class BeatDMXShow:
             self._flush_beat_line()
             if not self.dashboard_enabled:
                 print(f"Genre changed to {scn.value}", flush=True)
+            self._ai_log(f"Scenario changed to {scn.value}")
         self.scenario = scn
-        self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(
-            scn
-        )
+        self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(scn)
         self.beat_ends.clear()
         updates = dict(scn.updates)
         updates.pop("Smoke Machine", None)
         self._print_state_change(updates)
 
-
     def _start_genre_classification(self) -> None:
-        if self.classifying or not self.audio_buffer or self.genre_classifier is None:
+        if self.genre_classifier is None:
+            self._ai_log("Skipping classification: classifier disabled")
+            return
+        if self.classifying:
+            self._ai_log("Skipping classification: already classifying")
+            return
+        if not self.audio_buffer:
+            self._ai_log("Skipping classification: no buffered audio")
             return
         samples = np.concatenate(self.audio_buffer)
         self.audio_buffer.clear()
         self.classifying = True
-        self._ai_log(
-            f"Starting genre classification: {samples.shape[0]} samples"
-        )
+        self._ai_log(f"Starting genre classification: {samples.shape[0]} samples")
 
         def work() -> None:
             try:
@@ -287,6 +288,7 @@ class BeatDMXShow:
                 self._ai_log(f"Genre classification error: {exc}")
             finally:
                 self.classifying = False
+                self._ai_log("Genre classification finished")
 
         import threading
 
@@ -316,6 +318,7 @@ class BeatDMXShow:
             self.dashboard.set_genre(genre)
         else:
             print(f"State changed to {state.value}", flush=True)
+        self._ai_log(f"State changed to {state.value}")
         mapping = {
             SongState.INTERMISSION: Scenario.INTERMISSION,
             SongState.STARTING: Scenario.SONG_START,
@@ -336,7 +339,11 @@ class BeatDMXShow:
             if self.dashboard_enabled:
                 self.dashboard.set_bpm(bpm)
             else:
-                pad = "" if self._beat_line is None else " " * max(0, len(self._beat_line) - len(line))
+                pad = (
+                    ""
+                    if self._beat_line is None
+                    else " " * max(0, len(self._beat_line) - len(line))
+                )
                 if line != self._beat_line:
                     prefix = "\r" if self._beat_line is not None else ""
                     print(prefix + line + pad, end="", flush=True)
@@ -394,9 +401,7 @@ class BeatDMXShow:
 
         level = int(min(1.0, self.current_vu / parameters.VU_FULL) * 255)
         if self.log_file:
-            self.log_file.write(
-                f"{now:.3f} VU:{self.current_vu:.3f} dimmer:{level}\n"
-            )
+            self.log_file.write(f"{now:.3f} VU:{self.current_vu:.3f} dimmer:{level}\n")
             self.log_file.flush()
         if level != self.last_vu_dimmer:
             self._apply_update("Overhead Effects", {"dimmer": level})
@@ -421,6 +426,8 @@ class BeatDMXShow:
             if total >= self.samplerate * 5:
                 self._ai_log("Launching genre classification")
                 self._start_genre_classification()
+        elif self.detector.state == SongState.ONGOING and self.last_genre is not None:
+            self._ai_log("Skipping classification: genre already known")
 
         if self.dashboard_enabled:
             self.dashboard.set_chorus(self.detector.is_chorus)
@@ -491,9 +498,11 @@ class BeatDMXShow:
     def run(self) -> None:
         if sd is None:  # pragma: no cover - skip when sounddevice unavailable
             import sounddevice as sd_mod
-            globals()['sd'] = sd_mod
+
+            globals()["sd"] = sd_mod
         if self.detector is None:
             from src.audio import BeatDetector
+
             self.detector = BeatDetector(
                 samplerate=self.samplerate,
                 amplitude_threshold=parameters.AMPLITUDE_THRESHOLD,
@@ -503,18 +512,17 @@ class BeatDMXShow:
             )
             self.current_state = self.detector.state
         devices = parameters.DEVICES
-        with open(self.log_path, "a") as log, \
-            DMX(
-                devices,
-                port=parameters.COM_PORT,
-                fps=parameters.DMX_FPS,
-                pre_send=self._update_overhead_from_vu,
-            ) as ctrl, sd.InputStream(
-                channels=1,
-                callback=self.audio_callback,
-                samplerate=self.samplerate,
-                blocksize=512,
-            ):
+        with open(self.log_path, "a") as log, DMX(
+            devices,
+            port=parameters.COM_PORT,
+            fps=parameters.DMX_FPS,
+            pre_send=self._update_overhead_from_vu,
+        ) as ctrl, sd.InputStream(
+            channels=1,
+            callback=self.audio_callback,
+            samplerate=self.samplerate,
+            blocksize=512,
+        ):
             self.log_file = log
             self.controller = ctrl
             self.groups = ctrl.groups
@@ -530,17 +538,23 @@ class BeatDMXShow:
             self._flush_beat_line()
             if self.dashboard_enabled:
                 self.dashboard.set_state(self.current_state.value)
-                genre = "" if self.current_state == SongState.INTERMISSION else self._genre_label(self.last_genre)
+                genre = (
+                    ""
+                    if self.current_state == SongState.INTERMISSION
+                    else self._genre_label(self.last_genre)
+                )
                 self.dashboard.set_genre(genre)
             else:
-                init_genre = self._genre_label(self.last_genre) if self.current_state != SongState.INTERMISSION else ""
+                init_genre = (
+                    self._genre_label(self.last_genre)
+                    if self.current_state != SongState.INTERMISSION
+                    else ""
+                )
                 print(f"Initial genre {init_genre}", flush=True)
             self._print_state_change(self.scenario.updates)
             self._flush_beat_line()
             self.running = True
-            worker = threading.Thread(
-                target=self._process_audio_queue, daemon=True
-            )
+            worker = threading.Thread(target=self._process_audio_queue, daemon=True)
             worker.start()
             if not self.dashboard_enabled:
                 print("Listening for beats. Press Ctrl+C to stop.")
