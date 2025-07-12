@@ -284,9 +284,11 @@ class BeatDMXShow:
         self, samples: np.ndarray, sr: int, song_id: int
     ) -> None:
         start_t = time.perf_counter()
+        log.info("THREAD start — calling model...")
         log.info("THREAD start       song_id=%s", song_id)
         try:
             label = self.genre_classifier.classify(samples, sr)
+            log.info("THREAD got label: %s", label)
             scenario = self._scenario_from_label(label)
             log.info(
                 "THREAD prediction  song_id=%s  label=%s  elapsed=%.2fs",
@@ -312,7 +314,7 @@ class BeatDMXShow:
         except Exception as exc:  # pragma: no cover - model errors
             if self.dashboard_enabled:
                 self.dashboard.set_genre("(error)")
-            log.exception("THREAD error       song_id=%s  %s", song_id, exc)
+            log.exception("THREAD EXCEPTION:")
         finally:
             if song_id == self.song_id:
                 self.classifying = False
@@ -321,8 +323,16 @@ class BeatDMXShow:
                 song_id,
                 time.perf_counter() - start_t,
             )
+            log.info("THREAD finished.")
 
     def _launch_genre_classifier_immediately(self) -> None:
+        log.info("Attempting _launch_genre_classifier_immediately()")
+        if not self.pre_song_buffer:
+            log.warning("SKIP: Buffer empty.")
+        if self.classifying:
+            log.warning("SKIP: Already classifying.")
+        if self.last_genre is not None:
+            log.warning("SKIP: Genre already set: %s", self.last_genre)
         if self.genre_classifier is None:
             log.warning("SKIP   classification: classifier disabled")
             return
@@ -335,6 +345,10 @@ class BeatDMXShow:
             return
         self.classifying = True
         sid = self.song_id
+        log.info(
+            "LAUNCH classifier thread, %d samples in buffer",
+            sum(len(b) for b in self.pre_song_buffer),
+        )
         log.info(
             "LAUNCH classifier  song_id=%s  frames=%d  secs=%.2f",
             sid,
@@ -397,6 +411,15 @@ class BeatDMXShow:
             self.classify_after = None
             self.pre_song_buffer.clear()
         elif state == SongState.ONGOING:
+            if self.last_genre is None and not self.classifying:
+                log.info("Calling genre classification from ONGOING state.")
+                self._launch_genre_classifier_immediately()
+            else:
+                log.info(
+                    "NOT launching classifier: last_genre=%s classifying=%s",
+                    self.last_genre,
+                    self.classifying,
+                )
             if (
                 self.current_state == SongState.STARTING
                 and not self.classifying
