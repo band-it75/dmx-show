@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import TextIO
+import logging
+import log
+
+log = logging.getLogger("AI")
 from transformers import pipeline, is_torch_available, is_tf_available
 import numpy as np
 
@@ -39,6 +43,7 @@ class GenreClassifier:
                 self._own_log = True
 
     def _log(self, message: str) -> None:
+        log.info(message)
         if self.log_file:
             self.log_file.write(message + "\n")
             self.log_file.flush()
