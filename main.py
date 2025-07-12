@@ -299,6 +299,7 @@ class BeatDMXShow:
             label = self.genre_classifier.classify(samples, sr)
             log.info("THREAD got label: %s", label)
             scenario = self._scenario_from_label(label)
+            self._ai_log(f"Genre classified as '{label}' -> Scenario: {scenario.name}")
             log.info(
                 "THREAD prediction  song_id=%s  label=%s  elapsed=%.2fs",
                 song_id,
@@ -420,15 +421,10 @@ class BeatDMXShow:
             self.classify_after = None
             self.pre_song_buffer.clear()
         elif state == SongState.ONGOING:
-            if self.last_genre is None and not self.classifying:
-                log.info("Calling genre classification from ONGOING state.")
-                self._launch_genre_classifier_immediately()
-            else:
-                log.info(
-                    "NOT launching classifier: last_genre=%s classifying=%s",
-                    self.last_genre,
-                    self.classifying,
-                )
+            if self.last_genre is None:
+                # Delay classification until we have 5 seconds of audio
+                self.classify_after = time.time() + 5.0
+                self._ai_log("Scheduled genre classification in 5s.")
             if (
                 self.current_state == SongState.STARTING
                 and not self.classifying
@@ -553,11 +549,11 @@ class BeatDMXShow:
                 self.buffering = False
                 self._launch_genre_classifier_immediately()
         if (
-            self.classify_after is not None
-            and now >= self.classify_after
+            self.classify_after
+            and time.time() >= self.classify_after
             and not self.classifying
         ):
-            self.classify_after = None
+            self._ai_log("Launching genre classifier after delay.")
             self._launch_genre_classifier_immediately()
         self._debug_log(
             f"proc amp:{vu:.3f} bpm:{bpm:.2f} beat:{beat} state:{self.detector.state.value}"
