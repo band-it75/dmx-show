@@ -137,6 +137,7 @@ class BeatDMXShow:
         log_path: str = "vu_dimmer.log",
         *,
         ai_log_path: str = "ai.log",
+        debug_log_path: str | None = None,
         genre_model: GenreClassifier | None | object = _GENRE_SENTINEL,
     ) -> None:
         self.samplerate = samplerate
@@ -158,7 +159,11 @@ class BeatDMXShow:
         self.log_file = None
         self.log_path = log_path
         self.ai_log_path = ai_log_path
+        self.debug_log_path = debug_log_path
         self.ai_log_handle = open(self.ai_log_path, "a")
+        self.debug_log_handle = (
+            open(self.debug_log_path, "a") if self.debug_log_path else None
+        )
         if genre_model is _GENRE_SENTINEL:
             from src.audio import GenreClassifier as GC
 
@@ -179,6 +184,11 @@ class BeatDMXShow:
         if hasattr(self, "ai_log_handle") and self.ai_log_handle:
             try:
                 self.ai_log_handle.close()
+            except Exception:
+                pass
+        if hasattr(self, "debug_log_handle") and self.debug_log_handle:
+            try:
+                self.debug_log_handle.close()
             except Exception:
                 pass
 
@@ -202,6 +212,11 @@ class BeatDMXShow:
             log.write(msg + "\n")
             log.flush()
 
+    def _debug_log(self, msg: str) -> None:
+        if hasattr(self, "debug_log_handle") and self.debug_log_handle:
+            self.debug_log_handle.write(msg + "\n")
+            self.debug_log_handle.flush()
+
     def _apply_update(self, group: str, values: Dict[str, int]) -> None:
         fixtures = self.groups.get(group, [])
         for fx in fixtures:
@@ -224,6 +239,7 @@ class BeatDMXShow:
     def _print_state_change(self, updates: Dict[str, Dict[str, int]]) -> None:
         for name, vals in updates.items():
             self._flush_beat_line()
+            self._debug_log(f"DMX update for {name}: {vals}")
             if self.dashboard_enabled:
                 self.dashboard.set_group(name, vals)
             else:
@@ -319,6 +335,7 @@ class BeatDMXShow:
             self.dashboard.set_genre(genre)
         else:
             print(f"State changed to {state.value}", flush=True)
+        self._debug_log(f"State changed to {state.value}")
         self._ai_log(f"State changed to {state.value}")
         mapping = {
             SongState.INTERMISSION: Scenario.INTERMISSION,
@@ -352,6 +369,7 @@ class BeatDMXShow:
                     prefix = "\r" if self._beat_line is not None else ""
                     print(prefix + line + pad, end="", flush=True)
                     self._beat_line = line
+            self._debug_log(line)
 
             if (
                 not self.smoke_on
@@ -363,6 +381,7 @@ class BeatDMXShow:
                     self.dashboard.set_smoke(True)
                 else:
                     print("Smoke on", flush=True)
+                self._debug_log("Smoke on")
                 self.smoke.set_channel("fog", 255)
                 self.controller.update()
                 self.smoke_on = True
@@ -392,6 +411,7 @@ class BeatDMXShow:
                 self.dashboard.set_smoke(False)
             else:
                 print("Smoke off", flush=True)
+            self._debug_log("Smoke off")
             self.smoke.set_channel("fog", 0)
             self.controller.update()
             self.smoke_on = False
@@ -409,11 +429,15 @@ class BeatDMXShow:
             self.log_file.flush()
         if level != self.last_vu_dimmer:
             self._apply_update("Overhead Effects", {"dimmer": level})
+            self._debug_log(f"VU dimmer: {level}")
             self.last_vu_dimmer = level
 
     def _process_samples(self, samples: np.ndarray) -> None:
         now = time.time()
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
+        self._debug_log(
+            f"proc amp:{vu:.3f} bpm:{bpm:.2f} beat:{beat} state:{self.detector.state.value}"
+        )
 
         if self.detector.state == SongState.STARTING:
             self.audio_buffer.append(samples.copy())
@@ -447,6 +471,7 @@ class BeatDMXShow:
                 self.dashboard.set_group("Overhead Effects", update)
             else:
                 print(f"Snare flash: {update}", flush=True)
+            self._debug_log(f"Snare flash: {update}")
             self._apply_update("Overhead Effects", update)
             self.beat_ends["Overhead Effects"] = max(
                 self.beat_ends.get("Overhead Effects", 0.0), now + 0.1
@@ -461,6 +486,7 @@ class BeatDMXShow:
                         self.dashboard.set_group(group, base)
                     else:
                         print(f"Restore {group}: {base}", flush=True)
+                    self._debug_log(f"Restore {group}: {base}")
                     self._apply_update(group, base)
                 del self.beat_ends[group]
 

@@ -92,17 +92,25 @@ class BeatDetector:
             self.last_loud_time = now
 
         # Feature extraction for section detection
-        rms = float(librosa.feature.rms(y=samples).mean())
-        flatness = float(librosa.feature.spectral_flatness(y=samples).mean())
+        n_fft = min(1024, len(samples))
+        rms = float(
+            librosa.feature.rms(
+                y=samples, frame_length=n_fft, hop_length=n_fft // 2
+            ).mean()
+        )
+        flatness = float(
+            librosa.feature.spectral_flatness(y=samples, n_fft=n_fft).mean()
+        )
         chorus_raw = rms > 0.1 and flatness < 0.2
         crescendo_raw = rms > self.previous_rms * 1.1
         self.is_chorus = self.chorus_flag.update(chorus_raw, now)
         self.is_crescendo = self.crescendo_flag.update(crescendo_raw, now)
         self.previous_rms = rms
 
-        y_harm, y_perc = librosa.effects.hpss(samples)
-        perc_energy = float(np.sum(y_perc ** 2))
-        harm_energy = float(np.sum(y_harm ** 2))
+        S = librosa.stft(samples, n_fft=n_fft, hop_length=n_fft // 2)
+        y_harm, y_perc = librosa.decompose.hpss(S)
+        perc_energy = float(np.sum(np.abs(y_perc) ** 2))
+        harm_energy = float(np.sum(np.abs(y_harm) ** 2))
         self.is_drum_solo = perc_energy > 3 * harm_energy
 
         # Transient detection for snare/kick hits
@@ -110,7 +118,9 @@ class BeatDetector:
         self.kick_hit = False
         if self.onset(samples):
             centroid = float(
-                librosa.feature.spectral_centroid(y=samples, sr=self.samplerate).mean()
+                librosa.feature.spectral_centroid(
+                    y=samples, sr=self.samplerate, n_fft=n_fft
+                ).mean()
             )
             if centroid > 4000:
                 self.snare_hit = True
