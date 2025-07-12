@@ -176,6 +176,7 @@ class BeatDMXShow:
         self.log_file = None
         self.log_path = log_path
         self.ai_log_path = ai_log_path
+        self.ai_log_handle = open(self.ai_log_path, "a")
         self.debug_log_path = debug_log_path
         self.debug_log_handle = (
             open(self.debug_log_path, "a") if self.debug_log_path else None
@@ -183,7 +184,7 @@ class BeatDMXShow:
         if genre_model is _GENRE_SENTINEL:
             from src.audio import GenreClassifier as GC
 
-            self.genre_classifier = GC(verbose=True)
+            self.genre_classifier = GC(verbose=True, log_file=self.ai_log_handle)
         else:
             self.genre_classifier = genre_model
         if self.genre_classifier is None:
@@ -205,6 +206,11 @@ class BeatDMXShow:
                 self.debug_log_handle.close()
             except Exception:
                 pass
+        if hasattr(self, "ai_log_handle") and self.ai_log_handle:
+            try:
+                self.ai_log_handle.close()
+            except Exception:
+                pass
 
     @staticmethod
     def _genre_label(scn: Scenario | None) -> str:
@@ -219,6 +225,9 @@ class BeatDMXShow:
 
     def _ai_log(self, msg: str) -> None:
         log.info(msg)
+        if hasattr(self, "ai_log_handle") and self.ai_log_handle:
+            self.ai_log_handle.write(msg + "\n")
+            self.ai_log_handle.flush()
 
     def _debug_log(self, msg: str) -> None:
         if hasattr(self, "debug_log_handle") and self.debug_log_handle:
