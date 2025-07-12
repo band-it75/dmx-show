@@ -103,7 +103,7 @@ class Scenario(Enum):
         "Song Start",
         0.02,
         (0, 0),
-        [],
+        ["INTERMISSION"],
         [
             "SONG_ONGOING_SLOW",
             "SONG_ONGOING_JAZZ",
