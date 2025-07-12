@@ -65,6 +65,8 @@ Running the show writes VU and dimmer levels to ``vu_dimmer.log`` for debugging.
 Genre classifier details are also logged to ``ai.log``. The file begins with a
 status line noting whether the genre classifier loaded successfully. Messages
 appear only once even if both the show and classifier write to the same file.
+Enable ``debug_log_path`` on ``BeatDMXShow`` to capture extra runtime details in
+``debug.log``.
 
 ## Standalone beat detection
 
