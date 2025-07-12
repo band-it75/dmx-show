@@ -190,6 +190,9 @@ class BeatDMXShow:
         else:
             self._ai_log("AI logging started")
         self.pre_song_buffer = deque(maxlen=int(5 * self.samplerate))
+        self.buffering = False
+        self.buffer_start_time = 0.0
+        self.classify_after: float | None = None
         self.classifying = False
         self.genre_label = ""
         self.audio_queue: queue.Queue[np.ndarray] = queue.Queue(maxsize=20)
@@ -373,8 +376,17 @@ class BeatDMXShow:
             self.last_genre = None
             self.genre_label = ""
             self.classifying = False
+            self.buffering = False
+            self.classify_after = None
+            self.pre_song_buffer.clear()
         elif state == SongState.ONGOING:
-            self._launch_genre_classifier_immediately()
+            self.buffering = True
+            self.buffer_start_time = time.time()
+            self.classify_after = self.buffer_start_time + 5.0
+            self.pre_song_buffer.clear()
+        else:
+            self.buffering = False
+            self.classify_after = None
         self.current_state = state
 
     def _handle_beat(self, bpm: float, now: float) -> None:
@@ -460,7 +472,17 @@ class BeatDMXShow:
     def _process_samples(self, samples: np.ndarray) -> None:
         now = time.time()
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
-        self.pre_song_buffer.extend(samples)
+        if self.buffering:
+            self.pre_song_buffer.extend(samples)
+            if now - self.buffer_start_time >= 5.0:
+                self.buffering = False
+        if (
+            self.classify_after is not None
+            and now >= self.classify_after
+            and not self.classifying
+        ):
+            self.classify_after = None
+            self._launch_genre_classifier_immediately()
         self._debug_log(
             f"proc amp:{vu:.3f} bpm:{bpm:.2f} beat:{beat} state:{self.detector.state.value}"
         )
