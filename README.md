@@ -63,7 +63,8 @@ readings. Chorus, drum solo and crescendo flags appear alongside the song
 state and detected genre at the top.
 Running the show writes VU and dimmer levels to ``vu_dimmer.log`` for debugging.
 Genre classifier details are also logged to ``ai.log``. The file begins with a
-status line noting whether the genre classifier loaded successfully.
+status line noting whether the genre classifier loaded successfully. Messages
+appear only once even if both the show and classifier write to the same file.
 
 ## Standalone beat detection
 
