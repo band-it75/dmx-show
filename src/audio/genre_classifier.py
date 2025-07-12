@@ -13,7 +13,7 @@ class GenreClassifier:
         self,
         model_path: str | Path | None = None,
         verbose: bool = False,
-        log_file: str | Path | None = None,
+        log_file: str | Path | TextIO | None = None,
     ) -> None:
         if model_path is None:
             root_dir = Path(__file__).resolve().parents[2]
@@ -30,8 +30,13 @@ class GenreClassifier:
         self._classifier = None
         self.verbose = verbose
         self.log_file: TextIO | None = None
+        self._own_log = False
         if log_file is not None:
-            self.log_file = open(log_file, "a")
+            if hasattr(log_file, "write"):
+                self.log_file = log_file  # type: ignore[assignment]
+            else:
+                self.log_file = open(log_file, "a")
+                self._own_log = True
 
     def _log(self, message: str) -> None:
         if self.log_file:
@@ -61,7 +66,7 @@ class GenreClassifier:
         return label
 
     def __del__(self) -> None:
-        if self.log_file:
+        if self._own_log and self.log_file:
             try:
                 self.log_file.close()
             except Exception:
