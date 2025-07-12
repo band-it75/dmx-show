@@ -328,6 +328,8 @@ class BeatDMXShow:
         self._set_scenario(mapping.get(state, Scenario.INTERMISSION))
         if state == SongState.STARTING:
             self.audio_buffer.clear()
+            self.last_genre = None
+            self.genre_label = ""
         elif state == SongState.ONGOING:
             self._start_genre_classification()
         self.current_state = state
