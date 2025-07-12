@@ -2,16 +2,12 @@
 from __future__ import annotations
 
 from enum import Enum
-from pathlib import Path
-import sys
-SRC_DIR = Path(__file__).resolve().parent / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
-from dmx.Prolights_LumiPar12UAW5_7ch import Prolights_LumiPar12UAW5_7ch
-from dmx.Prolights_LumiPar7UTRI_8ch import Prolights_LumiPar7UTRI_8ch
-from dmx.Prolights_LumiPar12UQPro_9ch import Prolights_LumiPar12UQPro_9ch
-from dmx.Prolights_PixieWash_13ch import Prolights_PixieWash_13ch
-from dmx.WhatSoftware_Generic_4ch import WhatSoftware_Generic_4ch
+
+from src.dmx.Prolights_LumiPar12UAW5_7ch import Prolights_LumiPar12UAW5_7ch
+from src.dmx.Prolights_LumiPar7UTRI_8ch import Prolights_LumiPar7UTRI_8ch
+from src.dmx.Prolights_LumiPar12UQPro_9ch import Prolights_LumiPar12UQPro_9ch
+from src.dmx.Prolights_PixieWash_13ch import Prolights_PixieWash_13ch
+from src.dmx.WhatSoftware_Generic_4ch import WhatSoftware_Generic_4ch
 
 
 # Audio settings
@@ -81,8 +77,8 @@ class Scenario(Enum):
         obj.successor_names = successors
         obj.updates = updates
         obj.beat = beat
-        obj.predecessors = []  # type: list["Scenario"]
-        obj.successors = []    # type: list["Scenario"]
+        obj.predecessors = []  
+        obj.successors = []    
         return obj
 
     INTERMISSION = (
