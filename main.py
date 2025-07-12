@@ -309,13 +309,8 @@ class BeatDMXShow:
             if song_id == self.song_id:
                 self.genre_label = label
                 if label == "":
-                    scenario = parameters.scenario_for_bpm(self.last_bpm)
-                    log.info(
-                        "THREAD fallback    song_id=%s  bpm=%.2f  scenario=%s",
-                        song_id,
-                        self.last_bpm,
-                        scenario,
-                    )
+                    log.info("THREAD empty label, defaulting to slow scenario")
+                    scenario = Scenario.SONG_ONGOING_SLOW
                 self.last_genre = scenario
                 if self.current_state == SongState.ONGOING:
                     self._set_scenario(scenario)
