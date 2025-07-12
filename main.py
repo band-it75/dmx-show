@@ -5,6 +5,9 @@ import time
 import os
 import json
 import logging
+import log
+
+log = logging.getLogger("AI")
 import traceback
 from collections import deque
 from pathlib import Path
@@ -36,8 +39,6 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from dmx.dmx import DMX
-
-logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class Dashboard:
@@ -175,20 +176,19 @@ class BeatDMXShow:
         self.log_path = log_path
         self.ai_log_path = ai_log_path
         self.debug_log_path = debug_log_path
-        self.ai_log_handle = open(self.ai_log_path, "a")
         self.debug_log_handle = (
             open(self.debug_log_path, "a") if self.debug_log_path else None
         )
         if genre_model is _GENRE_SENTINEL:
             from src.audio import GenreClassifier as GC
 
-            self.genre_classifier = GC(log_file=self.ai_log_handle, verbose=True)
+            self.genre_classifier = GC(verbose=True)
         else:
             self.genre_classifier = genre_model
         if self.genre_classifier is None:
-            self._ai_log("Genre classifier disabled")
+            log.info("Genre classifier disabled")
         else:
-            self._ai_log("AI logging started")
+            log.info("AI logging started")
         self.pre_song_buffer = deque(maxlen=int(5 * self.samplerate))
         self.buffering = False
         self.buffer_start_time = 0.0
@@ -199,11 +199,6 @@ class BeatDMXShow:
         self.running = False
 
     def __del__(self) -> None:  # pragma: no cover - cleanup
-        if hasattr(self, "ai_log_handle") and self.ai_log_handle:
-            try:
-                self.ai_log_handle.close()
-            except Exception:
-                pass
         if hasattr(self, "debug_log_handle") and self.debug_log_handle:
             try:
                 self.debug_log_handle.close()
@@ -222,13 +217,7 @@ class BeatDMXShow:
             self._beat_line = None
 
     def _ai_log(self, msg: str) -> None:
-        if hasattr(self, "ai_log_handle") and self.ai_log_handle:
-            self.ai_log_handle.write(msg + "\n")
-            self.ai_log_handle.flush()
-        log = getattr(self.genre_classifier, "log_file", None)
-        if log and log is not self.ai_log_handle:
-            log.write(msg + "\n")
-            log.flush()
+        log.info(msg)
 
     def _debug_log(self, msg: str) -> None:
         if hasattr(self, "debug_log_handle") and self.debug_log_handle:
@@ -279,7 +268,7 @@ class BeatDMXShow:
             self._flush_beat_line()
             if not self.dashboard_enabled:
                 print(f"Genre changed to {scn.value}", flush=True)
-            self._ai_log(f"Scenario changed to {scn.value}")
+            log.info("SCENARIO apply     %s", scn)
         self.scenario = scn
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(scn)
         self.beat_ends.clear()
@@ -293,12 +282,17 @@ class BeatDMXShow:
     def _run_genre_classifier(
         self, samples: np.ndarray, sr: int, song_id: int
     ) -> None:
+        start_t = time.perf_counter()
+        log.info("THREAD start       song_id=%s", song_id)
         try:
             label = self.genre_classifier.classify(samples, sr)
             scenario = self._scenario_from_label(label)
-            logging.info(f"Predicted genre label: {label}")
-            self._ai_log(f"Predicted genre: {label}")
-            self._ai_log(f"Scenario: {scenario.value}")
+            log.info(
+                "THREAD prediction  song_id=%s  label=%s  elapsed=%.2fs",
+                song_id,
+                label,
+                time.perf_counter() - start_t,
+            )
             if song_id == self.song_id:
                 self.genre_label = label
                 self.last_genre = scenario
@@ -309,28 +303,35 @@ class BeatDMXShow:
         except Exception as exc:  # pragma: no cover - model errors
             if self.dashboard_enabled:
                 self.dashboard.set_genre("(error)")
-            logging.error(traceback.format_exc())
-            self._ai_log(f"Genre classification error: {exc}")
+            log.exception("THREAD error       song_id=%s  %s", song_id, exc)
         finally:
             if song_id == self.song_id:
                 self.classifying = False
-            self._ai_log("Genre classification finished")
+            log.info(
+                "THREAD finish      song_id=%s  elapsed=%.2fs",
+                song_id,
+                time.perf_counter() - start_t,
+            )
 
     def _launch_genre_classifier_immediately(self) -> None:
         if self.genre_classifier is None:
-            self._ai_log("Skipping classification: classifier disabled")
+            log.warning("SKIP   classification: classifier disabled")
             return
         if self.classifying:
-            self._ai_log("Skipping classification: already classifying")
+            log.warning("SKIP   classification: already running")
             return
         samples = np.array(self.pre_song_buffer, dtype=np.float32)
         if samples.size == 0:
-            self._ai_log("Skipping classification: pre-song buffer empty")
+            log.warning("SKIP   classification: buffer empty")
             return
         self.classifying = True
         sid = self.song_id
-        self._ai_log(
-            f"Starting genre classification: {samples.shape[0]} samples")
+        log.info(
+            "LAUNCH classifier  song_id=%s  frames=%d  secs=%.2f",
+            sid,
+            samples.shape[0],
+            samples.shape[0] / self.samplerate,
+        )
         th = threading.Thread(
             target=self._run_genre_classifier,
             args=(samples, self.samplerate, sid),
@@ -361,9 +362,15 @@ class BeatDMXShow:
             genre = "" if state == SongState.INTERMISSION else self._genre_label(self.last_genre)
             self.dashboard.set_genre(genre)
         else:
-            logging.info(f"State changed to {state.value}")
+            log.info("State changed to %s", state.value)
         self._debug_log(f"State changed to {state.value}")
-        self._ai_log(f"State changed to {state.value}")
+        log.info(
+            "STATE change %s -> %s  | last_genre=%s  classifying=%s",
+            self.current_state,
+            state,
+            self.last_genre,
+            self.classifying,
+        )
         mapping = {
             SongState.INTERMISSION: Scenario.INTERMISSION,
             SongState.STARTING: Scenario.SONG_START,
@@ -474,6 +481,12 @@ class BeatDMXShow:
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
         if self.buffering:
             self.pre_song_buffer.extend(samples)
+            total = len(self.pre_song_buffer)
+            log.debug(
+                "AUDIO   buffer %d frames (%.2fs)",
+                total,
+                total / self.samplerate,
+            )
             if now - self.buffer_start_time >= 5.0:
                 self.buffering = False
         if (
