@@ -21,5 +21,7 @@ DMX output without running the full show.
 
 # Implementation Proposal
 
-
+* Script pulses a LumiPar 7UTRI red using simple DMX write calls.
+* Accept CLI options for serial port, starting address and blink count.
+* Print usage help when required arguments are missing.
 

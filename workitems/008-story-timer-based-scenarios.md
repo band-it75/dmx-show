@@ -5,7 +5,7 @@
 Support timer-based color transitions in scenarios
 
 # State
-New
+Active
 
 # User Story
 As a Karaoke Host, I want scenarios to define beat, chorus and timed color
@@ -21,5 +21,7 @@ changes so that complex cues run without code changes.
 
 # Implementation Proposal
 
-
+* Extend scenario definitions with a `timer` section for timed transitions.
+* Schedule color fades using the main loop and current DMX FPS value.
+* Combine timer events with beat or chorus triggers for complex cues.
 

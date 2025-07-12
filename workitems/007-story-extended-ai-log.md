@@ -5,7 +5,7 @@
 Timestamped AI log with beat entries
 
 # State
-New
+Active
 
 # User Story
 As a Karaoke Host, I want `ai.log` to include timestamps and occasional BPM lines so
@@ -21,5 +21,7 @@ that I can trace show behavior after a performance.
 
 # Implementation Proposal
 
-
+* Add a helper function that writes timestamped lines to `ai.log`.
+* Call this helper for all console messages and periodic BPM reports.
+* Keep each log entry under 100 characters for readability.
 
