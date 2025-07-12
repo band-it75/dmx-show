@@ -103,7 +103,7 @@ class Scenario(Enum):
         "Song Start",
         0.02,
         (0, 0),
-        ["INTERMISSION"],
+        [],
         [
             "SONG_ONGOING_SLOW",
             "SONG_ONGOING_JAZZ",
@@ -311,10 +311,6 @@ def _resolve_transitions() -> None:
         sc.successors = [lookup[n] for n in sc.successor_names]
         del sc.predecessor_names
         del sc.successor_names
-    # Prevent Song Start from transitioning directly to Intermission
-    intermission = lookup["INTERMISSION"]
-    if Scenario.SONG_START in intermission.predecessors:
-        intermission.predecessors.remove(Scenario.SONG_START)
 
 
 _resolve_transitions()
