@@ -1,10 +1,3 @@
-Thanks for the clarification. I’ll now perform a full audit of the `band-it75/dmx-show` repository to identify what is broken or incomplete and propose concrete improvements.
-
-This will include a review of the genre classification logic, DMX control flow, model integration, scenario mapping, error handling, and how it matches your available lighting hardware.
-
-I’ll get back to you shortly with findings and suggested improvements.
-
-
 ## Genre Classification Pipeline
 
 * **Model Loading & Output:** The audio genre classifier is initialized to load a local Hugging Face model from `models/music_genres_classification`. If this folder is missing or PyTorch/TensorFlow isn’t installed, the classifier will raise an exception on startup. In operation, the model is loaded lazily on first use (with a console message if `verbose=True`). Ensure the model is properly downloaded (e.g. by running the provided PowerShell script to `snapshot_download` the model) and that `torch` is installed, so the genre model actually loads. To verify predictions, run the system with `GenreClassifier(verbose=True)` – on song start it should print a genre label to confirm the model’s inference.
