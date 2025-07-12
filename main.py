@@ -163,7 +163,7 @@ class BeatDMXShow:
         self.ai_log_handle = open(self.ai_log_path, "a")
         if genre_model is _GENRE_SENTINEL:
             from src.audio import GenreClassifier as GC
-            self.genre_classifier = GC(log_file=self.ai_log_path, verbose=True)
+            self.genre_classifier = GC(log_file=self.ai_log_handle, verbose=True)
         else:
             self.genre_classifier = genre_model
         if self.genre_classifier is None:
