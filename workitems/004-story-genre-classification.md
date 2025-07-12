@@ -4,8 +4,11 @@
 # Title
 Genre classification sets lighting scenarios
 
+# State
+New
+
 # User Story
-As an operator, I want the show to classify the music genre so that lighting
+As a Karaoke Host, I want the show to classify the music genre so that lighting
 changes to a matching scenario automatically.
 
 # Acceptance Criteria
@@ -16,3 +19,8 @@ changes to a matching scenario automatically.
   When classification completes,
   Then the corresponding scenario replaces Song Start and the result logs to
   `ai.log`.
+
+# Implementation Proposal
+
+
+

@@ -46,3 +46,8 @@ Actual: Genre stays empty, leaving the show stuck in Song Start.
 
 # Solution
 (Not solved yet)
+
+# Implementation Proposal
+
+
+

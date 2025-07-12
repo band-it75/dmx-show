@@ -4,8 +4,11 @@
 # Title
 Provide blink_red.py demo script
 
+# State
+Closed
+
 # User Story
-As a hobbyist, I want a simple script to flash a LumiPar 7UTRI so that I can test
+As a Karaoke Host, I want a simple script to flash a LumiPar 7UTRI so that I can test
 DMX output without running the full show.
 
 # Acceptance Criteria
@@ -15,3 +18,8 @@ DMX output without running the full show.
 - Given a missing command argument,
   When the script starts,
   Then it prints usage instructions.
+
+# Implementation Proposal
+
+
+
