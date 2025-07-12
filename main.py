@@ -263,6 +263,9 @@ class BeatDMXShow:
         samples = np.concatenate(self.audio_buffer)
         self.audio_buffer.clear()
         self.classifying = True
+        self._ai_log(
+            f"Starting genre classification: {samples.shape[0]} samples"
+        )
 
         def work() -> None:
             try:
@@ -279,6 +282,8 @@ class BeatDMXShow:
             except Exception as exc:  # pragma: no cover - model errors
                 if not self.dashboard_enabled:
                     print(f"Genre classification error: {exc}", flush=True)
+                else:
+                    self.dashboard.set_genre("(error)")
                 self._ai_log(f"Genre classification error: {exc}")
             finally:
                 self.classifying = False
@@ -403,6 +408,8 @@ class BeatDMXShow:
 
         if self.detector.state == SongState.STARTING:
             self.audio_buffer.append(samples.copy())
+            total = sum(len(buf) for buf in self.audio_buffer)
+            self._ai_log(f"Buffer STARTING: {total} samples")
         elif (
             self.detector.state == SongState.ONGOING
             and not self.classifying
@@ -410,7 +417,9 @@ class BeatDMXShow:
         ):
             self.audio_buffer.append(samples.copy())
             total = sum(len(buf) for buf in self.audio_buffer)
+            self._ai_log(f"Buffer ONGOING: {total} samples")
             if total >= self.samplerate * 5:
+                self._ai_log("Launching genre classification")
                 self._start_genre_classification()
 
         if self.dashboard_enabled:
