@@ -499,6 +499,14 @@ class BeatDMXShow:
             )
             if now - self.buffer_start_time >= 5.0:
                 self.buffering = False
+            elif (
+                len(self.pre_song_buffer) >= self.pre_song_buffer.maxlen
+                and not self.classifying
+            ):
+                # Enough audio collected, start classification early
+                self.classify_after = None
+                self.buffering = False
+                self._launch_genre_classifier_immediately()
         if (
             self.classify_after is not None
             and now >= self.classify_after
