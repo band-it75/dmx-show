@@ -38,6 +38,11 @@ Actual: Genre stays empty, leaving the show stuck in Song Start.
   duplicates.
 - Genre state resets when a new song begins so classification can run again.
 - Fixed buffering logic to start classification after five seconds of audio.
+- Reset stored genre on startup and clear persisted value.
+- Keep a rolling 5-second buffer of audio before songs.
+- Start classification immediately when a song becomes Ongoing.
+- Guard threads with a song ID so results from old songs are dropped.
+- Print state changes and genre results using the logging module.
 
 # Solution
 (Not solved yet)
