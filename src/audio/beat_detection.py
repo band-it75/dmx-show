@@ -11,6 +11,7 @@ import sounddevice as sd
 import aubio
 import librosa
 from .debounce import DebouncedFlag
+from parameters import Scenario
 
 
 class SongState(Enum):
@@ -20,6 +21,33 @@ class SongState(Enum):
     STARTING = "Starting"
     ONGOING = "Ongoing"
     ENDING = "Ending"
+
+
+
+_SCENARIO_TO_STATE = {
+    Scenario.INTERMISSION: SongState.INTERMISSION,
+    Scenario.SONG_START: SongState.STARTING,
+    Scenario.SONG_ENDING: SongState.ENDING,
+    Scenario.SONG_ONGOING_SLOW: SongState.ONGOING,
+    Scenario.SONG_ONGOING_JAZZ: SongState.ONGOING,
+    Scenario.SONG_ONGOING_POP: SongState.ONGOING,
+    Scenario.SONG_ONGOING_ROCK: SongState.ONGOING,
+    Scenario.SONG_ONGOING_METAL: SongState.ONGOING,
+}
+
+
+def _compute_allowed_transitions() -> dict[SongState, set[SongState]]:
+    mapping = {s: set() for s in SongState}
+    for scn in Scenario:
+        state_from = _SCENARIO_TO_STATE.get(scn)
+        for succ in scn.successors:
+            state_to = _SCENARIO_TO_STATE.get(succ)
+            if state_from is not None and state_to is not None:
+                mapping[state_from].add(state_to)
+    return mapping
+
+
+ALLOWED_STATE_TRANSITIONS = _compute_allowed_transitions()
 
 
 class BeatDetector:
@@ -56,6 +84,22 @@ class BeatDetector:
         self.kick_hit = False
         self.chorus_flag = DebouncedFlag(chorus_debounce)
         self.crescendo_flag = DebouncedFlag(crescendo_debounce)
+
+
+    def _set_state(self, new_state: SongState, now: float) -> bool:
+        """Set ``self.state`` if transition is allowed."""
+        if new_state == self.state:
+            return False
+        allowed = ALLOWED_STATE_TRANSITIONS.get(self.state, set())
+        if new_state not in allowed:
+            print(
+                f"Blocked illegal state transition: {self.state} -> {new_state}",
+                flush=True,
+            )
+            return False
+        self.state = new_state
+        self.state_change_time = now
+        return True
 
     # ------------------------------------------------------------------
     def _compute_bpm(self) -> float:
@@ -129,35 +173,25 @@ class BeatDetector:
 
         # song state machine
         if self.state == SongState.INTERMISSION and loud:
-            self.state = SongState.STARTING
-            self.state_change_time = now
-            state_changed = True
+            state_changed |= self._set_state(SongState.STARTING, now)
         elif self.state == SongState.STARTING:
-            if now - self.state_change_time >= self.start_duration:
-                self.state = SongState.ONGOING if loud else SongState.INTERMISSION
+            if loud:
+                if now - self.state_change_time >= self.start_duration:
+                    state_changed |= self._set_state(SongState.ONGOING, now)
+            elif now - self.last_loud_time > self.end_duration:
+                # remain in STARTING; do not revert to Intermission
                 self.state_change_time = now
-                state_changed = True
-            elif not loud and now - self.last_loud_time > self.end_duration:
-                self.state = SongState.INTERMISSION
-                self.state_change_time = now
-                state_changed = True
         elif (
             self.state == SongState.ONGOING
             and not loud
             and now - self.last_loud_time > self.end_duration
         ):
-            self.state = SongState.ENDING
-            self.state_change_time = now
-            state_changed = True
+            state_changed |= self._set_state(SongState.ENDING, now)
         elif self.state == SongState.ENDING:
             if loud:
-                self.state = SongState.STARTING
-                self.state_change_time = now
-                state_changed = True
+                state_changed |= self._set_state(SongState.STARTING, now)
             elif now - self.state_change_time >= self.end_duration:
-                self.state = SongState.INTERMISSION
-                self.state_change_time = now
-                state_changed = True
+                state_changed |= self._set_state(SongState.INTERMISSION, now)
 
         beat = False
         bpm = 0.0
