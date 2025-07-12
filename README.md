@@ -128,6 +128,15 @@ This model runs in a background thread so beat detection remains responsive.
 If the genre remains blank, create ``GenreClassifier(verbose=True)`` to see
 model loading details and the raw label returned.
 
+### Troubleshooting
+
+If no genre predictions appear at runtime, verify the classifier can load
+independently. Run ``python check_classifier.py`` from the project root. The
+script reports the installed versions of ``torch`` and ``transformers`` and
+prints a test prediction. If the model fails to load, reinstall the Python
+dependencies or re-run ``install_requirements.ps1`` to download the model
+under ``models/music_genres_classification``.
+
 ## Devices
 
 The following table lists the DMX fixtures currently configured for the
