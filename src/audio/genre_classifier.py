@@ -8,6 +8,7 @@ import log
 log = logging.getLogger("AI")
 from transformers import pipeline, is_torch_available, is_tf_available
 import numpy as np
+import librosa
 
 
 class GenreClassifier:
@@ -62,6 +63,12 @@ class GenreClassifier:
         self._log(
             f"classify: samples={samples.shape} samplerate={samplerate}"
         )
+        if samplerate != 16000:
+            self._log(
+                f"Resampling from {samplerate}Hz to 16000Hz for classifier"
+            )
+            samples = librosa.resample(samples, orig_sr=samplerate, target_sr=16000)
+            samplerate = 16000
         result = self._classifier({"array": samples, "sampling_rate": samplerate})
         if not result:
             self._log("genre model returned no predictions")
