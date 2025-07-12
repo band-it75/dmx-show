@@ -3,9 +3,10 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from parameters import Scenario
+from parameters import Scenario, scenario_for_bpm
 from main import BeatDMXShow
 import log
+import numpy as np
 
 
 def test_scenario_mapping():
@@ -30,5 +31,24 @@ def test_ai_log_single_entry(monkeypatch):
     contents = log.log_file.read_text().splitlines()
     assert any("AI logging started" in line for line in contents)
     assert "entry" in contents[-1]
+
+
+def test_fallback_scenario(monkeypatch):
+
+    class DummyGC:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def classify(self, samples, sr):
+            return ""
+
+    import src.audio as audio
+
+    monkeypatch.setattr(audio, "GenreClassifier", DummyGC)
+    show = BeatDMXShow(genre_model=DummyGC())
+    show.last_bpm = 120.0
+    samples = np.zeros(10, dtype=np.float32)
+    show._run_genre_classifier(samples, show.samplerate, show.song_id)
+    assert show.last_genre == scenario_for_bpm(120.0)
 
 

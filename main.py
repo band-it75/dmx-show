@@ -166,6 +166,7 @@ class BeatDMXShow:
         self.smoke_start = 0.0
         self.last_smoke_time = 0.0
         self.scenario = parameters.SCENARIO_MAP[Scenario.INTERMISSION]
+        self.last_bpm = 0.0
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(self.scenario)
         self.groups: Dict[str, list] = {}
         self.beat_ends: Dict[str, float] = {}
@@ -295,6 +296,14 @@ class BeatDMXShow:
             )
             if song_id == self.song_id:
                 self.genre_label = label
+                if label == "":
+                    scenario = parameters.scenario_for_bpm(self.last_bpm)
+                    log.info(
+                        "THREAD fallback    song_id=%s  bpm=%.2f  scenario=%s",
+                        song_id,
+                        self.last_bpm,
+                        scenario,
+                    )
                 self.last_genre = scenario
                 if self.current_state == SongState.ONGOING:
                     self._set_scenario(scenario)
@@ -398,6 +407,7 @@ class BeatDMXShow:
 
     def _handle_beat(self, bpm: float, now: float) -> None:
         if bpm:
+            self.last_bpm = bpm
             label = self._genre_label(self.last_genre)
             line = f"Beat at {bpm:.2f} BPM" + (f" - genre {label}" if label else "")
             if self.dashboard_enabled:
