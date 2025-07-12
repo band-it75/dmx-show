@@ -32,7 +32,12 @@ Actual: Genre stays empty, leaving the show stuck in Song Start.
 - Run from PowerShell terminal.
 
 # Solution Attempts
-
+- Bundled the model locally under `models/music_genres_classification`.
+- Added a verbose flag and AI logging to track model loading and predictions.
+- `ai.log` records every state change and classification result without
+  duplicates.
+- Genre state resets when a new song begins so classification can run again.
+- Fixed buffering logic to start classification after five seconds of audio.
 
 # Solution
 (Not solved yet)
