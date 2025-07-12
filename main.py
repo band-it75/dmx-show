@@ -456,6 +456,7 @@ class BeatDMXShow:
             self._debug_log(f"VU dimmer: {level}")
             self.last_vu_dimmer = level
 
+
     def _process_samples(self, samples: np.ndarray) -> None:
         now = time.time()
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
