@@ -30,3 +30,5 @@ def test_ai_log_single_entry(tmp_path, monkeypatch):
     show.ai_log_handle.close()
     contents = log_file.read_text().splitlines()
     assert contents == ["AI logging started", "entry"]
+
+
