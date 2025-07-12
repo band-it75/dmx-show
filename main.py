@@ -261,8 +261,8 @@ class BeatDMXShow:
         current = self.scenario
         if (
             not force
-            and name != current
-            and (current not in name.predecessors or name not in current.successors)
+            and scn != current
+            and (current not in scn.predecessors or scn not in current.successors)
         ):
             return
         if scn != self.scenario:
