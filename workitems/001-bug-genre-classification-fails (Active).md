@@ -21,8 +21,8 @@ is not applied so the scenario never changes.
 
 # Expected vs. Actual Results
 Expected: After a few seconds of music the genre classifier predicts a label and
-lighting shifts to the matching scenario. If classification fails a BPM-based
-fallback should run.
+lighting shifts to the matching scenario. Classification must succeed; simply
+falling back to BPM is not acceptable.
 Actual: Genre stays empty, leaving the show stuck in Song Start.
 
 # Environment
@@ -58,7 +58,7 @@ This suggests that the **genre classification step is not succeeding** – eithe
 * **The classification thread never actually ran** (or exited early), so no prediction was made.
 * **The classifier returned an empty prediction**, causing the label to be an empty string (and thus the console would log “Predicted genre label:” with nothing after it, which may have been easy to miss).
 
-In either case, the lighting scenario remained stuck in `SONG_START` (the “Song Start” scene) instead of transitioning. The bug description confirms the *expected* behavior was that after a few seconds of music, a genre label should be predicted and the lighting should shift to the corresponding scenario, or at least a **BPM-based fallback** should pick a scenario if classification fails. This isn’t happening.
+In either case, the lighting scenario remained stuck in `SONG_START` (the “Song Start” scene) instead of transitioning. The bug description confirms the *expected* behavior is that after a few seconds of music the classifier predicts a genre and the lighting shifts accordingly. This isn’t happening.
 
 ## Enhancing Logging for Diagnosis
 
@@ -78,9 +78,9 @@ To debug this issue, it’s crucial to add **more granular logging** around the 
 
 * **Surface Classification Skips**: There are conditions where `_launch_genre_classifier_immediately()` will **skip running the classifier** – for example, if the pre-song audio buffer is empty, or if a classification is already in progress. These conditions are logged to `ai.log` (e.g., *“Skipping classification: pre-song buffer empty”*). It would help to also print these skip reasons to the console or clearly to the log so you can catch them during a test. If, say, the buffer was empty at the moment of transition, you’d see that message and know why classification didn’t run. Consider temporarily adding a `print()` or `logging.warning()` in those branches for visibility.
 
-* **Log Scenario Changes and Fallback Decisions**: The code prints *“Genre changed to X”* on the console when a new lighting scenario is applied. This is great for seeing real-time changes. Additionally, the `_set_scenario` method already logs the scenario change to `ai.log` as well. Verify that this is happening – e.g., if a scenario change were to occur (from Song Start to some Song Ongoing genre), it should be recorded. For debugging the **fallback**, if the classifier returns an empty label (`""`), the code currently maps that to the **Slow** scenario by default. In such cases, nothing was printed to console (because the label was empty, the console message would just say “Genre changed to Song Ongoing – Slow” without explicitly noting it was a fallback). To avoid confusion, you might enhance the logging: for example, if `label == ""`, call something like `self._ai_log("No genre predicted – defaulting to Slow scenario")` before applying the fallback. This would make the fallback action explicit in the log.
+* **Log Scenario Changes**: The code prints *“Genre changed to X”* on the console when a new lighting scenario is applied. This is great for seeing real-time changes. Additionally, the `_set_scenario` method already logs the scenario change to `ai.log`. Verify these logs appear so you know when the genre update occurs. Since the goal is to fix classification rather than use a fallback, any empty label should be treated as an error worth logging.
 
-* **Include BPM info periodically** (optional): Since a BPM-based fallback is supposed to be a safety net, consider logging the BPM around the time classification happens. The system prints “Beat at XX BPM” on each beat in the console. You could log the **average or last BPM reading when classification is triggered**. For instance, just before launching the classifier thread, log the current BPM or a short history of it. This could later inform whether a high-BPM song was incorrectly defaulted to a slow scenario due to the classifier failing.
+* **Include BPM info periodically** (optional): Logging the BPM around the time classification runs can help diagnose why a genre wasn’t detected. The system prints “Beat at XX BPM” on each beat. You might also log the average or last BPM reading when classification starts to correlate tempo with any classifier issues.
 
 By implementing these logging improvements, you’ll have a much clearer picture in `ai.log` and console of the sequence: song state changes, classifier start, classifier result (or lack thereof), and scenario changes. The goal is that after the next run, you can **open `ai.log`** and see a timeline of events (with timestamps, ideally) that shows, for example:
 
@@ -89,8 +89,8 @@ By implementing these logging improvements, you’ll have a much clearer picture
 * *Starting genre classification: 88200 samples* (thread launched with \~2s of audio)
 * *Genre model returned no predictions* (classifier didn’t identify a genre)
 * *Predicted genre: **\[empty]*** (main thread got empty label)
-* *Scenario: Song Ongoing – Slow* (it chose the Slow scenario as fallback)
-* *Scenario changed to Song Ongoing – Slow* (attempted to apply fallback scenario)
+* *Scenario: Song Ongoing – Slow* (fallback was triggered because no genre was detected)
+* *Scenario changed to Song Ongoing – Slow* (this fallback behavior is not desired)
 * … etc.
 
 If you find entries like “Skipping classification: pre-song buffer empty” or no “Starting genre classification” at all, that tells us the classification didn’t run when expected.
@@ -107,21 +107,12 @@ With improved logging in place, you can pinpoint why the classifier isn’t yiel
 
 * **Classification Finishing After Song End**: It’s possible the classification thread started, but by the time it finished, the song had already ended or changed state. The code only applies the new scenario if the song is still in Ongoing state when the result comes back. If the song went to ENDING/INTERMISSION before the classifier returned, the genre label is effectively ignored (no scenario change). The log snippet actually shows the song ending relatively soon (it hit an Ending state around the time BPM spiked) without any genre change. If your classifier model is heavy, it might take a few seconds to run – enough that the song ended first. **Solution:** You might need to account for this race condition. For instance, if the song ends while classification is in progress, maybe still apply the result at least for the record or for the next song. At minimum, log that “classification result came after song ended, ignoring.” However, a better approach is to try to get the classification done earlier (by feeding it audio sooner, as above). Using a 5-second window early in the song is typically sufficient for a genre guess. If the first song was very short or stopped, that could also explain it. Keep an eye on the timestamps in `ai.log` (add timestamps if not present) to see how long classification took versus the song duration.
 
-* **BPM-Based Fallback Implementation**: The bug report mentions a BPM-based fallback should kick in if the AI fails. Currently, if the classifier returns an empty label, the code defaults to the `SONG_ONGOING_SLOW` scenario (which is a “slow” genre lighting). This is a simple fallback but doesn’t account for actual BPM. You can improve this. For example:
-
-  * If the song’s BPM is high (e.g., >120), you might assume a more energetic genre like Rock/Metal.
-  * For mid-range BPM (\~80-120), assume Pop or a general medium scenario.
-  * Otherwise, use Slow for low BPM.
-
-  You have the BPM value continuously being measured. Perhaps take the **average BPM after a few seconds** and map it to a scenario. You could extend `_scenario_from_label` or create a new `_fallback_scenario_from_bpm(bpm)` function to decide the scenario when no genre label is available. Then, if `label == ""`, call that with the current BPM. For instance:
-
-  ```python
-  if label == "":
-      scenario = Scenario.SONG_ONGOING_ROCK if bpm > 120 else Scenario.SONG_ONGOING_POP if bpm > 80 else Scenario.SONG_ONGOING_SLOW
-  ```
-
-  (You can refine the thresholds and mapping to your liking, maybe use Jazz vs Pop if needed). This way, a fast song will at least trigger a fast lighting scenario. Currently, without this, a high-BPM song that fails classification still ends up in the Slow scenario – which might be why the lighting didn’t make sense. Implementing this fallback would fulfill the expected behavior noted in the bug report.
+* **Focus on Fixing Classification**: Earlier drafts suggested creating a BPM-based
+  fallback if the classifier returned no label. This bug now explicitly requires
+  solving the root cause of the missing genre prediction instead of relying on a
+  fallback. Ensure the classifier reliably returns a genre so the show can switch
+  to the correct scenario.
 
 * **Verify Reset for Subsequent Songs**: You already fixed the logic to reset `last_genre` on a new song start, which ensures the classifier will run for each new song (good). Make sure that’s working by checking that when the state went from Ending back to Starting for the next song, `last_genre` became `None` and `classifying` flag reset. The logs show multiple “State changed to Starting” events, which likely correspond to new song detections, so that part seems okay.
 
-In summary, the likely root issue is **timing/insufficient data for the classifier**. The lights stayed in the “Song Start” scene because the classifier didn’t output a genre in time (or at all), and the fallback by BPM wasn’t yet implemented. By **adding more logging**, as outlined above, you’ll confirm exactly where things go wrong: whether the classifier was triggered, what it did, and why the scenario didn’t change. Then by **tweaking the timing and fallback logic** – for example, using a 5-second classification window and leveraging BPM for fallback – you should see the show automatically transition to an appropriate genre scene a few seconds into the song (or at least default to one based on tempo).
+In summary, the likely root issue is **timing/insufficient data for the classifier**. The lights stayed in the “Song Start” scene because the classifier didn’t output a genre in time (or at all). Focus on improving the classification timing and reliability so the show transitions to the correct genre without relying on BPM-based fallbacks.
