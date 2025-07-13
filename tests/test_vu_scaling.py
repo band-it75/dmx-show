@@ -54,6 +54,9 @@ def test_snare_resets_smoothed_dimmer():
     show.detector = DummyDetector()
     show.smoothed_vu_dimmer = 255
     show.last_vu_dimmer = 255
+    show.scenario.events = {
+        "snare_hit": {"Overhead Effects": {"dimmer": 255, "duration": 100}}
+    }
     show._process_samples(np.zeros(512))
     assert show.smoothed_vu_dimmer == BeatDMXShow._vu_to_level(parameters.VU_FULL)
     # last_vu_dimmer is left unchanged so the next VU update triggers
@@ -82,6 +85,8 @@ def test_beat_resets_smoothed_dimmer():
     show.last_vu_dimmer = 255
     show.detector = BeatDummyDetector()
     show.current_vu = parameters.VU_FULL
-    show.scenario.beat = {"Overhead Effects": {"dimmer": 255, "duration": 100}}
+    show.scenario.events = {
+        "beat": {"Overhead Effects": {"dimmer": 255, "duration": 100}}
+    }
     show._handle_beat(120, 0.0)
     assert show.smoothed_vu_dimmer == BeatDMXShow._vu_to_level(parameters.VU_FULL)
