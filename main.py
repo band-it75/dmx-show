@@ -327,6 +327,8 @@ class BeatDMXShow:
         finally:
             if song_id == self.song_id:
                 self.classifying = False
+                if self.last_genre is None:
+                    self.classify_after = time.time() + 5.0
             logger.info(
                 "THREAD finish      song_id=%s  elapsed=%.2fs",
                 song_id,
@@ -417,14 +419,12 @@ class BeatDMXShow:
             self.classifying = False
             self.buffering = True
             self.buffer_start_time = time.time()
-            self.classify_after = None
+            self.classify_after = time.time() + 5.0
             self.pre_song_buffer.clear()
+            self._ai_log("Scheduled genre classification in 5s.")
         elif state == SongState.ONGOING:
             if self.last_genre is None:
                 # remain in STARTING until genre detected
-                if not self.classifying and self.classify_after is None:
-                    self.classify_after = time.time() + 5.0
-                    self._ai_log("Scheduled genre classification in 5s.")
                 return
             self.buffering = True
         elif state == SongState.ENDING:

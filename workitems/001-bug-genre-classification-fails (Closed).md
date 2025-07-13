@@ -120,3 +120,28 @@ With improved logging in place, you can pinpoint why the classifier isn’t yiel
 * **Verify Reset for Subsequent Songs**: You already fixed the logic to reset `last_genre` on a new song start, which ensures the classifier will run for each new song (good). Make sure that’s working by checking that when the state went from Ending back to Starting for the next song, `last_genre` became `None` and `classifying` flag reset. The logs show multiple “State changed to Starting” events, which likely correspond to new song detections, so that part seems okay.
 
 In summary, the likely root issue is **timing/insufficient data for the classifier**. The lights stayed in the “Song Start” scene because the classifier didn’t output a genre in time (or at all). Focus on improving the classification timing and reliability so the show transitions to the correct genre without relying on BPM-based fallbacks.
+
+## Reopened 2025-07-13
+The latest ai.log shows state changes but no genre prediction. Genre classification never ran:
+```
+2025-07-13 09:35:11,777 [INFO] AI: AI logging started
+2025-07-13 09:38:33,709 [INFO] AI: State changed to Starting
+2025-07-13 09:38:33,710 [INFO] AI: STATE change INTERMISSION -> STARTING
+2025-07-13 09:38:43,175 [INFO] AI: State changed to Ongoing
+2025-07-13 09:38:43,176 [INFO] AI: STATE change STARTING -> ONGOING
+2025-07-13 09:39:04,708 [INFO] AI: State changed to Ending
+2025-07-13 09:39:04,708 [INFO] AI: STATE change ONGOING -> ENDING
+2025-07-13 09:39:07,739 [INFO] AI: State changed to Intermission
+2025-07-13 09:39:07,740 [INFO] AI: STATE change ENDING -> INTERMISSION
+```
+Classification thread never launched, so the bug remains.
+
+
+## Fix 2025-07-13
+Launch the classifier while the song is still in the **Starting** state. Once a
+genre is detected, transition to **Ongoing** so the correct scenario is used.
+
+## Fix 2025-07-13b
+Classification retries every five seconds until a genre label is returned. The
+show remains in Starting until a genre is detected, then moves to Ongoing.
+Bug closed.
