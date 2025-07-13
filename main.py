@@ -491,6 +491,11 @@ class BeatDMXShow:
             logger.debug("Ignore Ongoing transition until genre classified")
             return
 
+        if state in {SongState.STARTING, SongState.INTERMISSION, SongState.ENDING}:
+            self.last_genre = None
+            self.genre_label = ""
+            self.classifying = False
+
         self._flush_beat_line()
         if self.dashboard_enabled:
             self.dashboard.set_state(state.value)
@@ -515,9 +520,6 @@ class BeatDMXShow:
         self._set_scenario(mapping.get(state, Scenario.INTERMISSION))
         if state == SongState.STARTING:
             self.song_id += 1
-            self.last_genre = None
-            self.genre_label = ""
-            self.classifying = False
             self.buffering = True
             self.buffer_start_time = time.time()
             self.classify_after = time.time() + 5.0
