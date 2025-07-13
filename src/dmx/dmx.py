@@ -163,7 +163,6 @@ class DmxSerial:
         self.baudrate = baudrate
         self._serial = None
         self.error: Optional[str] = None
-        self._last_frame = bytearray(512)
 
     def __enter__(self) -> "DmxSerial":
         self.open()
@@ -202,9 +201,6 @@ class DmxSerial:
         for channel, value in values.items():
             if 1 <= channel <= 512:
                 data[channel - 1] = max(0, min(255, value))
-        if data == self._last_frame:
-            return
-        self._last_frame[:] = data
         if self._serial is None:
             return
         # Break (>=88us) and mark after break (>=8us)
