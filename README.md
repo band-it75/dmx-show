@@ -41,7 +41,7 @@ python blink_red.py --port /dev/ttyUSB0 --start-address 1 --blink-times 3
 
 `beat_dmx.py` simply blinks one channel whenever a beat is detected. It prints
 the estimated BPM every few seconds. LumiPar 12UAW5 units double as house
-lights and overhead effects pulse with BPM. Smoke bursts last 3 seconds with a
+lights and overhead effects respond to the current genre. Smoke bursts last 3 seconds with a
 30-second gap. The moving head stays on the artist during songs and points at
 the audience to end each song. Stage lights fade to black during songs and
 return at 50% warm white when the moving head faces the crowd.
@@ -81,7 +81,7 @@ python beat_detection.py
 Output is limited to a short summary printed every 10 seconds to avoid
 performance issues when detecting rapid beats. Each summary also prints the
 current stage lighting state and whether smoke bursts are firing. LumiPar 12UAW5
-units double as house lights, overhead effects pulse with BPM and smoke bursts
+units double as house lights, overhead effects track the detected genre and smoke bursts
 last 3 seconds with a 30-second gap.
 
 The detector will also analyze the incoming volume (VU level) to determine when a
@@ -118,11 +118,16 @@ classifier loads the model from `models/music_genres_classification`. The
 predicted
 label selects the closest lighting scenario:
 
-- rock -> Song Ongoing - Rock
+- disco -> Song Ongoing - Disco
 - metal -> Song Ongoing - Metal
+- reggae -> Song Ongoing - Reggae
+- blues -> Song Ongoing - Blues
+- rock -> Song Ongoing - Rock
+- classical -> Song Ongoing - Classical
 - jazz -> Song Ongoing - Jazz
-- pop/disco -> Song Ongoing - Pop
-- blues, country, reggae or classical -> Song Ongoing - Slow
+- hiphop -> Song Ongoing - HipHop
+- country -> Song Ongoing - Country
+- pop -> Song Ongoing - Pop
 
 This model runs in a background thread so beat detection remains responsive.
 If the genre remains blank, create ``GenreClassifier(verbose=True)`` to see
@@ -163,8 +168,8 @@ equal RGB values so scenarios need no manual changes.
 
 ## Show
 
-Lighting cues are BPM-driven. LumiPar 12UAW5 units double as house lights.
-Overheads pulse with BPM and smoke bursts last 3 seconds with a 30-second gap.
+Lighting cues follow the AI-detected genre. LumiPar 12UAW5 units double as house lights.
+Overhead effects respond to the current genre and smoke bursts last 3 seconds with a 30-second gap.
 Beat updates briefly change overhead colors for 100 ms on each beat.
 Genre-specific colors guide intensity and timing. The moving head stays on the
 artist during songs and aims at the audience to end each song. Stage lights fade
