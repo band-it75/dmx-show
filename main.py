@@ -621,7 +621,8 @@ class BeatDMXShow:
             )
             # Reset the smoothed dimmer so it returns to the expected level
             self.smoothed_vu_dimmer = self._vu_to_level(vu)
-            self.last_vu_dimmer = int(self.smoothed_vu_dimmer)
+            # Do not update last_vu_dimmer here so the next VU update
+            # triggers a DMX refresh back to the baseline level
 
         for group, end in list(self.beat_ends.items()):
             if now >= end:
