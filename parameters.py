@@ -32,6 +32,9 @@ PRINT_INTERVAL = 10
 # RMS level that results in full intensity for overhead effects
 VU_FULL = 0.3
 
+# Exponential smoothing factor for dimmer levels
+VU_SMOOTHING = 0.8
+
 # Display a static dashboard instead of logging lines
 SHOW_DASHBOARD = True
 
