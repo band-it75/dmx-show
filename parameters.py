@@ -41,6 +41,9 @@ COM_PORT = "COM4"
 # How many DMX frames to send per second
 DMX_FPS = 30
 
+# Seconds between automatic genre classification checks
+GENRE_CHECK_INTERVAL = 15.0
+
 # Mapping from numeric genre IDs to label strings
 GENRE_ID_MAP = {
     "0": "disco",

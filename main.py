@@ -194,6 +194,7 @@ class BeatDMXShow:
         self.buffer_start_time = 0.0
         self.classify_after: float | None = None
         self.classifying = False
+        self.last_genre_check = 0.0
         self.genre_label = ""
         self.audio_queue: queue.Queue[np.ndarray] = queue.Queue(maxsize=20)
         self.running = False
@@ -355,6 +356,7 @@ class BeatDMXShow:
             logger.warning("SKIP   classification: buffer empty")
             return
         self.classifying = True
+        self.last_genre_check = time.time()
         sid = self.song_id
         logger.info(
             "LAUNCH classifier thread, %d samples in buffer",
@@ -443,6 +445,7 @@ class BeatDMXShow:
                 # remain in STARTING until genre detected
                 return
             self.buffering = True
+            self.buffer_start_time = time.time()
         elif state == SongState.ENDING:
             self.buffering = False
             self.classify_after = None
@@ -535,8 +538,8 @@ class BeatDMXShow:
     def _process_samples(self, samples: np.ndarray) -> None:
         now = time.time()
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
+        self.pre_song_buffer.extend(samples)
         if self.buffering:
-            self.pre_song_buffer.extend(samples)
             total = len(self.pre_song_buffer)
             logger.debug(
                 "AUDIO   buffer %d frames (%.2fs)",
@@ -553,6 +556,15 @@ class BeatDMXShow:
                 self.classify_after = None
                 self.buffering = False
                 self._launch_genre_classifier_immediately()
+        if (
+            self.genre_classifier is not None
+            and self.current_state == SongState.ONGOING
+            and not self.classifying
+            and len(self.pre_song_buffer) >= self.pre_song_buffer.maxlen
+            and now - self.last_genre_check >= parameters.GENRE_CHECK_INTERVAL
+        ):
+            self._ai_log("Launching periodic genre classifier.")
+            self._launch_genre_classifier_immediately()
         if (
             self.classify_after
             and time.time() >= self.classify_after
