@@ -264,6 +264,83 @@ class BeatDMXShow:
                 print(f"DMX update for {name}: {vals}", flush=True)
             self._apply_update(name, vals)
 
+    def apply_beat_effects(self) -> None:
+        beat_cfg = self.scenario.events.get("beat")
+        if beat_cfg:
+            now = time.time()
+            for group, settings in beat_cfg.items():
+                dur_ms = settings.get("duration", 100)
+                update = {k: v for k, v in settings.items() if k != "duration"}
+                self._flush_beat_line()
+                if self.dashboard_enabled:
+                    self.dashboard.set_group(group, update)
+                else:
+                    print(f"Beat update {group}: {update}", flush=True)
+                self._apply_update(group, update)
+                self.beat_ends[group] = now + dur_ms / 1000.0
+                if group == "Overhead Effects" and "dimmer" in update:
+                    self.last_vu_dimmer = update["dimmer"]
+                    self.smoothed_vu_dimmer = self._vu_to_level(self.current_vu)
+
+    def apply_chorus_effects(self) -> None:
+        chorus_cfg = self.scenario.events.get("chorus")
+        if chorus_cfg:
+            self._print_state_change(chorus_cfg)
+
+    def apply_snare_hit_effects(self) -> None:
+        snare_cfg = self.scenario.events.get("snare_hit")
+        if snare_cfg:
+            now = time.time()
+            for group, settings in snare_cfg.items():
+                dur_ms = settings.get("duration", 50)
+                update = {k: v for k, v in settings.items() if k != "duration"}
+                self._flush_beat_line()
+                if self.dashboard_enabled:
+                    self.dashboard.set_group(group, update)
+                else:
+                    print(f"Snare update {group}: {update}", flush=True)
+                self._apply_update(group, update)
+                self.beat_ends[group] = max(
+                    self.beat_ends.get(group, 0.0), now + dur_ms / 1000.0
+                )
+                if group == "Overhead Effects" and "dimmer" in update:
+                    self.last_vu_dimmer = update["dimmer"]
+                    self.smoothed_vu_dimmer = self._vu_to_level(self.current_vu)
+
+    def start_timer_effects(self) -> None:
+        timer_cfg = self.scenario.events.get("timer")
+        if timer_cfg:
+            after = timer_cfg.get("after_seconds", 0)
+            threading.Thread(
+                target=self._timer_worker,
+                args=(timer_cfg, after),
+                daemon=True,
+            ).start()
+
+    def _timer_worker(self, timer_cfg, after_seconds):
+        time.sleep(after_seconds)
+        for group, colors in timer_cfg.items():
+            if group == "after_seconds":
+                continue
+            self._color_fade_worker(group, colors)
+
+    def _color_fade_worker(self, group, colors):
+        duration = colors["duration_ms"] / 1000.0
+        start_time = time.time()
+        end_time = start_time + duration
+        from_colors = colors["from"]
+        to_colors = colors["to"]
+        while time.time() < end_time:
+            elapsed = time.time() - start_time
+            ratio = elapsed / duration
+            current_colors = {
+                color: int(from_colors[color] * (1 - ratio) + to_colors[color] * ratio)
+                for color in from_colors
+            }
+            self._apply_update(group, current_colors)
+            time.sleep(0.05)
+        self._apply_update(group, to_colors)
+
     def _set_scenario(self, name: parameters.Scenario, force: bool = False) -> None:
         scn = parameters.SCENARIO_MAP.get(name)
         if scn is None:
@@ -288,6 +365,8 @@ class BeatDMXShow:
         updates = dict(scn.updates)
         updates.pop("Smoke Machine", None)
         self._print_state_change(updates)
+        if scn.name.startswith("SONG_ONGOING"):
+            self.start_timer_effects()
 
     def _start_genre_classification(self) -> None:
         self._launch_genre_classifier_immediately()
@@ -494,22 +573,7 @@ class BeatDMXShow:
                 self.smoke_start = now
                 self.last_smoke_time = now
 
-            if self.scenario.beat:
-                for group, vals in self.scenario.beat.items():
-                    dur = vals.get("duration", 0) / 1000.0
-                    update = {k: v for k, v in vals.items() if k != "duration"}
-                    self._flush_beat_line()
-                    if self.dashboard_enabled:
-                        self.dashboard.set_group(group, update)
-                    else:
-                        print(f"Beat update {group}: {update}", flush=True)
-                    self._apply_update(group, update)
-                    self.beat_ends[group] = now + dur
-                    if group == "Overhead Effects" and "dimmer" in update:
-                        # Track the override value so the VU update restores it
-                        self.last_vu_dimmer = update["dimmer"]
-                        # Reset smoothing so the dimmer returns to the VU level
-                        self.smoothed_vu_dimmer = self._vu_to_level(self.current_vu)
+            self.apply_beat_effects()
 
     def _tick(self, now: float) -> None:
         if (
@@ -569,6 +633,7 @@ class BeatDMXShow:
     def _process_samples(self, samples: np.ndarray) -> None:
         now = time.time()
         beat, bpm, state_changed, vu = self.detector.process(samples, now)
+        self.current_vu = vu
         self.pre_song_buffer.extend(samples)
         if self.buffering:
             total = len(self.pre_song_buffer)
@@ -618,21 +683,10 @@ class BeatDMXShow:
             self.dashboard.set_kick(self.detector.kick_hit)
 
         if self.detector.snare_hit:
-            update = {"dimmer": 255}
-            self._flush_beat_line()
-            if self.dashboard_enabled:
-                self.dashboard.set_group("Overhead Effects", update)
-            else:
-                print(f"Snare flash: {update}", flush=True)
-            self._debug_log(f"Snare flash: {update}")
-            self._apply_update("Overhead Effects", update)
-            self.beat_ends["Overhead Effects"] = max(
-                self.beat_ends.get("Overhead Effects", 0.0), now + 0.1
-            )
-            # Reset the smoothed dimmer so it returns to the expected level
-            self.smoothed_vu_dimmer = self._vu_to_level(vu)
-            # Do not update last_vu_dimmer here so the next VU update
-            # triggers a DMX refresh back to the baseline level
+            self.apply_snare_hit_effects()
+
+        if self.detector.is_chorus:
+            self.apply_chorus_effects()
 
         for group, end in list(self.beat_ends.items()):
             if now >= end:

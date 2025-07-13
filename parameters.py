@@ -108,7 +108,7 @@ class Scenario(Enum):
         predecessors: list[str],
         successors: list[str],
         updates: dict[str, dict[str, float]],
-        beat: dict[str, dict[str, float]] | None = None,
+        events: dict[str, dict[str, dict[str, float]]] | None = None,
     ):
         obj = object.__new__(cls)
         obj._value_ = label
@@ -117,7 +117,7 @@ class Scenario(Enum):
         obj.predecessor_names = predecessors
         obj.successor_names = successors
         obj.updates = updates
-        obj.beat = beat
+        obj.events = events or {}
         obj.predecessors = []  
         obj.successors = []    
         return obj
@@ -188,7 +188,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_JAZZ = (
@@ -229,7 +231,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_POP = (
@@ -270,7 +274,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"green": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"green": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_ROCK = (
@@ -311,7 +317,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"red": 255, "green": 64, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"red": 255, "green": 64, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_METAL = (
@@ -352,7 +360,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_DISCO = (
@@ -393,7 +403,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_REGGAE = (
@@ -434,7 +446,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"red": 255, "green": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"red": 255, "green": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_BLUES = (
@@ -475,7 +489,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"blue": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"blue": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_CLASSICAL = (
@@ -516,7 +532,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_HIPHOP = (
@@ -557,7 +575,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"green": 255, "blue": 255, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"green": 255, "blue": 255, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ONGOING_COUNTRY = (
@@ -598,7 +618,9 @@ class Scenario(Enum):
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
-            "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255, "duration": 100},
+            "beat": {
+                "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255, "duration": 100}
+            }
         },
     )
     SONG_ENDING = (
