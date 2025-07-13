@@ -5,7 +5,7 @@
 Genre classification fails to set lighting scenario
 
 # State
-Active
+Closed
 
 # Description
 The show stays in the Song Start scenario for entire songs. Logs show the
@@ -45,7 +45,11 @@ Actual: Genre stays empty, leaving the show stuck in Song Start.
 - Print state changes and genre results using the logging module.
 
 # Solution
-(Not solved yet)
+Genre classification now retries every five seconds while the show
+remains in the Song Start scenario. The song start duration was
+increased to five seconds so the classifier works with a larger audio
+sample. Once a genre is detected the show switches to the matching
+scenario and resumes normal timing.
 
 # Fix Proposal
 

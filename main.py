@@ -307,13 +307,19 @@ class BeatDMXShow:
             if song_id == self.song_id:
                 self.genre_label = label
                 if label == "":
-                    logger.info("THREAD empty label, defaulting to slow scenario")
-                    scenario = Scenario.SONG_ONGOING_SLOW
-                self.last_genre = scenario
-                if self.current_state == SongState.ONGOING:
-                    self._set_scenario(scenario)
-                if self.dashboard_enabled:
-                    self.dashboard.set_genre(label)
+                    logger.info("THREAD empty label, scheduling retry")
+                    self.classify_after = time.time() + 5.0
+                    if self.dashboard_enabled:
+                        self.dashboard.set_genre("(retry)")
+                else:
+                    self.last_genre = scenario
+                    if self.current_state == SongState.STARTING:
+                        self._handle_state_change(SongState.ONGOING)
+                        self._set_scenario(scenario)
+                    elif self.current_state == SongState.ONGOING:
+                        self._set_scenario(scenario)
+                    if self.dashboard_enabled:
+                        self.dashboard.set_genre(label)
         except Exception as exc:  # pragma: no cover - model errors
             if self.dashboard_enabled:
                 self.dashboard.set_genre("(error)")
@@ -415,21 +421,11 @@ class BeatDMXShow:
             self.pre_song_buffer.clear()
         elif state == SongState.ONGOING:
             if self.last_genre is None:
-                # Delay classification until we have 5 seconds of audio
-                self.classify_after = time.time() + 5.0
-                self._ai_log("Scheduled genre classification in 5s.")
-            if (
-                self.current_state == SongState.STARTING
-                and not self.classifying
-                and self.last_genre is None
-            ):
-                if len(self.pre_song_buffer) >= self.pre_song_buffer.maxlen:
-                    logger.info(
-                        "FORCE classification launch on ONGOING (buffer full)"
-                    )
-                    self._launch_genre_classifier_immediately()
-                else:
+                # remain in STARTING until genre detected
+                if not self.classifying and self.classify_after is None:
                     self.classify_after = time.time() + 5.0
+                    self._ai_log("Scheduled genre classification in 5s.")
+                return
             self.buffering = True
         elif state == SongState.ENDING:
             self.buffering = False
