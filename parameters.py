@@ -31,6 +31,8 @@ PRINT_INTERVAL = 10
 
 # RMS level that results in full intensity for overhead effects
 VU_FULL = 0.3
+# Ratio of VU_FULL that must be exceeded to trigger dimmer pulses
+VU_PULSE_THRESHOLD = VU_FULL * 0.75
 
 # Exponential smoothing factor for dimmer levels
 VU_SMOOTHING = 0.8
