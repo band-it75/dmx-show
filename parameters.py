@@ -189,7 +189,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"red": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"blue": 255, "dimmer": 255},
@@ -247,7 +247,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"red": 255, "blue": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"green": 255, "dimmer": 255},
@@ -305,7 +305,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"green": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"green": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"green": 255, "blue": 128, "dimmer": 255},
@@ -363,7 +363,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "green": 64, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"red": 255, "green": 64, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"red": 255, "blue": 64, "dimmer": 255},
@@ -421,7 +421,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"white": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"white": 255, "dimmer": 255},
@@ -479,7 +479,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"red": 255, "blue": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"green": 255, "blue": 255, "dimmer": 255},
@@ -537,7 +537,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "green": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"red": 255, "green": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"red": 255, "green": 128, "dimmer": 255},
@@ -595,7 +595,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"blue": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"blue": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"green": 255, "blue": 128, "dimmer": 255},
@@ -653,7 +653,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"white": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"warm_white": 255, "dimmer": 255},
@@ -711,7 +711,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"green": 255, "blue": 255, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"green": 255, "blue": 255, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255},
@@ -769,7 +769,7 @@ class Scenario(Enum):
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255, "duration": 100}
+                "Overhead Effects": {"red": 255, "green": 96, "duration": 100}
             },
             "chorus": {
                 "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255},
