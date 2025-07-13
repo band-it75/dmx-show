@@ -524,12 +524,15 @@ class BeatDMXShow:
 
     @staticmethod
     def _vu_to_level(vu: float) -> int:
-        """Return a dimmer level that pulses only for high VU."""
+        """Return a dimmer level that rises with VU above a baseline."""
+        base = 25
+        peak = 175
         if vu <= parameters.VU_PULSE_THRESHOLD:
-            return 0
+            return base
         top = parameters.VU_FULL - parameters.VU_PULSE_THRESHOLD
         ratio = max(0.0, min(1.0, (vu - parameters.VU_PULSE_THRESHOLD) / top))
-        return min(255, int(ratio * 255))
+        level = base + ratio * (peak - base)
+        return min(peak, int(level))
 
     def _update_overhead_from_vu(self, _ctrl: DMX) -> None:
         """Set Overhead Effects dimmer based on the latest VU reading."""

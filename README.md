@@ -62,8 +62,8 @@ dashboard also shows the current VU level along with minimum and maximum
 readings. Chorus, drum solo and crescendo flags appear alongside the song
 state and detected genre at the top.
 Running the show writes VU and dimmer levels to ``vu_dimmer.log`` for debugging.
-The dimmer stays off until the VU crosses a threshold, then pulses toward full
-brightness with 0.8 smoothing.
+The dimmer idles around 25 until the VU crosses a threshold, then rises toward
+175 with 0.8 smoothing. Snare hits briefly push it to full brightness.
 Genre classifier details are also logged to ``ai.log``. The file begins with a
 status line noting whether the genre classifier loaded successfully. Messages
 appear only once even if both the show and classifier write to the same file.
