@@ -35,6 +35,11 @@ class DmxDevice:
         # Initialize all channel values to 0
         self._values: Dict[str, int] = {name: 0 for name in self.channels}
 
+    def reset(self) -> None:
+        """Reset all channels to zero."""
+        for name in self._values:
+            self._values[name] = 0
+
     def _approximate_channel(self, name: str, value: int) -> bool:
         """Fallback for abstract color channels.
 
@@ -158,6 +163,7 @@ class DmxSerial:
         self.baudrate = baudrate
         self._serial = None
         self.error: Optional[str] = None
+        self._last_frame = bytearray(512)
 
     def __enter__(self) -> "DmxSerial":
         self.open()
@@ -196,6 +202,9 @@ class DmxSerial:
         for channel, value in values.items():
             if 1 <= channel <= 512:
                 data[channel - 1] = max(0, min(255, value))
+        if data == self._last_frame:
+            return
+        self._last_frame[:] = data
         if self._serial is None:
             return
         # Break (>=88us) and mark after break (>=8us)
@@ -246,6 +255,12 @@ class DMX:
         self._running = False
         self._thread: Optional[threading.Thread] = None
         self.pre_send = pre_send
+
+    def reset(self) -> None:
+        """Reset all device channels to zero and store the frame."""
+        for device in self.devices:
+            device.reset()
+        self.update()
 
     def _compute_frame(self) -> Dict[int, int]:
         frame: Dict[int, int] = {}
