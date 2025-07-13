@@ -505,6 +505,10 @@ class BeatDMXShow:
                         print(f"Beat update {group}: {update}", flush=True)
                     self._apply_update(group, update)
                     self.beat_ends[group] = now + dur
+                    if group == "Overhead Effects" and "dimmer" in update:
+                        # Reset smoothing so the dimmer returns to the VU level
+                        self.smoothed_vu_dimmer = self._vu_to_level(self.current_vu)
+                        # Do not update last_vu_dimmer here
 
     def _tick(self, now: float) -> None:
         if (
