@@ -16,6 +16,7 @@ import threading
 import queue
 
 import numpy as np
+import math
 
 try:
     import sounddevice as sd
@@ -520,6 +521,15 @@ class BeatDMXShow:
             self.controller.update()
             self.smoke_on = False
 
+    @staticmethod
+    def _vu_to_level(vu: float) -> int:
+        """Map a raw VU value to a dimmer level using a logarithmic scale."""
+        ratio = max(0.0, min(1.0, vu / parameters.VU_FULL))
+        if ratio <= 0.0:
+            return 0
+        level = math.log(ratio * 9 + 1, 10)
+        return int(level * 255)
+
     def _update_overhead_from_vu(self, _ctrl: DMX) -> None:
         """Set Overhead Effects dimmer based on the latest VU reading."""
         now = time.time()
@@ -527,7 +537,7 @@ class BeatDMXShow:
         if now < end:
             return
 
-        level = int(min(1.0, self.current_vu / parameters.VU_FULL) * 255)
+        level = self._vu_to_level(self.current_vu)
         if self.log_file:
             self.log_file.write(f"{now:.3f} VU:{self.current_vu:.3f} dimmer:{level}\n")
             self.log_file.flush()
