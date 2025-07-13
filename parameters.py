@@ -41,6 +41,20 @@ COM_PORT = "COM4"
 # How many DMX frames to send per second
 DMX_FPS = 30
 
+# Mapping from numeric genre IDs to label strings
+GENRE_ID_MAP = {
+    "0": "disco",
+    "1": "metal",
+    "2": "reggae",
+    "3": "blues",
+    "4": "rock",
+    "5": "classical",
+    "6": "jazz",
+    "7": "hiphop",
+    "8": "country",
+    "9": "pop",
+}
+
 # List of (fixture class, start_address, name) tuples describing the rig
 DEVICES = [
     #(Prolights_LumiPar12UAW5_7ch, 1, "House Lights"),
@@ -282,6 +296,113 @@ class Scenario(Enum):
             },
         },
     )
+    SONG_ONGOING_DISCO = (
+        "Song Ongoing - Disco",
+        0.02,
+        (110, 130),
+        [],
+        [],
+        {
+            "House Lights": {"dimmer": 0},
+            "Moving Head": {"dimmer": 255},
+            "Overhead Effects": {"red": 255, "blue": 96, "dimmer": 255},
+            "Karaoke Lights": {"red": 26, "blue": 10, "dimmer": 26},
+            "Smoke Machine": {"smoke_gap": 10000, "duration": 5000},
+        },
+        {
+            "Overhead Effects": {
+                "red": 255,
+                "blue": 96,
+                "dimmer": 255,
+                "duration": 100,
+            },
+        },
+    )
+    SONG_ONGOING_REGGAE = (
+        "Song Ongoing - Reggae",
+        0.02,
+        (0, 80),
+        [],
+        [],
+        {
+            "House Lights": {"dimmer": 0},
+            "Moving Head": {"dimmer": 255},
+            "Overhead Effects": {"red": 255, "dimmer": 255},
+            "Karaoke Lights": {"red": 26, "dimmer": 26},
+            "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
+        },
+        {
+            "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100},
+        },
+    )
+    SONG_ONGOING_BLUES = (
+        "Song Ongoing - Blues",
+        0.02,
+        (0, 80),
+        [],
+        [],
+        {
+            "House Lights": {"dimmer": 0},
+            "Moving Head": {"dimmer": 255},
+            "Overhead Effects": {"red": 255, "dimmer": 255},
+            "Karaoke Lights": {"red": 26, "dimmer": 26},
+            "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
+        },
+        {
+            "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100},
+        },
+    )
+    SONG_ONGOING_CLASSICAL = (
+        "Song Ongoing - Classical",
+        0.02,
+        (0, 80),
+        [],
+        [],
+        {
+            "House Lights": {"dimmer": 0},
+            "Moving Head": {"dimmer": 255},
+            "Overhead Effects": {"red": 255, "dimmer": 255},
+            "Karaoke Lights": {"red": 26, "dimmer": 26},
+            "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
+        },
+        {
+            "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100},
+        },
+    )
+    SONG_ONGOING_HIPHOP = (
+        "Song Ongoing - HipHop",
+        0.02,
+        (0, 80),
+        [],
+        [],
+        {
+            "House Lights": {"dimmer": 0},
+            "Moving Head": {"dimmer": 255},
+            "Overhead Effects": {"red": 255, "dimmer": 255},
+            "Karaoke Lights": {"red": 26, "dimmer": 26},
+            "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
+        },
+        {
+            "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100},
+        },
+    )
+    SONG_ONGOING_COUNTRY = (
+        "Song Ongoing - Country",
+        0.02,
+        (0, 80),
+        [],
+        [],
+        {
+            "House Lights": {"dimmer": 0},
+            "Moving Head": {"dimmer": 255},
+            "Overhead Effects": {"red": 255, "dimmer": 255},
+            "Karaoke Lights": {"red": 26, "dimmer": 26},
+            "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
+        },
+        {
+            "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100},
+        },
+    )
     SONG_ENDING = (
         "Song Ending",
         0.02,
@@ -304,6 +425,15 @@ class Scenario(Enum):
     )
 
 
+def _add_ongoing_transitions() -> None:
+    names = [sc.name for sc in Scenario if sc.name.startswith("SONG_ONGOING")]
+    for sc in Scenario:
+        if sc.name.startswith("SONG_ONGOING"):
+            others = [n for n in names if n != sc.name]
+            sc.predecessor_names = ["SONG_START"] + others
+            sc.successor_names = others + ["SONG_ENDING"]
+
+
 def _resolve_transitions() -> None:
     lookup = {sc.name: sc for sc in Scenario}
     for sc in Scenario:
@@ -313,6 +443,7 @@ def _resolve_transitions() -> None:
         del sc.successor_names
 
 
+_add_ongoing_transitions()
 _resolve_transitions()
 
 # Mapping for quick lookup by name

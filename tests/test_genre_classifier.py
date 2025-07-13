@@ -12,7 +12,22 @@ import numpy as np
 def test_scenario_mapping():
     show = BeatDMXShow(genre_model=None)
     assert show._scenario_from_label("rock") == Scenario.SONG_ONGOING_ROCK
-    assert show._scenario_from_label("classical") == Scenario.SONG_ONGOING_SLOW
+    assert show._scenario_from_label("classical") == Scenario.SONG_ONGOING_CLASSICAL
+
+    expected = {
+        "0": Scenario.SONG_ONGOING_DISCO,
+        "1": Scenario.SONG_ONGOING_METAL,
+        "2": Scenario.SONG_ONGOING_REGGAE,
+        "3": Scenario.SONG_ONGOING_BLUES,
+        "4": Scenario.SONG_ONGOING_ROCK,
+        "5": Scenario.SONG_ONGOING_CLASSICAL,
+        "6": Scenario.SONG_ONGOING_JAZZ,
+        "7": Scenario.SONG_ONGOING_HIPHOP,
+        "8": Scenario.SONG_ONGOING_COUNTRY,
+        "9": Scenario.SONG_ONGOING_POP,
+    }
+    for digit, scenario in expected.items():
+        assert show._scenario_from_label(digit) == scenario
 
 
 def test_ai_log_single_entry(monkeypatch):

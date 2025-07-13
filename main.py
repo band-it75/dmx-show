@@ -376,17 +376,28 @@ class BeatDMXShow:
     @staticmethod
     def _scenario_from_label(label: str) -> Scenario:
         """Map model label to a show scenario."""
-        lbl = label.lower()
+        lbl = label.lower().strip()
+        lbl = parameters.GENRE_ID_MAP.get(lbl, lbl)
         if "rock" in lbl:
             return Scenario.SONG_ONGOING_ROCK
         if "metal" in lbl:
             return Scenario.SONG_ONGOING_METAL
         if "jazz" in lbl:
             return Scenario.SONG_ONGOING_JAZZ
-        if "pop" in lbl or "disco" in lbl:
+        if "pop" in lbl:
             return Scenario.SONG_ONGOING_POP
-        if lbl in {"blues", "country", "reggae", "classical", "hip hop", "hip-hop"}:
-            return Scenario.SONG_ONGOING_SLOW
+        if "disco" in lbl:
+            return Scenario.SONG_ONGOING_DISCO
+        if "reggae" in lbl:
+            return Scenario.SONG_ONGOING_REGGAE
+        if "blues" in lbl:
+            return Scenario.SONG_ONGOING_BLUES
+        if "classical" in lbl:
+            return Scenario.SONG_ONGOING_CLASSICAL
+        if "country" in lbl:
+            return Scenario.SONG_ONGOING_COUNTRY
+        if any(x in lbl for x in ["hip hop", "hip-hop", "hiphop"]):
+            return Scenario.SONG_ONGOING_HIPHOP
         return Scenario.SONG_ONGOING_SLOW
 
     def _handle_state_change(self, state: SongState) -> None:
