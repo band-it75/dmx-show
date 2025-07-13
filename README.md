@@ -127,6 +127,8 @@ label selects the closest lighting scenario:
 This model runs in a background thread so beat detection remains responsive.
 If the genre remains blank, create ``GenreClassifier(verbose=True)`` to see
 model loading details and the raw label returned.
+The show retries classification every five seconds while it stays in the
+``Song Start`` scenario so a label is eventually detected.
 
 ### Troubleshooting
 
