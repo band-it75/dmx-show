@@ -33,7 +33,7 @@ PRINT_INTERVAL = 10
 VU_FULL = 0.3
 
 # Display a static dashboard instead of logging lines
-SHOW_DASHBOARD = False
+SHOW_DASHBOARD = True
 
 # DMX hardware port
 COM_PORT = "COM4"
