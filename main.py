@@ -543,7 +543,12 @@ class BeatDMXShow:
 
         level = self._vu_to_level(self.current_vu)
         smooth = parameters.VU_SMOOTHING
-        self.smoothed_vu_dimmer = self.smoothed_vu_dimmer * smooth + level * (1 - smooth)
+        self.smoothed_vu_dimmer = (
+            self.smoothed_vu_dimmer * smooth + level * (1 - smooth)
+        )
+        peak = self._vu_to_level(parameters.VU_FULL)
+        if self.smoothed_vu_dimmer > peak:
+            self.smoothed_vu_dimmer = peak
         final_level = int(self.smoothed_vu_dimmer)
         if self.log_file:
             self.log_file.write(
