@@ -24,3 +24,37 @@ def test_vu_to_level_scale():
     assert mid == 25
     assert 25 < high < full
 
+
+import numpy as np
+from src.audio.beat_detection import SongState
+
+class DummyDetector:
+    def __init__(self) -> None:
+        self.state = SongState.ONGOING
+        self.snare_hit = True
+        self.is_chorus = False
+        self.is_drum_solo = False
+        self.is_crescendo = False
+        self.kick_hit = False
+
+    def process(self, samples, now):
+        return False, 0, False, parameters.VU_FULL
+
+class DummyCtrl:
+    def update(self):
+        pass
+
+    def reset(self):
+        pass
+
+
+def test_snare_resets_smoothed_dimmer():
+    show = BeatDMXShow(genre_model=None)
+    show.controller = DummyCtrl()
+    show.detector = DummyDetector()
+    show.smoothed_vu_dimmer = 255
+    show.last_vu_dimmer = 255
+    show._process_samples(np.zeros(512))
+    assert show.smoothed_vu_dimmer == BeatDMXShow._vu_to_level(parameters.VU_FULL)
+    # last_vu_dimmer is left unchanged so the next VU update triggers
+    # a DMX refresh back to the expected level
