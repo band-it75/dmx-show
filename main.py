@@ -281,6 +281,8 @@ class BeatDMXShow:
         self.scenario = scn
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(scn)
         self.beat_ends.clear()
+        if self.controller:
+            self.controller.reset()
         updates = dict(scn.updates)
         updates.pop("Smoke Machine", None)
         self._print_state_change(updates)

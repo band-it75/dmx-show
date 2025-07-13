@@ -10,6 +10,9 @@ class DummyCtrl:
     def update(self):
         pass
 
+    def reset(self):
+        pass
+
 
 def test_intermission_to_start_allowed():
     show = BeatDMXShow(genre_model=None)
