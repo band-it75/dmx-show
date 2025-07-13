@@ -19,7 +19,23 @@ class GenreClassifier:
         model_path: str | Path | None = None,
         verbose: bool = False,
         log_file: str | Path | TextIO | None = None,
+        *,
+        device: int = -1,
     ) -> None:
+        """Create the classifier.
+
+        Parameters
+        ----------
+        model_path:
+            Path to the local transformer model directory.
+        verbose:
+            If ``True`` print diagnostic messages when classifying.
+        log_file:
+            Optional log file handle or path.
+        device:
+            ``transformers`` device ID; ``-1`` forces CPU which avoids
+            GPU-related crashes on some systems.
+        """
         if model_path is None:
             root_dir = Path(__file__).resolve().parents[2]
             model_path = root_dir / "models" / "music_genres_classification"
@@ -34,6 +50,7 @@ class GenreClassifier:
 
         self._classifier = None
         self.verbose = verbose
+        self.device = device
         self.log_file: TextIO | None = None
         self._own_log = False
         if log_file is not None:
@@ -54,11 +71,14 @@ class GenreClassifier:
     def classify(self, samples: np.ndarray, samplerate: int) -> str:
         """Return the top predicted genre label for the given audio."""
         if self._classifier is None:
-            self._log(f"Loading genre model from {self.model_path}")
+            self._log(
+                f"Loading genre model from {self.model_path} on device {self.device}"
+            )
             self._classifier = pipeline(
                 "audio-classification",
                 model=str(self.model_path),
                 local_files_only=True,
+                device=self.device,
             )
         self._log(
             f"classify: samples={samples.shape} samplerate={samplerate}"
