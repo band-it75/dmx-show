@@ -194,14 +194,14 @@ Stage lights fade to black as overheads rise to 30% warm white. Moving head cent
 
 ### Song Ongoing - Slow (BPM <80)
 
-* Overhead **deep indigo** pulse every 2 beats (RGB: 54, 0, 88).
+* Overhead **deep indigo** flashes every 2 beats (RGB: 54, 0, 88).
 * Accent color: **soft lavender** highlights crescendos (RGB: 200, 160, 255).
 * Moving head gentle pan focusing on the artist.
 * **2-second smoke burst** every **15 seconds**.
 
 ### Song Ongoing - Jazz (80-110 BPM)
 
-* Overhead **amber** pulse each beat (RGB: 255, 147, 41).
+* Overhead **amber** accent on each beat (RGB: 255, 147, 41).
 * Accent color: **teal** accents highlight dynamic sections (RGB: 0, 128, 128).
 * Moving head performs narrow, rhythmic sweeps.
 * **3-second smoke burst** every **30 seconds**.
@@ -210,13 +210,13 @@ Stage lights fade to black as overheads rise to 30% warm white. Moving head cent
 
 * Overhead **candy pink** chase each beat (RGB: 255, 64, 200).
 * Accent color: **bright cyan** flashes on strong beats (RGB: 0, 200, 255).
-* Beat accents push Overhead Effects to full intensity for 100 ms beyond the VU level.
+* Beat accents change color for 100 ms beyond the VU level.
 * Moving head executes wide, energetic sweeps.
 * **3-second smoke burst** every **30 seconds**.
 
 ### Song Ongoing - Rock (130-160 BPM)
 
-* Overhead **fire red** pulse each beat using strong low-frequency peaks (RGB: 255, 0, 0).
+* Overhead **fire red** accent each beat using strong low-frequency peaks (RGB: 255, 0, 0).
 * Accent color: **electric blue** in sustained sections (RGB: 0, 64, 255).
 * Chorus downbeats switch to **golden amber** (RGB: 255, 180, 0).
 * Moving head rapid pan and tilt movements.
@@ -224,7 +224,7 @@ Stage lights fade to black as overheads rise to 30% warm white. Moving head cent
 
 ### Song Ongoing - Metal (>160 BPM)
 
-* Overhead **icy white** pulse each beat (RGB: 255, 255, 255).
+* Overhead **icy white** accent each beat (RGB: 255, 255, 255).
 * Accent color: **UV purple** washes during intense passages (RGB: 128, 0, 255).
 * **Blood red** bursts on strong low-frequency hits (RGB: 180, 0, 0).
 * Moving head performs rapid, erratic sweeps.

@@ -167,7 +167,6 @@ class BeatDMXShow:
         self.smoke_start = 0.0
         self.last_smoke_time = 0.0
         self.scenario = parameters.SCENARIO_MAP[Scenario.INTERMISSION]
-        self.last_bpm = 0.0
         self.smoke_gap_ms, self.smoke_duration_ms = parameters.smoke_settings(self.scenario)
         self.groups: Dict[str, list] = {}
         self.beat_ends: Dict[str, float] = {}
@@ -546,7 +545,6 @@ class BeatDMXShow:
 
     def _handle_beat(self, bpm: float, now: float) -> None:
         if bpm:
-            self.last_bpm = bpm
             label = self._genre_label(self.last_genre)
             line = f"Beat at {bpm:.2f} BPM" + (f" - genre {label}" if label else "")
             if self.dashboard_enabled:

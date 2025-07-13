@@ -86,7 +86,7 @@ def test_beat_resets_smoothed_dimmer():
     show.detector = BeatDummyDetector()
     show.current_vu = parameters.VU_FULL
     show.scenario.events = {
-        "beat": {"Overhead Effects": {"dimmer": 255, "duration": 100}}
+        "beat": {"Overhead Effects": {"duration": 100}}
     }
     show._handle_beat(120, 0.0)
-    assert show.smoothed_vu_dimmer == BeatDMXShow._vu_to_level(parameters.VU_FULL)
+    assert show.smoothed_vu_dimmer == 255
