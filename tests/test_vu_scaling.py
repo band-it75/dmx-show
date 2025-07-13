@@ -58,3 +58,30 @@ def test_snare_resets_smoothed_dimmer():
     assert show.smoothed_vu_dimmer == BeatDMXShow._vu_to_level(parameters.VU_FULL)
     # last_vu_dimmer is left unchanged so the next VU update triggers
     # a DMX refresh back to the expected level
+
+class BeatDummyDetector:
+    def __init__(self) -> None:
+        self.state = SongState.ONGOING
+        self.snare_hit = False
+        self.is_chorus = False
+        self.is_drum_solo = False
+        self.is_crescendo = False
+        self.kick_hit = False
+
+    def process(self, samples, now):
+        return True, 120, False, parameters.VU_FULL
+
+
+def test_beat_resets_smoothed_dimmer():
+    show = BeatDMXShow(dashboard=False, genre_model=None)
+    show.controller = DummyCtrl()
+    show.smoke = None
+    show.smoke_on = False
+    show.smoke_gap_ms = 0
+    show.smoothed_vu_dimmer = 255
+    show.last_vu_dimmer = 255
+    show.detector = BeatDummyDetector()
+    show.current_vu = parameters.VU_FULL
+    show.scenario.beat = {"Overhead Effects": {"dimmer": 255, "duration": 100}}
+    show._handle_beat(120, 0.0)
+    assert show.smoothed_vu_dimmer == BeatDMXShow._vu_to_level(parameters.VU_FULL)
