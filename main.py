@@ -390,6 +390,11 @@ class BeatDMXShow:
         return Scenario.SONG_ONGOING_SLOW
 
     def _handle_state_change(self, state: SongState) -> None:
+        prev_state = self.current_state
+        if state == SongState.ONGOING and self.last_genre is None:
+            logger.debug("Ignore Ongoing transition until genre classified")
+            return
+
         self._flush_beat_line()
         if self.dashboard_enabled:
             self.dashboard.set_state(state.value)
@@ -400,7 +405,7 @@ class BeatDMXShow:
         self._debug_log(f"State changed to {state.value}")
         logger.info(
             "STATE change %s -> %s  | last_genre=%s  classifying=%s",
-            self.current_state,
+            prev_state,
             state,
             self.last_genre,
             self.classifying,
