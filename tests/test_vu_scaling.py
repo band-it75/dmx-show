@@ -16,11 +16,11 @@ def test_vu_to_level_scale():
     high = BeatDMXShow._vu_to_level(
         (parameters.VU_FULL + parameters.VU_PULSE_THRESHOLD) / 2
     )
-    assert zero == 0
-    assert threshold == 0
-    assert full == 255
-    assert above == 255
-    assert low == 0
-    assert mid == 0
-    assert 0 < high < full
+    assert zero == 25
+    assert threshold == 25
+    assert full == 175
+    assert above == 175
+    assert low == 25
+    assert mid == 25
+    assert 25 < high < full
 
