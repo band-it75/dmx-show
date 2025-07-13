@@ -190,7 +190,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"red": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"blue": 255, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"red": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_JAZZ = (
@@ -233,7 +248,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"green": 255, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"red": 255, "blue": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_POP = (
@@ -276,7 +306,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"green": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"green": 255, "blue": 128, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"green": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_ROCK = (
@@ -319,7 +364,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"red": 255, "green": 64, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"red": 255, "blue": 64, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"red": 255, "green": 64},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_METAL = (
@@ -362,7 +422,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"white": 255, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"white": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_DISCO = (
@@ -405,7 +480,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"green": 255, "blue": 255, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"red": 255, "blue": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_REGGAE = (
@@ -448,7 +538,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"red": 255, "green": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"red": 255, "green": 128, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"red": 255, "green": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_BLUES = (
@@ -491,7 +596,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"blue": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"green": 255, "blue": 128, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"blue": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_CLASSICAL = (
@@ -534,7 +654,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"warm_white": 255, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"white": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_HIPHOP = (
@@ -577,7 +712,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"green": 255, "blue": 255, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"green": 255, "blue": 255},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ONGOING_COUNTRY = (
@@ -620,7 +770,22 @@ class Scenario(Enum):
         {
             "beat": {
                 "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255, "duration": 100}
-            }
+            },
+            "chorus": {
+                "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255},
+                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+            },
+            "snare_hit": {
+                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+            },
+            "timer": {
+                "after_seconds": 30,
+                "Overhead Effects": {
+                    "from": {"red": 255, "green": 96},
+                    "to": {"red": 128, "blue": 255},
+                    "duration_ms": 45000,
+                },
+            },
         },
     )
     SONG_ENDING = (
