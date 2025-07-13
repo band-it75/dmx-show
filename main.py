@@ -358,7 +358,7 @@ class BeatDMXShow:
         sid = self.song_id
         logger.info(
             "LAUNCH classifier thread, %d samples in buffer",
-            sum(len(b) for b in self.pre_song_buffer),
+            len(self.pre_song_buffer),
         )
         logger.info(
             "LAUNCH classifier  song_id=%s  frames=%d  secs=%.2f",
