@@ -39,7 +39,7 @@ SHOW_DASHBOARD = True
 COM_PORT = "COM4"
 
 # How many DMX frames to send per second
-DMX_FPS = 30
+DMX_FPS = 5
 
 # Seconds between automatic genre classification checks
 GENRE_CHECK_INTERVAL = 15.0
