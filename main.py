@@ -22,7 +22,7 @@ try:
 except Exception:  # pragma: no cover - optional dependency for tests
     sd = None
 
-from src.audio import SongState
+from src.audio.beat_detection import SongState
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
