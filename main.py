@@ -619,6 +619,9 @@ class BeatDMXShow:
             self.beat_ends["Overhead Effects"] = max(
                 self.beat_ends.get("Overhead Effects", 0.0), now + 0.1
             )
+            # Reset the smoothed dimmer so it returns to the expected level
+            self.smoothed_vu_dimmer = self._vu_to_level(vu)
+            self.last_vu_dimmer = int(self.smoothed_vu_dimmer)
 
         for group, end in list(self.beat_ends.items()):
             if now >= end:
