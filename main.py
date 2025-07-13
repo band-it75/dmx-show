@@ -173,6 +173,7 @@ class BeatDMXShow:
         self.beat_ends: Dict[str, float] = {}
         self._beat_line: str | None = None
         self.last_vu_dimmer = -1
+        self.smoothed_vu_dimmer = 0.0
         self.current_vu = 0.0
         self.log_file = None
         self.log_path = log_path
@@ -523,12 +524,12 @@ class BeatDMXShow:
 
     @staticmethod
     def _vu_to_level(vu: float) -> int:
-        """Map a raw VU value to a dimmer level using a logarithmic scale."""
+        """Map a raw VU value to a dimmer level using a square root scale."""
         ratio = max(0.0, min(1.0, vu / parameters.VU_FULL))
         if ratio <= 0.0:
             return 0
-        level = math.log(ratio * 9 + 1, 10)
-        return int(level * 255)
+        level = math.sqrt(ratio)
+        return min(255, int(level * 255))
 
     def _update_overhead_from_vu(self, _ctrl: DMX) -> None:
         """Set Overhead Effects dimmer based on the latest VU reading."""
@@ -538,13 +539,18 @@ class BeatDMXShow:
             return
 
         level = self._vu_to_level(self.current_vu)
+        smooth = parameters.VU_SMOOTHING
+        self.smoothed_vu_dimmer = self.smoothed_vu_dimmer * smooth + level * (1 - smooth)
+        final_level = int(self.smoothed_vu_dimmer)
         if self.log_file:
-            self.log_file.write(f"{now:.3f} VU:{self.current_vu:.3f} dimmer:{level}\n")
+            self.log_file.write(
+                f"{now:.3f} VU:{self.current_vu:.3f} dimmer:{final_level}\n"
+            )
             self.log_file.flush()
-        if level != self.last_vu_dimmer:
-            self._apply_update("Overhead Effects", {"dimmer": level})
-            self._debug_log(f"VU dimmer: {level}")
-            self.last_vu_dimmer = level
+        if final_level != self.last_vu_dimmer:
+            self._apply_update("Overhead Effects", {"dimmer": final_level})
+            self._debug_log(f"VU dimmer: {final_level}")
+            self.last_vu_dimmer = final_level
 
 
     def _process_samples(self, samples: np.ndarray) -> None:

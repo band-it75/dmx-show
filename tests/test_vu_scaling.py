@@ -6,7 +6,7 @@ import parameters
 from main import BeatDMXShow
 
 
-def test_vu_to_level_log_scale():
+def test_vu_to_level_scale():
     zero = BeatDMXShow._vu_to_level(0.0)
     full = BeatDMXShow._vu_to_level(parameters.VU_FULL)
     above = BeatDMXShow._vu_to_level(parameters.VU_FULL * 2)
