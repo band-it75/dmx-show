@@ -330,16 +330,21 @@ class BeatDMXShow:
         end_time = start_time + duration
         from_colors = colors["from"]
         to_colors = colors["to"]
+        all_colors = set(from_colors) | set(to_colors)
         while time.time() < end_time:
             elapsed = time.time() - start_time
             ratio = elapsed / duration
             current_colors = {
-                color: int(from_colors[color] * (1 - ratio) + to_colors[color] * ratio)
-                for color in from_colors
+                color: int(
+                    from_colors.get(color, 0) * (1 - ratio)
+                    + to_colors.get(color, 0) * ratio
+                )
+                for color in all_colors
             }
             self._apply_update(group, current_colors)
             time.sleep(0.05)
-        self._apply_update(group, to_colors)
+        final_colors = {color: to_colors.get(color, 0) for color in all_colors}
+        self._apply_update(group, final_colors)
 
     def _set_scenario(self, name: parameters.Scenario, force: bool = False) -> None:
         scn = parameters.SCENARIO_MAP.get(name)
