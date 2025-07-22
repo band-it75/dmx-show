@@ -111,6 +111,10 @@ visible in dashboard mode. Chorus and crescendo detection now include a
 0.375-second debounce interval to reduce erratic short bursts.
 You can tweak this debounce time by editing the ``BeatDetector``
 ``chorus_debounce`` and ``crescendo_debounce`` parameters.
+Detection sensitivity for chorus, drum solo, crescendo, snare and kick adapts
+over time. ``beat_detection.py`` tracks how often each event fires along with
+the current BPM and VU level. It adjusts the thresholds every 30 seconds and
+saves them to ``tuning.json`` so the next run starts with the tuned values.
 
 ## Genre classification
 

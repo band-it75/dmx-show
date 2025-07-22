@@ -16,3 +16,5 @@
   - Chorus and crescendo detection uses a 0.375-second debounce to avoid
     flicker
   - `DMX_FPS` sets how many DMX frames are transmitted per second
+  - Detection sensitivity for chorus, drum solo, crescendo, snare and kick is
+    tuned dynamically and saved to ``tuning.json``
