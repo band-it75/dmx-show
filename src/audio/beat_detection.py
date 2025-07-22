@@ -5,6 +5,8 @@ from __future__ import annotations
 import time
 from enum import Enum
 from typing import Tuple
+import json
+from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
@@ -12,6 +14,17 @@ import aubio
 import librosa
 from .debounce import DebouncedFlag
 from parameters import Scenario
+
+DEFAULT_TUNING = {
+    "snare_centroid": 3000.0,
+    "kick_centroid": 625.0,
+    "chorus_rms": 0.075,
+    "chorus_flatness": 0.25,
+    "drum_ratio": 2.25,
+    "crescendo_mult": 1.075,
+}
+
+TUNING_FILE = Path("tuning.json")
 
 
 class SongState(Enum):
@@ -85,6 +98,81 @@ class BeatDetector:
         self.chorus_flag = DebouncedFlag(chorus_debounce)
         self.crescendo_flag = DebouncedFlag(crescendo_debounce)
 
+        self.tuning = DEFAULT_TUNING.copy()
+        if TUNING_FILE.exists():
+            try:
+                self.tuning.update(json.loads(TUNING_FILE.read_text()))
+            except Exception as exc:  # pragma: no cover - configuration load issue
+                print(f"Failed to load tuning: {exc}", flush=True)
+
+        self.snare_centroid = self.tuning["snare_centroid"]
+        self.kick_centroid = self.tuning["kick_centroid"]
+        self.chorus_rms = self.tuning["chorus_rms"]
+        self.chorus_flatness = self.tuning["chorus_flatness"]
+        self.drum_ratio = self.tuning["drum_ratio"]
+        self.crescendo_mult = self.tuning["crescendo_mult"]
+
+        self.last_adjust_time = time.time()
+        self.counts = {
+            "chorus": 0,
+            "crescendo": 0,
+            "drum_solo": 0,
+            "snare": 0,
+            "kick": 0,
+            "onset": 0,
+        }
+
+    def _save_tuning(self) -> None:
+        data = {
+            "snare_centroid": self.snare_centroid,
+            "kick_centroid": self.kick_centroid,
+            "chorus_rms": self.chorus_rms,
+            "chorus_flatness": self.chorus_flatness,
+            "drum_ratio": self.drum_ratio,
+            "crescendo_mult": self.crescendo_mult,
+        }
+        try:
+            TUNING_FILE.write_text(json.dumps(data))
+        except Exception as exc:  # pragma: no cover - disk issues
+            print(f"Failed to save tuning: {exc}", flush=True)
+
+    def _adjust_tuning(self, now: float, bpm: float) -> None:
+        if now - self.last_adjust_time < 30:
+            return
+        onset = max(self.counts["onset"], 1)
+
+        snare_ratio = self.counts["snare"] / onset
+        if snare_ratio > 0.6:
+            self.snare_centroid *= 1.05
+        elif snare_ratio < 0.1 and bpm > 0:
+            self.snare_centroid *= 0.95
+
+        kick_ratio = self.counts["kick"] / onset
+        if kick_ratio > 0.6:
+            self.kick_centroid *= 0.95
+        elif kick_ratio < 0.1 and bpm > 0:
+            self.kick_centroid *= 1.05
+
+        if self.counts["chorus"] > 10:
+            self.chorus_rms *= 1.05
+        elif self.counts["chorus"] == 0 and bpm > 0:
+            self.chorus_rms *= 0.95
+
+        if self.counts["crescendo"] > 10:
+            self.crescendo_mult *= 1.05
+        elif self.counts["crescendo"] == 0 and bpm > 0:
+            self.crescendo_mult *= 0.95
+
+        if self.counts["drum_solo"] > 5:
+            self.drum_ratio *= 1.05
+        elif self.counts["drum_solo"] == 0 and bpm > 0:
+            self.drum_ratio *= 0.95
+
+        self.last_adjust_time = now
+        for key in self.counts:
+            self.counts[key] = 0
+        self._save_tuning()
+
 
     def _set_state(self, new_state: SongState, now: float) -> bool:
         """Set ``self.state`` if transition is allowed."""
@@ -145,31 +233,45 @@ class BeatDetector:
         flatness = float(
             librosa.feature.spectral_flatness(y=samples, n_fft=n_fft).mean()
         )
-        chorus_raw = rms > 0.075 and flatness < 0.25
-        crescendo_raw = rms > self.previous_rms * 1.075
+        chorus_raw = rms > self.chorus_rms and flatness < self.chorus_flatness
+        crescendo_raw = rms > self.previous_rms * self.crescendo_mult
         self.is_chorus = self.chorus_flag.update(chorus_raw, now)
         self.is_crescendo = self.crescendo_flag.update(crescendo_raw, now)
+        if self.is_chorus:
+            self.counts["chorus"] += 1
+        if self.is_crescendo:
+            self.counts["crescendo"] += 1
         self.previous_rms = rms
 
         S = librosa.stft(samples, n_fft=n_fft, hop_length=n_fft // 2)
         y_harm, y_perc = librosa.decompose.hpss(S)
         perc_energy = float(np.sum(np.abs(y_perc) ** 2))
         harm_energy = float(np.sum(np.abs(y_harm) ** 2))
-        self.is_drum_solo = perc_energy > 2.25 * harm_energy
+        self.is_drum_solo = perc_energy > self.drum_ratio * harm_energy
+        if self.is_drum_solo:
+            self.counts["drum_solo"] += 1
 
         # Transient detection for snare/kick hits
         self.snare_hit = False
         self.kick_hit = False
+        onset_detected = False
         if self.onset(samples):
+            onset_detected = True
             centroid = float(
                 librosa.feature.spectral_centroid(
                     y=samples, sr=self.samplerate, n_fft=n_fft
                 ).mean()
             )
-            if centroid > 3000:
+            if centroid > self.snare_centroid:
                 self.snare_hit = True
-            elif centroid < 625:
+            elif centroid < self.kick_centroid:
                 self.kick_hit = True
+        if onset_detected:
+            self.counts["onset"] += 1
+        if self.snare_hit:
+            self.counts["snare"] += 1
+        if self.kick_hit:
+            self.counts["kick"] += 1
 
         # song state machine
         if self.state == SongState.INTERMISSION and loud:
@@ -204,6 +306,7 @@ class BeatDetector:
                 self.last_print = now
 
         self.beat_times = [t for t in self.beat_times if now - t <= 60]
+        self._adjust_tuning(now, bpm)
         return beat, bpm, state_changed, amplitude
 
     # ------------------------------------------------------------------
