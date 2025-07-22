@@ -1,8 +1,1 @@
-{
-  "snare_centroid": 3000.0,
-  "kick_centroid": 625.0,
-  "chorus_rms": 0.075,
-  "chorus_flatness": 0.25,
-  "drum_ratio": 2.25,
-  "crescendo_mult": 1.075
-}
+{"snare_centroid": 3150.0, "kick_centroid": 625.0, "chorus_rms": 0.08268750000000001, "chorus_flatness": 0.25, "drum_ratio": 2.25, "crescendo_mult": 1.1851875}
