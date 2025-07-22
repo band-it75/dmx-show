@@ -13,6 +13,6 @@
     faces the audience
 - Avoid cues that rely on detecting solos or other musical details the
    software cannot sense
-  - Chorus and crescendo detection uses a 0.5-second debounce to avoid
+  - Chorus and crescendo detection uses a 0.375-second debounce to avoid
     flicker
   - `DMX_FPS` sets how many DMX frames are transmitted per second

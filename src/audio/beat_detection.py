@@ -60,8 +60,8 @@ class BeatDetector:
         start_duration: float = 2.0,
         end_duration: float = 3.0,
         print_interval: float = 10.0,
-        chorus_debounce: float = 0.5,
-        crescendo_debounce: float = 0.5,
+        chorus_debounce: float = 0.375,
+        crescendo_debounce: float = 0.375,
     ) -> None:
         self.samplerate = samplerate
         self.tempo = aubio.tempo("default", 1024, 512, samplerate)
@@ -145,8 +145,8 @@ class BeatDetector:
         flatness = float(
             librosa.feature.spectral_flatness(y=samples, n_fft=n_fft).mean()
         )
-        chorus_raw = rms > 0.1 and flatness < 0.2
-        crescendo_raw = rms > self.previous_rms * 1.1
+        chorus_raw = rms > 0.075 and flatness < 0.25
+        crescendo_raw = rms > self.previous_rms * 1.075
         self.is_chorus = self.chorus_flag.update(chorus_raw, now)
         self.is_crescendo = self.crescendo_flag.update(crescendo_raw, now)
         self.previous_rms = rms
@@ -155,7 +155,7 @@ class BeatDetector:
         y_harm, y_perc = librosa.decompose.hpss(S)
         perc_energy = float(np.sum(np.abs(y_perc) ** 2))
         harm_energy = float(np.sum(np.abs(y_harm) ** 2))
-        self.is_drum_solo = perc_energy > 3 * harm_energy
+        self.is_drum_solo = perc_energy > 2.25 * harm_energy
 
         # Transient detection for snare/kick hits
         self.snare_hit = False
@@ -166,9 +166,9 @@ class BeatDetector:
                     y=samples, sr=self.samplerate, n_fft=n_fft
                 ).mean()
             )
-            if centroid > 4000:
+            if centroid > 3000:
                 self.snare_hit = True
-            elif centroid < 500:
+            elif centroid < 625:
                 self.kick_hit = True
 
         # song state machine
