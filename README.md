@@ -10,7 +10,7 @@ BPM every few seconds and runs a genre classifier based on the
 `music_genres_classification` transformer model stored under
 `models/music_genres_classification`. The detector also provides lightweight
 heuristics for chorus, crescendo and drum solo detection using a
-0.5-second debounce.
+0.375-second debounce.
 
 ### Usage
 
@@ -108,7 +108,7 @@ and chorus sections. These rely on RMS loudness trends, harmonic/percussive
 ratios and spectral flatness. Results are heuristic and may produce occasional
 false triggers but can be useful for debugging lighting ideas. Their status is
 visible in dashboard mode. Chorus and crescendo detection now include a
-0.5-second debounce interval to reduce erratic short bursts.
+0.375-second debounce interval to reduce erratic short bursts.
 You can tweak this debounce time by editing the ``BeatDetector``
 ``chorus_debounce`` and ``crescendo_debounce`` parameters.
 
