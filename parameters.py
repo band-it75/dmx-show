@@ -29,7 +29,7 @@ CHANNEL = 1
 # How often to print BPM and genre summaries, in seconds
 PRINT_INTERVAL = 10
 
-# RMS level that results in full intensity for overhead effects
+# RMS level that results in full intensity for Stage Lights
 VU_FULL = 0.3
 # Ratio of VU_FULL that must be exceeded to trigger dimmer pulses
 VU_PULSE_THRESHOLD = VU_FULL * 0.75
@@ -65,17 +65,18 @@ GENRE_ID_MAP = {
 
 # List of (fixture class, start_address, name) tuples describing the rig
 DEVICES = [
-    #(Prolights_LumiPar12UAW5_7ch, 1, "House Lights"),
-    #(Prolights_LumiPar7UTRI_8ch, 1, "House Lights"),
-    #(Prolights_LumiPar12UAW5_7ch, 10, "House Lights"),
-    #(Prolights_LumiPar12UAW5_7ch, 19, "House Lights"),
+    #(Prolights_LumiPar12UAW5_7ch, 1, "Music Lights"),
+    (Prolights_LumiPar7UTRI_8ch, 1, "Stage Lights"),
+    #(Prolights_LumiPar7UTRI_8ch, 1, "Karaoke Lights"),
+    #(Prolights_LumiPar7UTRI_8ch, 1, "Music Lights"),
+    #(Prolights_LumiPar12UAW5_7ch, 10, "Music Lights"),
+    #(Prolights_LumiPar12UAW5_7ch, 19, "Music Lights"),
     #(Prolights_LumiPar7UTRI_8ch, 30, "Karaoke Lights"),
     #(Prolights_LumiPar7UTRI_8ch, 41, "Karaoke Lights"),
-    #(Prolights_LumiPar12UQPro_9ch, 55, "Overhead Effects"),
-    #(Prolights_LumiPar12UQPro_9ch, 69, "Overhead Effects"),
+    #(Prolights_LumiPar12UQPro_9ch, 55, "Stage Lights"),
+    #(Prolights_LumiPar12UQPro_9ch, 69, "Stage Lights"),
     #(Prolights_PixieWash_13ch, 85, "Moving Head"),
     #(WhatSoftware_Generic_4ch, 115, "Smoke Machine"),
-    (Prolights_LumiPar7UTRI_8ch, 1, "Overhead Effects"),
 ]
 
 # Names of every ongoing scenario
@@ -129,10 +130,10 @@ class Scenario(Enum):
         ["SONG_ENDING"],
         ["SONG_START"],
         {
-            "House Lights": {"warm_white": 51, "dimmer": 51},
+            "Music Lights": {"warm_white": 51, "dimmer": 51},
             "Moving Head": {"dimmer": 0},
-            "Overhead Effects": {"dimmer": 0},
-            "Karaoke Lights": {"dimmer": 0},
+            "Stage Lights": {"dimmer": 0},
+            "Karaoke Lights": {"red":255, "green": 218, "blue:": 185, "dimmer": 255},
             "Smoke Machine": {"smoke_gap": 60000, "duration": 5000},
         },
     )
@@ -143,10 +144,10 @@ class Scenario(Enum):
         ["INTERMISSION"],
         ONGOING_STATES,
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"pan": 32768, "tilt": 49152, "dimmer": 255},
-            "Overhead Effects": {"white": 77, "dimmer": 77},
-            "Karaoke Lights": {"dimmer": 0},
+            "Stage Lights": {"white": 77, "dimmer": 77},
+            "Karaoke Lights": {"red":255, "green": 218, "blue:": 185, "dimmer": 50},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
         },
     )
@@ -181,26 +182,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255},
-            "Karaoke Lights": {"red": 26, "dimmer": 26},
+            "Stage Lights": {"red": 255},
+            "Karaoke Lights": {"dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "duration": 100}
+                "Stage Lights": {"red": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"blue": 255, "dimmer": 255},
+                "Stage Lights": {"blue": 255, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"red": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -239,26 +240,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255, "blue": 255},
-            "Karaoke Lights": {"red": 26, "blue": 26, "dimmer": 26},
+            "Stage Lights": {"red": 255, "blue": 255},
+            "Karaoke Lights": {"red": 26, "blue": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "blue": 255, "duration": 100}
+                "Stage Lights": {"red": 255, "blue": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"green": 255, "dimmer": 255},
+                "Stage Lights": {"green": 255, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"red": 255, "blue": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -297,26 +298,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"green": 255},
-            "Karaoke Lights": {"green": 26, "dimmer": 26},
+            "Stage Lights": {"green": 255},
+            "Karaoke Lights": {"green": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"green": 255, "duration": 100}
+                "Stage Lights": {"green": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"green": 255, "blue": 128, "dimmer": 255},
+                "Stage Lights": {"green": 255, "blue": 128, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"green": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -355,26 +356,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255, "green": 64},
-            "Karaoke Lights": {"red": 26, "green": 6, "dimmer": 26},
+            "Stage Lights": {"red": 255, "green": 64},
+            "Karaoke Lights": {"red": 26, "green": 6, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "green": 64, "duration": 100}
+                "Stage Lights": {"red": 255, "green": 64, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"red": 255, "blue": 64, "dimmer": 255},
+                "Stage Lights": {"red": 255, "blue": 64, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"red": 255, "green": 64},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -413,26 +414,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"white": 255},
-            "Karaoke Lights": {"white": 26, "dimmer": 26},
+            "Stage Lights": {"white": 255},
+            "Karaoke Lights": {"white": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"white": 255, "duration": 100}
+                "Stage Lights": {"white": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"white": 255, "dimmer": 255},
+                "Stage Lights": {"white": 255, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"white": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -471,26 +472,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255, "blue": 255},
-            "Karaoke Lights": {"red": 26, "blue": 26, "dimmer": 26},
+            "Stage Lights": {"red": 255, "blue": 255},
+            "Karaoke Lights": {"red": 26, "blue": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "blue": 255, "duration": 100}
+                "Stage Lights": {"red": 255, "blue": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"green": 255, "blue": 255, "dimmer": 255},
+                "Stage Lights": {"green": 255, "blue": 255, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"red": 255, "blue": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -529,26 +530,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255, "green": 255},
-            "Karaoke Lights": {"red": 26, "green": 26, "dimmer": 26},
+            "Stage Lights": {"red": 255, "green": 255},
+            "Karaoke Lights": {"red": 26, "green": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "green": 255, "duration": 100}
+                "Stage Lights": {"red": 255, "green": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"red": 255, "green": 128, "dimmer": 255},
+                "Stage Lights": {"red": 255, "green": 128, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"red": 255, "green": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -587,26 +588,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"blue": 255},
-            "Karaoke Lights": {"blue": 26, "dimmer": 26},
+            "Stage Lights": {"blue": 255},
+            "Karaoke Lights": {"blue": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"blue": 255, "duration": 100}
+                "Stage Lights": {"blue": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"green": 255, "blue": 128, "dimmer": 255},
+                "Stage Lights": {"green": 255, "blue": 128, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"blue": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -645,26 +646,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"white": 255},
+            "Stage Lights": {"white": 255},
             "Karaoke Lights": {"white": 26, "dimmer": 26},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"white": 255, "duration": 100}
+                "Stage Lights": {"white": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"warm_white": 255, "dimmer": 255},
+                "Stage Lights": {"warm_white": 255, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"white": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -703,26 +704,26 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"green": 255, "blue": 255},
-            "Karaoke Lights": {"green": 26, "blue": 26, "dimmer": 26},
+            "Stage Lights": {"green": 255, "blue": 255},
+            "Karaoke Lights": {"green": 26, "blue": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"green": 255, "blue": 255, "duration": 100}
+                "Stage Lights": {"green": 255, "blue": 255, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"red": 255, "blue": 255, "dimmer": 255},
+                "Stage Lights": {"red": 255, "blue": 255, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"green": 255, "blue": 255},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -761,26 +762,27 @@ class Scenario(Enum):
             "SONG_ENDING",
         ],
         {
-            "House Lights": {"dimmer": 0},
+            "Music Lights": {"dimmer": 0},
             "Moving Head": {"dimmer": 255},
-            "Overhead Effects": {"red": 255, "green": 96},
-            "Karaoke Lights": {"red": 26, "green": 10, "dimmer": 26},
+            "Stage Lights": {"red": 255, "green": 96},
+            "Karaoke Lights": {"red": 26, "green": 10, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
         },
         {
             "beat": {
-                "Overhead Effects": {"red": 255, "green": 96, "duration": 100}
+                "Stage Lights": {"red": 255, "green": 96, "duration": 100}
             },
             "chorus": {
-                "Overhead Effects": {"red": 255, "green": 96, "dimmer": 255},
+                "Stage Lights": {"red": 255, "green": 96, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Karaoke Lights": {"red": 255, "green": 0, "blue:": 0, "dimmer": 255},
             },
             "snare_hit": {
-                "Overhead Effects": {"white": 255, "dimmer": 255, "duration": 50}
+                "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
             },
             "timer": {
                 "after_seconds": 30,
-                "Overhead Effects": {
+                "Stage Lights": {
                     "from": {"red": 255, "green": 96},
                     "to": {"red": 128, "blue": 255},
                     "duration_ms": 45000,
@@ -795,10 +797,10 @@ class Scenario(Enum):
         ONGOING_STATES,
         ["INTERMISSION"],
         {
-            "House Lights": {"warm_white": 128, "dimmer": 128},
+            "Music Lights": {"warm_white": 128, "dimmer": 128},
             "Moving Head": {"pan": 32768, "tilt": 16384, "dimmer": 255},
-            "Overhead Effects": {"dimmer": 0},
-            "Karaoke Lights": {"dimmer": 0},
+            "Stage Lights": {"dimmer": 0},
+            "Karaoke Lights": {"red":255, "green": 218, "blue:": 185, "dimmer": 50},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
         },
     )
