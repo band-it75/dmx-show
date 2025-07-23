@@ -46,6 +46,12 @@ _SCENARIO_TO_STATE = {
     Scenario.SONG_ONGOING_POP: SongState.ONGOING,
     Scenario.SONG_ONGOING_ROCK: SongState.ONGOING,
     Scenario.SONG_ONGOING_METAL: SongState.ONGOING,
+    Scenario.SONG_ONGOING_DISCO: SongState.ONGOING,
+    Scenario.SONG_ONGOING_REGGAE: SongState.ONGOING,
+    Scenario.SONG_ONGOING_BLUES: SongState.ONGOING,
+    Scenario.SONG_ONGOING_CLASSICAL: SongState.ONGOING,
+    Scenario.SONG_ONGOING_HIPHOP: SongState.ONGOING,
+    Scenario.SONG_ONGOING_COUNTRY: SongState.ONGOING,
 }
 
 
