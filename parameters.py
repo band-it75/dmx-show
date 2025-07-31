@@ -67,25 +67,25 @@ GENRE_ID_MAP = {
 # List of (fixture class, start_address, name) tuples describing the rig
 DEVICES = [
     # House lights
-    (Prolights_LumiPar12UAW5_7ch, 1, "House Left"),      # Channels 1–7
-    (Prolights_LumiPar12UAW5_7ch, 8, "House Right"),     # Channels 8–14
+    (Prolights_LumiPar12UAW5_7ch, 1, "Music Lights"),
+    (Prolights_LumiPar12UAW5_7ch, 8, "Music Lights"),
 
     # Karaoke wall
-    (Prolights_LumiPar7UTRI_8ch, 15, "Karaoke Left"),    # Channels 15–22
-    (Prolights_LumiPar7UTRI_8ch, 23, "Karaoke Right"),   # Channels 23–30
+    (Prolights_LumiPar7UTRI_8ch, 15, "Karaoke Lights"),
+    (Prolights_LumiPar7UTRI_8ch, 23, "Karaoke Lights"),
 
-    # Overhead effects
-    (Prolights_LumiPar12UQPro_9ch, 31, "Overhead #1"),   # Channels 31–39
-    (Prolights_LumiPar12UQPro_9ch, 40, "Overhead #2"),   # Channels 40–48
-    (Prolights_LumiPar12UQPro_9ch, 49, "Overhead #3"),   # Channels 49–57
+    # Overhead pars used for stage wash and effects
+    (Prolights_LumiPar12UQPro_9ch, 31, ("Stage Lights", "Overhead Effects")),
+    (Prolights_LumiPar12UQPro_9ch, 40, ("Stage Lights", "Overhead Effects")),
+    (Prolights_LumiPar12UQPro_9ch, 49, ("Stage Lights", "Overhead Effects")),
 
     # Moving head and smoke
-    (Prolights_PixieWash_13ch, 58, "Moving Head"),       # Channels 58–70
-    (WhatSoftware_Generic_4ch, 71, "Smoke Machine"),     # Channels 71–74
+    (Prolights_PixieWash_13ch, 58, "Moving Head"),
+    (WhatSoftware_Generic_4ch, 71, "Smoke Machine"),
 
     # UV wash
-    (Fuzzix_PartyParUV_7ch, 75, "UV Wash Left"),    # Channels 75–82
-    (Fuzzix_PartyParUV_7ch, 82, "UV Wash Right"),   # Channels 83–90
+    (Fuzzix_PartyParUV_7ch, 75, "UV Wash Left"),
+    (Fuzzix_PartyParUV_7ch, 82, "UV Wash Right"),
 ]
 
 # Names of every ongoing scenario
@@ -816,10 +816,13 @@ class Scenario(Enum):
 
 def _fill_updates() -> None:
     """Ensure every scenario sets all available channels."""
-    channel_map = {}
-    for cls, addr, name in DEVICES:
+    channel_map: dict[str, set[str]] = {}
+    for cls, addr, names in DEVICES:
         device = cls(addr)
-        channel_map[name] = list(device.channels)
+        if isinstance(names, (str, bytes)):
+            names = [names]
+        for name in names:
+            channel_map.setdefault(name, set()).update(device.channels.keys())
     for scn in Scenario:
         for name, channels in channel_map.items():
             update = scn.updates.setdefault(name, {})
