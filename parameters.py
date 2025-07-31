@@ -12,6 +12,7 @@ from dmx.Prolights_LumiPar7UTRI_8ch import Prolights_LumiPar7UTRI_8ch
 from dmx.Prolights_LumiPar12UQPro_9ch import Prolights_LumiPar12UQPro_9ch
 from dmx.Prolights_PixieWash_13ch import Prolights_PixieWash_13ch
 from dmx.WhatSoftware_Generic_4ch import WhatSoftware_Generic_4ch
+from dmx.Fuzzix_PartyParUV_7ch import Fuzzix_PartyParUV_7ch
 
 
 # Audio settings
@@ -83,8 +84,8 @@ DEVICES = [
     (WhatSoftware_Generic_4ch, 68, "Smoke Machine"),
 
     # UV wash
-    (Prolights_LumiPar7UTRI_8ch, 72, "UV Wash Left"),
-    (Prolights_LumiPar7UTRI_8ch, 79, "UV Wash Right"),
+    (Fuzzix_PartyParUV_7ch, 72, "UV Wash Left"),
+    (Fuzzix_PartyParUV_7ch, 79, "UV Wash Right"),
 ]
 
 # Names of every ongoing scenario

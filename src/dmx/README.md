@@ -19,6 +19,7 @@ such as `set_color` and `set_dimmer` to construct DMX frames.
 - `Prolights_LumiPar7UTRI_3ch.py`
 - `Prolights_PixieWash_13ch.py`
 - `WhatSoftware_Generic_4ch.py`
+- `Fuzzix_PartyParUV_7ch.py`
 
 # main.py
 
