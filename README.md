@@ -166,9 +166,9 @@ by each fixture.
 | 035–044    | LumiPar 12UQPro #2               | 10-ch                    | Overhead effects               |
 | 045–054    | LumiPar 12UQPro #3               | 10-ch                    | Overhead effects               |
 | 055–067    | PixieWash                        | 13-ch                    | Moving head front              |
-| 068–070    | Smoke machine                    | 1-ch used, 3-ch reserved | Timed fog bursts               |
-| 071–077    | Fuzzix PartyPar UV 153.232 #1    | 7-ch                     | UV Wash left                   |
-| 078–084    | Fuzzix PartyPar UV 153.232 #2    | 7-ch                     | UV Wash right                  |
+| 068–071    | Smoke machine                    | 4-ch                     | Timed fog bursts               |
+| 072–078    | Fuzzix PartyPar UV 153.232 #1    | 7-ch                     | UV Wash left                   |
+| 079–085    | Fuzzix PartyPar UV 153.232 #2    | 7-ch                     | UV Wash right                  |
 
 Note: the Overhead Effects group expects LumiPar 12UQPro fixtures with a white
 channel. When testing with a LumiPar 7UTRI the controller now maps ``white`` to
