@@ -66,25 +66,25 @@ GENRE_ID_MAP = {
 # List of (fixture class, start_address, name) tuples describing the rig
 DEVICES = [
     # House lights
-    (Prolights_LumiPar12UAW5_7ch, 1, "House Left"),
-    (Prolights_LumiPar12UAW5_7ch, 6, "House Right"),
+    (Prolights_LumiPar12UAW5_7ch, 1, "House Left"),      # Channels 1–7
+    (Prolights_LumiPar12UAW5_7ch, 8, "House Right"),     # Channels 8–14
 
     # Karaoke wall
-    (Prolights_LumiPar7UTRI_8ch, 11, "Karaoke Left"),
-    (Prolights_LumiPar7UTRI_8ch, 18, "Karaoke Right"),
+    (Prolights_LumiPar7UTRI_8ch, 15, "Karaoke Left"),    # Channels 15–22
+    (Prolights_LumiPar7UTRI_8ch, 23, "Karaoke Right"),   # Channels 23–30
 
     # Overhead effects
-    (Prolights_LumiPar12UQPro_9ch, 25, "Overhead #1"),
-    (Prolights_LumiPar12UQPro_9ch, 35, "Overhead #2"),
-    (Prolights_LumiPar12UQPro_9ch, 45, "Overhead #3"),
+    (Prolights_LumiPar12UQPro_9ch, 31, "Overhead #1"),   # Channels 31–39
+    (Prolights_LumiPar12UQPro_9ch, 40, "Overhead #2"),   # Channels 40–48
+    (Prolights_LumiPar12UQPro_9ch, 49, "Overhead #3"),   # Channels 49–57
 
     # Moving head and smoke
-    (Prolights_PixieWash_13ch, 55, "Moving Head"),
-    (WhatSoftware_Generic_4ch, 68, "Smoke Machine"),
+    (Prolights_PixieWash_13ch, 58, "Moving Head"),       # Channels 58–70
+    (WhatSoftware_Generic_4ch, 71, "Smoke Machine"),     # Channels 71–74
 
     # UV wash
-    (Prolights_LumiPar7UTRI_8ch, 72, "UV Wash Left"),
-    (Prolights_LumiPar7UTRI_8ch, 79, "UV Wash Right"),
+    (Prolights_LumiPar7UTRI_8ch, 75, "UV Wash Left"),    # Channels 75–82
+    (Prolights_LumiPar7UTRI_8ch, 83, "UV Wash Right"),   # Channels 83–90
 ]
 
 # Names of every ongoing scenario
