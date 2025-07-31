@@ -142,7 +142,7 @@ class Scenario(Enum):
             "Music Lights": {"warm_white": 51, "dimmer": 51},
             "Moving Head": {"dimmer": 0},
             "Stage Lights": {"dimmer": 0},
-            "Karaoke Lights": {"red":255, "green": 218, "blue:": 185, "dimmer": 255},
+            "Karaoke Lights": {"red": 255, "green": 218, "blue": 185, "dimmer": 255},
             "Smoke Machine": {"smoke_gap": 60000, "duration": 5000},
         },
     )
@@ -156,7 +156,7 @@ class Scenario(Enum):
             "Music Lights": {"dimmer": 0},
             "Moving Head": {"pan": 32768, "tilt": 49152, "dimmer": 255},
             "Stage Lights": {"white": 77, "dimmer": 77},
-            "Karaoke Lights": {"red":255, "green": 218, "blue:": 185, "dimmer": 50},
+            "Karaoke Lights": {"red": 255, "green": 218, "blue": 185, "dimmer": 50},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
         },
     )
@@ -784,7 +784,7 @@ class Scenario(Enum):
             "chorus": {
                 "Stage Lights": {"red": 255, "green": 96, "dimmer": 255},
                 "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
-                "Karaoke Lights": {"red": 255, "green": 0, "blue:": 0, "dimmer": 255},
+                "Karaoke Lights": {"red": 255, "green": 0, "blue": 0, "dimmer": 255},
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -809,11 +809,35 @@ class Scenario(Enum):
             "Music Lights": {"warm_white": 128, "dimmer": 128},
             "Moving Head": {"pan": 32768, "tilt": 16384, "dimmer": 255},
             "Stage Lights": {"dimmer": 0},
-            "Karaoke Lights": {"red":255, "green": 218, "blue:": 185, "dimmer": 50},
+            "Karaoke Lights": {"red": 255, "green": 218, "blue": 185, "dimmer": 50},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
         },
     )
 
+def _fill_updates() -> None:
+    """Ensure every scenario sets all available channels."""
+    channel_map = {}
+    for cls, addr, name in DEVICES:
+        device = cls(addr)
+        channel_map[name] = list(device.channels)
+    for scn in Scenario:
+        for name, channels in channel_map.items():
+            update = scn.updates.setdefault(name, {})
+            for ch in channels:
+                update.setdefault(ch, 0)
+            if update.get("dimmer", 0) > 0:
+                if "shutter" in channels:
+                    update.setdefault("shutter", 255)
+                if "white" in channels:
+                    update.setdefault("white", 255)
+                elif {"red", "green", "blue"}.issubset(channels):
+                    if not any(update.get(c, 0) > 0 for c in ("red", "green", "blue")):
+                        update.setdefault("red", 255)
+                        update.setdefault("green", 255)
+                        update.setdefault("blue", 255)
+
+
+_fill_updates()
 
 def _resolve_transitions() -> None:
     lookup = {sc.name: sc for sc in Scenario}
