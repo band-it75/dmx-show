@@ -830,14 +830,12 @@ def _fill_updates() -> None:
                 update.setdefault(ch, 0)
             if update.get("dimmer", 0) > 0:
                 if "shutter" in channels:
-                    update.setdefault("shutter", 255)
-                if "white" in channels:
-                    update.setdefault("white", 255)
-                elif {"red", "green", "blue"}.issubset(channels):
-                    if not any(update.get(c, 0) > 0 for c in ("red", "green", "blue")):
-                        update.setdefault("red", 255)
-                        update.setdefault("green", 255)
-                        update.setdefault("blue", 255)
+                    update.setdefault("shutter", 63)
+                color_names = [c for c in ("red", "green", "blue", "white") if c in channels]
+                if color_names:
+                    if not any(update.get(c, 0) > 0 for c in color_names):
+                        for c in color_names:
+                            update.setdefault(c, 255)
 
 
 _fill_updates()
