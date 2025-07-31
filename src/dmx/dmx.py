@@ -236,13 +236,16 @@ class DMX:
         for item in devices:
             if len(item) == 2:
                 cls, addr = item  # type: ignore[misc]
-                name = None
+                names: Iterable[str] | None = None
             else:
-                cls, addr, name = item  # type: ignore[misc]
+                cls, addr, names = item  # type: ignore[misc]
+                if isinstance(names, (str, bytes)):
+                    names = [names]
             device = cls(addr)
             self.devices.append(device)
-            if name:
-                self.groups.setdefault(name, []).append(device)
+            if names:
+                for name in names:
+                    self.groups.setdefault(name, []).append(device)
 
         self.serial = DmxSerial(port)
         self.interval = 1.0 / float(fps)
