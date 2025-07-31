@@ -174,6 +174,10 @@ Note: the Overhead Effects group expects LumiPar 12UQPro fixtures with a white
 channel. When testing with a LumiPar 7UTRI the controller now maps ``white`` to
 equal RGB values so scenarios need no manual changes.
 
+The moving head's shutter automatically opens when the dimmer is above zero.
+If no color is provided, all four color channels (red, green, blue and white)
+default to full so the beam always appears during songs.
+
 ## Show
 
 Lighting cues follow the AI-detected genre. LumiPar 12UAW5 units double as house lights.
