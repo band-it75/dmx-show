@@ -154,7 +154,15 @@ class Scenario(Enum):
         ONGOING_STATES,
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"pan": 32768, "tilt": 49152, "dimmer": 255},
+            "Moving Head": {
+                "pan": 32768,
+                "tilt": 49152,
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"white": 77, "dimmer": 77},
             "Karaoke Lights": {"red": 255, "green": 218, "blue": 185, "dimmer": 50},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
@@ -192,7 +200,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"red": 255},
             "Karaoke Lights": {"dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -203,7 +217,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"blue": 255, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -250,7 +272,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"red": 255, "blue": 255},
             "Karaoke Lights": {"red": 26, "blue": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -261,7 +289,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"green": 255, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -308,7 +344,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"green": 255},
             "Karaoke Lights": {"green": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -319,7 +361,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"green": 255, "blue": 128, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -366,7 +416,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"red": 255, "green": 64},
             "Karaoke Lights": {"red": 26, "green": 6, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -377,7 +433,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"red": 255, "blue": 64, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -424,7 +488,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"white": 255},
             "Karaoke Lights": {"white": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -435,7 +505,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"white": 255, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -482,7 +560,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"red": 255, "blue": 255},
             "Karaoke Lights": {"red": 26, "blue": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -493,7 +577,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"green": 255, "blue": 255, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -540,7 +632,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"red": 255, "green": 255},
             "Karaoke Lights": {"red": 26, "green": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -551,7 +649,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"red": 255, "green": 128, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -598,7 +704,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"blue": 255},
             "Karaoke Lights": {"blue": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -609,7 +721,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"green": 255, "blue": 128, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -656,7 +776,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"white": 255},
             "Karaoke Lights": {"white": 26, "dimmer": 26},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -667,7 +793,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"warm_white": 255, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -714,7 +848,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"green": 255, "blue": 255},
             "Karaoke Lights": {"green": 26, "blue": 26, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -725,7 +865,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"red": 255, "blue": 255, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
             },
             "snare_hit": {
                 "Stage Lights": {"white": 255, "dimmer": 255, "duration": 50}
@@ -772,7 +920,13 @@ class Scenario(Enum):
         ],
         {
             "Music Lights": {"dimmer": 0},
-            "Moving Head": {"dimmer": 255},
+            "Moving Head": {
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"red": 255, "green": 96},
             "Karaoke Lights": {"red": 26, "green": 10, "dimmer": 10},
             "Smoke Machine": {"smoke_gap": 15000, "duration": 5000},
@@ -783,7 +937,15 @@ class Scenario(Enum):
             },
             "chorus": {
                 "Stage Lights": {"red": 255, "green": 96, "dimmer": 255},
-                "Moving Head": {"pan": 30000, "tilt": 40000, "dimmer": 255},
+                "Moving Head": {
+                    "pan": 30000,
+                    "tilt": 40000,
+                    "dimmer": 255,
+                    "red": 255,
+                    "green": 255,
+                    "blue": 255,
+                    "white": 255,
+                },
                 "Karaoke Lights": {"red": 255, "green": 0, "blue": 0, "dimmer": 255},
             },
             "snare_hit": {
@@ -807,7 +969,15 @@ class Scenario(Enum):
         ["INTERMISSION"],
         {
             "Music Lights": {"warm_white": 128, "dimmer": 128},
-            "Moving Head": {"pan": 32768, "tilt": 16384, "dimmer": 255},
+            "Moving Head": {
+                "pan": 32768,
+                "tilt": 16384,
+                "dimmer": 255,
+                "red": 255,
+                "green": 255,
+                "blue": 255,
+                "white": 255,
+            },
             "Stage Lights": {"dimmer": 0},
             "Karaoke Lights": {"red": 255, "green": 218, "blue": 185, "dimmer": 50},
             "Smoke Machine": {"smoke_gap": 30000, "duration": 5000},
@@ -832,10 +1002,9 @@ def _fill_updates() -> None:
                 if "shutter" in channels:
                     update.setdefault("shutter", 63)
                 color_names = [c for c in ("red", "green", "blue", "white") if c in channels]
-                if color_names:
-                    if not any(update.get(c, 0) > 0 for c in color_names):
-                        for c in color_names:
-                            update.setdefault(c, 255)
+                if color_names and not any(update.get(c, 0) > 0 for c in color_names):
+                    for c in color_names:
+                        update[c] = 255
 
 
 _fill_updates()
