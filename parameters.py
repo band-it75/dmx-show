@@ -84,8 +84,8 @@ DEVICES = [
     (WhatSoftware_Generic_4ch, 71, "Smoke Machine"),     # Channels 71–74
 
     # UV wash
-    (Prolights_LumiPar7UTRI_8ch, 75, "UV Wash Left"),    # Channels 75–82
-    (Prolights_LumiPar7UTRI_8ch, 83, "UV Wash Right"),   # Channels 83–90
+    (Fuzzix_PartyParUV_7ch, 75, "UV Wash Left"),    # Channels 75–82
+    (Fuzzix_PartyParUV_7ch, 82, "UV Wash Right"),   # Channels 83–90
 ]
 
 # Names of every ongoing scenario
