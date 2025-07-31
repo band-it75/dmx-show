@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device type="DMXDevice"
+        dmxaddresscount="7"
+        dmxcversion="3.3.0"
+        ddfversion="1.0.0">
+
+  <information>
+    <model>PartyPar UV</model>
+    <vendor>Fuzzix</vendor>
+    <author>Bjorn T. Nostdahl</author>
+    <mode>7ch</mode>
+    <comment>Approximate channel layout.</comment>
+  </information>
+
+  <functions>
+
+    <!-- Master dimmer -->
+    <dimmer dmxchannel="0"/>
+
+    <!-- Four UV sections -->
+    <rawchannel name="uv1" dmxchannel="1"/>
+    <rawchannel name="uv2" dmxchannel="2"/>
+    <rawchannel name="uv3" dmxchannel="3"/>
+    <rawchannel name="uv4" dmxchannel="4"/>
+
+    <!-- Strobe -->
+    <strobe dmxchannel="5">
+      <step type="open" mindmx="0" maxdmx="0" caption="Open"/>
+      <range type="linear" mindmx="1" maxdmx="255" minval="0.5" maxval="20"
+             caption="Strobe slow→fast"/>
+    </strobe>
+
+    <!-- Macro / program selector -->
+    <rawstep dmxchannel="6" name="macro selector">
+      <step mindmx="1"  maxdmx="17"  caption="UV1 only"/>
+      <step mindmx="18" maxdmx="35"  caption="UV2 only"/>
+      <step mindmx="36" maxdmx="53"  caption="UV3 only"/>
+      <step mindmx="54" maxdmx="71"  caption="UV4 only"/>
+      <step mindmx="72" maxdmx="89"  caption="UV1+UV2"/>
+      <step mindmx="90" maxdmx="107" caption="UV2+UV3"/>
+      <step mindmx="108" maxdmx="125" caption="UV1+UV3"/>
+      <step mindmx="126" maxdmx="127" caption="All UV on"/>
+      <range mindmx="128" maxdmx="220" caption="Jump"/>
+      <range mindmx="221" maxdmx="255" caption="Fade"/>
+    </rawstep>
+
+  </functions>
+</device>
