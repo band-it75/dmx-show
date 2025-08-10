@@ -47,6 +47,44 @@
 |       |                               | 128–220 | **Jump (hard change)** program, slow → fast |
 |       |                               | 221–255 | **Fade** program, slow → fast ([sonomateriel.com][1]) |
 
+### 3.1 Master Dimmer
+
+* **0–255** — sets the overall brightness for every UV zone.
+
+### 3.2 UV section 1 (front quadrant)
+
+* **0–255** — controls the front‑facing UV emitters. Scaled by **CH1**.
+
+### 3.3 UV section 2
+
+* **0–255** — intensity for the second quadrant. Scaled by **CH1**.
+
+### 3.4 UV section 3
+
+* **0–255** — intensity for the third quadrant. Scaled by **CH1**.
+
+### 3.5 UV section 4 (rear quadrant)
+
+* **0–255** — intensity for rear LEDs. Scaled by **CH1**.
+
+### 3.6 Strobe
+
+* **0** — no strobe.
+* **1–255** — strobe effect, slow → fast.
+
+### 3.7 Macro / auto‑program selector
+
+* **1–17** — UV 1 only.
+* **18–35** — UV 2 only.
+* **36–53** — UV 3 only.
+* **54–71** — UV 4 only.
+* **72–89** — UV 1 + UV 2.
+* **90–107** — UV 2 + UV 3.
+* **108–125** — UV 1 + UV 3.
+* **126–127** — all UV sections on.
+* **128–220** — jump program, slow → fast.
+* **221–255** — fade program, slow → fast.
+
 ---
 
 ## 4. Electrical Specifications
