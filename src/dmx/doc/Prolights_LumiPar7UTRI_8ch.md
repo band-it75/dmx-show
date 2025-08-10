@@ -46,6 +46,24 @@
 | 7  | Master Dimmer  | 0–255 |       |
 | 8  | Dimmer Speed   | 0–255 | mode selection |
 
+### 3a. Programs
+
+0–31: No function (RGB mode)
+
+32–63: Pulse 0→100% (uses your RGB faders for the color)
+
+64–95: Pulse 100%→0
+
+96–127: Pulse 100%→0→100%
+
+128–159: Colors Fade (auto fade)
+
+160–191: 3 Colors Snap (auto snap between 3 colors)
+
+192–223: 7 Colors Snap (auto snap between 7 colors)
+
+224–255: Sound Control (sound‑active)
+
 ---
 
 ## 4. Electrical Specifications
