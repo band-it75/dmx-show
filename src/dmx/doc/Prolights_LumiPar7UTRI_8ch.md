@@ -48,23 +48,61 @@
 
 ### 3.8. Programs
 
-0–31: No function (RGB mode)
+**0–31 — No function (manual RGB / static color)**
 
-32–63: Pulse 0→100% (uses your RGB faders for the color)
+* **Midpoint to use:** 16
+* **What it does:** Disables auto programs. Output follows **Ch1–3** (RGB) for manual mixes. If **Ch4 ≥ 16**, a built‑in static **Color Macro** is used instead of manual RGB.
+* **Pairs with:** **Ch5** (strobe overlay) works normally; **Ch6/Ch7** have no effect here. 
 
-64–95: Pulse 100%→0
+**32–63 — Pulse 0→100% (fade‑in “breath”)**
 
-96–127: Pulse 100%→0→100%
+* **Midpoint to use:** 48
+* **What it does:** Repeats a smooth fade from black up to full, then snaps back to black.
+* **Color source:** Your currently selected color (manual RGB on Ch1–3, or a macro from Ch4).
+* **Speed:** **Ch6** controls the pulse rate (lower = slower).
+* **Notes:** Works nicely as a subtle “breathing” backlight; avoid heavy strobe on Ch5 at the same time unless you *want* a double‑flash feel. 
 
-128–159: Colors Fade (auto fade)
+**64–95 — Pulse 100%→0 (fade‑out)**
 
-160–191: 3 Colors Snap (auto snap between 3 colors)
+* **Midpoint to use:** 80
+* **What it does:** Starts at full and fades to black, then jumps back to full.
+* **Color source / Speed:** same logic as above (Ch1–4 set color; **Ch6** sets rate). 
 
-192–223: 7 Colors Snap (auto snap between 7 colors)
+**96–127 — Pulse 100%→0→100% (triangular)**
 
-224–255: Sound Control (sound‑active)
+* **Midpoint to use:** 112
+* **What it does:** Symmetrical up‑and‑down pulse (full → black → full).
+* **Color source / Speed:** as above (Ch1–4 for color; **Ch6** for rate).
+* **Notes:** This reads as the smoothest “breathing” variant because the slope up and down are matched. 
 
----
+**128–159 — Colors Fade (auto fade)**
+
+* **Midpoint to use:** 144
+* **What it does:** Crossfades through internal color presets automatically.
+* **Speed:** **Ch6** controls how long each fade takes.
+* **Interplay:** Ch1–3 are ignored while this is active; **Ch5** can still overlay a strobe; **Ch7** is ignored. (Color selection is fixture‑defined; use this when you want motion without programming color steps.) 
+
+**160–191 — 3 Colors Snap (auto)**
+
+* **Midpoint to use:** 176
+* **What it does:** Hard cuts through a 3‑color set (typical primaries on this class of fixture).
+* **Speed:** **Ch6** sets dwell time between snaps.
+* **Interplay:** Ch1–3 are ignored; **Ch5** strobe can overlay; **Ch7** ignored. 
+
+**192–223 — 7 Colors Snap (auto)**
+
+* **Midpoint to use:** 208
+* **What it does:** Hard cuts through a broader 7‑color set (the standard primaries/secondaries + white mix on RGB fixtures).
+* **Speed:** **Ch6** sets the step rate.
+* **Interplay:** Ch1–3 ignored; **Ch5** overlays; **Ch7** ignored.
+
+**224–255 — Sound Control (sound‑active)**
+
+* **Midpoint to use:** 240
+* **What it does:** Reacts to the internal mic—typically snapping/fading with the beat.
+* **Sensitivity:** **Ch7** becomes active here. Values **0–10** = sound off; **11–255** = adjust mic sensitivity (higher values give a stronger reaction range; exact scaling is fixture‑defined). You can also set Snd1/Snd2 and an on‑fixture sensitivity (u0–u100) from the menu for standalone use.
+* **Speed:** **Ch6** is generally ignored; the beat drives timing.
+* **Notes:** If response is weak, raise Ch7 and/or increase the room’s bass content; the manual’s sound‑mode section describes the mic settings.
 
 ## 4. Electrical Specifications
 
