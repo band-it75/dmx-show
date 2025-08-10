@@ -46,7 +46,7 @@
 | 7  | Master Dimmer  | 0–255 |       |
 | 8  | Dimmer Speed   | 0–255 | mode selection |
 
-### 3a. Programs
+### 3.8. Programs
 
 0–31: No function (RGB mode)
 
