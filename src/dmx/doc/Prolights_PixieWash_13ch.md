@@ -51,6 +51,63 @@
 | 12 | White             | 0–255 |       |
 | 13 | Color Macros      | 0–255 | preset colours |
 
+### 3.1 Pan
+
+* **0–255** — coarse pan across fixture range. Fine adjust on **CH2**.
+
+### 3.2 Pan Fine
+
+* **0–255** — 16‑bit fine pan control.
+
+### 3.3 Tilt
+
+* **0–255** — coarse tilt. Fine adjust on **CH4**.
+
+### 3.4 Tilt Fine
+
+* **0–255** — 16‑bit fine tilt control.
+
+### 3.5 Pan/Tilt Speed
+
+* **0–255** — movement speed, 0 fast → 255 slow.
+
+### 3.6 Special Functions
+
+* **0–15** — none.
+* **16–31** — motor reset.
+* **32–47** — dimmer reset.
+* **48–255** — fixture‑specific utilities.
+
+### 3.7 Master Dimmer
+
+* **0–255** — global light output.
+
+### 3.8 Shutter
+
+* **0–31** — closed.
+* **32–63** — open.
+* **64–255** — strobe, slow → fast.
+
+### 3.9 Red
+
+* **0–255** — red LED intensity.
+
+### 3.10 Green
+
+* **0–255** — green LED intensity.
+
+### 3.11 Blue
+
+* **0–255** — blue LED intensity.
+
+### 3.12 White
+
+* **0–255** — white LED intensity.
+
+### 3.13 Color Macros
+
+* **0–255** — built‑in colour presets.
+
 ---
 
 ## 4. Electrical Specifications

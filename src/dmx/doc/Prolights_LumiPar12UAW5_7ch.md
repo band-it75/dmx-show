@@ -45,6 +45,39 @@
 | 6  | Master Dimmer   | 0–255 |       |
 | 7  | Dimmer Curve    | 0–255 | select curve |
 
+### 3.1 Amber
+
+* **0–255** — intensity for amber LEDs.
+
+### 3.2 Cold White
+
+* **0–255** — intensity for cold‑white LEDs.
+
+### 3.3 Warm White
+
+* **0–255** — intensity for warm‑white LEDs.
+
+### 3.4 Strobe
+
+* **0–15** — no strobe.
+* **16–255** — strobe effect, slow → fast.
+
+### 3.5 Macro Programs
+
+* **0–15** — no program.
+* **16–255** — built‑in colour fades and chases.
+
+### 3.6 Master Dimmer
+
+* **0–255** — global intensity scaling channels 1–5.
+
+### 3.7 Dimmer Curve
+
+* **0–63** — linear.
+* **64–127** — square law.
+* **128–191** — inverse square.
+* **192–255** — S‑curve.
+
 ---
 
 ## 4. Electrical Specifications

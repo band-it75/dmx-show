@@ -41,6 +41,18 @@
 | 2  | Green    | 0–255 |       |
 | 3  | Blue     | 0–255 |       |
 
+### 3.1 Red
+
+* **0–255** — intensity for red LEDs.
+
+### 3.2 Green
+
+* **0–255** — intensity for green LEDs.
+
+### 3.3 Blue
+
+* **0–255** — intensity for blue LEDs.
+
 ---
 
 ## 4. Electrical Specifications

@@ -47,6 +47,48 @@
 | 8  | Master Dimmer      | 0–255 |       |
 | 9  | Dimmer Curve       | 0–255 | select curve |
 
+### 3.1 Red
+
+* **0–255** — intensity for red LEDs.
+
+### 3.2 Green
+
+* **0–255** — intensity for green LEDs.
+
+### 3.3 Blue
+
+* **0–255** — intensity for blue LEDs.
+
+### 3.4 White
+
+* **0–255** — intensity for white LEDs.
+
+### 3.5 Colour Macros
+
+* **0–10** — no macro.
+* **11–255** — preset colours, step through palette.
+
+### 3.6 Strobe
+
+* **0–15** — open.
+* **16–255** — strobe effect, slow → fast.
+
+### 3.7 Internal Programs
+
+* **0–31** — none.
+* **32–255** — built‑in fades or sound‑active shows.
+
+### 3.8 Master Dimmer
+
+* **0–255** — global intensity for channels 1–5.
+
+### 3.9 Dimmer Curve
+
+* **0–63** — linear.
+* **64–127** — square law.
+* **128–191** — inverse square.
+* **192–255** — S‑curve.
+
 ---
 
 ## 4. Electrical Specifications

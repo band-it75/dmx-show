@@ -42,6 +42,23 @@
 | 3  | Reserved 3  | 0     | held at 0 |
 | 4  | Reserved 4  | 0     | held at 0 |
 
+### 3.1 Fog Output
+
+* **0** — off.
+* **1–255** — fog output, low → high.
+
+### 3.2 Reserved 2
+
+* Channel unused; keep at **0**.
+
+### 3.3 Reserved 3
+
+* Channel unused; keep at **0**.
+
+### 3.4 Reserved 4
+
+* Channel unused; keep at **0**.
+
 ---
 
 ## 4. Electrical Specifications

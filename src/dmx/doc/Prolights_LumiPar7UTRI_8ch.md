@@ -46,6 +46,28 @@
 | 7  | Master Dimmer  | 0–255 |       |
 | 8  | Dimmer Speed   | 0–255 | mode selection |
 
+### 3.1 Red
+
+* **0–255** — red LED intensity.
+
+### 3.2 Green
+
+* **0–255** — green LED intensity.
+
+### 3.3 Blue
+
+* **0–255** — blue LED intensity.
+
+### 3.4 Color Macros
+
+* **0–15** — manual RGB from **CH1–CH3**.
+* **16–255** — static colour presets.
+
+### 3.5 Strobe
+
+* **0–15** — open.
+* **16–255** — strobe effect, slow → fast.
+
 ### 3.8. Programs
 
 **0–31 — No function (manual RGB / static color)**
@@ -103,6 +125,17 @@
 * **Sensitivity:** **Ch7** becomes active here. Values **0–10** = sound off; **11–255** = adjust mic sensitivity (higher values give a stronger reaction range; exact scaling is fixture‑defined). You can also set Snd1/Snd2 and an on‑fixture sensitivity (u0–u100) from the menu for standalone use.
 * **Speed:** **Ch6** is generally ignored; the beat drives timing.
 * **Notes:** If response is weak, raise Ch7 and/or increase the room’s bass content; the manual’s sound‑mode section describes the mic settings.
+
+### 3.9 Master Dimmer
+
+* **0–255** — overall output level for all colours.
+
+### 3.10 Dimmer Speed
+
+* **0–63** — instant.
+* **64–127** — fast fades.
+* **128–191** — medium fades.
+* **192–255** — slow fades.
 
 ## 4. Electrical Specifications
 
